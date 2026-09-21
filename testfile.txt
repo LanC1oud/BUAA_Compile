@@ -47,8 +47,16 @@ int main() {
 
     result = add_values(+numbers[0], -numbers[1]);
     result = result * 2 / 3 % 5;
-    result = (result == 0) || (result != 1);
-    result = (result < MAX_VALUE) && (result <= MAX_VALUE);
+    if (result == 0 || result != 1) {
+        result = 1;
+    } else {
+        result = 0;
+    }
+    if (result < MAX_VALUE && result <= MAX_VALUE) {
+        result = 1;
+    } else {
+        result = 0;
+    }
     result = !result;
 
     while (index < 3 && result >= 0) {

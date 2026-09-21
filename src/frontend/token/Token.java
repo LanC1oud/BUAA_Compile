@@ -5,10 +5,7 @@ import frontend.Navigation;
 
 import java.util.Arrays;
 
-public class Token {
-    private final TokenType type;
-    private final String value;
-    private final Navigation location;
+public record Token(TokenType type, String value, Navigation location) {
 
     public Token(TokenType type, String value, Navigation location) {
         this.type = type;

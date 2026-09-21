@@ -2,6 +2,9 @@ package utils;
 
 import error.ErrorTable;
 import frontend.Lexer;
+import frontend.Parser;
+import frontend.ParserWatcher;
+import frontend.ast.CompileUnit;
 import frontend.token.TokenStream;
 
 import java.io.FileWriter;
@@ -23,6 +26,20 @@ public class Controller {
             try (FileWriter writer = new FileWriter(errors.noError() ?
                     Configure.target : Configure.error)) {
                 writer.write((errors.noError() ? tokens : errors).toString());
+            }
+            Controller.exit();
+        }
+
+        // stage 2: Parser
+        if (HomeworkConfig.hw == HomeworkConfig.Hw.Syntax) {
+            Configure.debug.displayTokensWithAst = true;
+        }
+        ParserWatcher watcher = new ParserWatcher();
+        CompileUnit ast = new Parser(tokens, watcher).parse().emit();
+        if (HomeworkConfig.hw == HomeworkConfig.Hw.Syntax) {
+            try (FileWriter writer = new FileWriter(errors.noError() ?
+                    Configure.target : Configure.error)) {
+                writer.write((errors.noError() ? watcher : errors).toString());
             }
             Controller.exit();
         }

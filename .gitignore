@@ -1,0 +1,18 @@
+# IDE
+.idea/
+*.iml
+out/
+
+# macOS
+.DS_Store
+
+# 运行/评测产物
+lexer.txt
+parser.txt
+error.txt
+symbol.txt
+llvm_ir.txt
+mips.txt
+
+# 本地测试备份
+testfile.invalid-sysy.bak

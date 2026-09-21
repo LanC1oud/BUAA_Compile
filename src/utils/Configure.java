@@ -11,5 +11,6 @@ public class Configure {
         public static boolean displayTokens = false;
         public static boolean displayErrors = false;
         public static boolean displaySymbols = false;
+        public static boolean displayTokensWithAst = false;
     }
 }
