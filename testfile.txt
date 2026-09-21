@@ -1,7 +1,83 @@
-int main() {
-    if(1 & 2)
-    {
-        printf("For Super Compiler!\n");
+/* Comprehensive SysY lexer/parser sample.
+ * It intentionally exercises every keyword, delimiter and operator.
+ */
+const int ZERO = 0, MAX_VALUE = 42;
+const char LETTER_A = 'A', NEWLINE = '\n';
+
+int global_value = 1;
+char global_chars[6] = {'A', '\n', '\t', '\r', '\0', '\\'};
+char message[32] = "hello %d %c %s\n";
+
+int add_values(int left_value, int right_value) {
+    return left_value + right_value;
+}
+
+char choose_char(char first_char, char second_char) {
+    if (first_char != second_char) {
+        return first_char;
+    } else {
+        return second_char;
     }
+}
+
+void inspect_arrays(int values[], char letters[]) {
+    static int call_count = 0;
+    call_count = call_count + 1;
+    if (call_count > 0 && values[0] >= 0 || letters[0] == 'A') {
+        put_int(values[0]);
+        put_char(letters[0]);
+    }
+    return;
+}
+
+int main() {
+    int index = 0;
+    int result = 0;
+    int numbers[3] = {1, 2, 3};
+    char letters[3] = {'x', 'y', 'z'};
+    char current_char = 'A';
+    int input_number = get_int();
+    char input_char = get_char();
+
+    get_string(letters, 3);
+    put_string(message);
+    put_int(input_number);
+    put_char(input_char);
+    printf("result=%d char=%c text=%s\n", result, current_char, message);
+
+    result = add_values(+numbers[0], -numbers[1]);
+    result = result * 2 / 3 % 5;
+    result = (result == 0) || (result != 1);
+    result = (result < MAX_VALUE) && (result <= MAX_VALUE);
+    result = !result;
+
+    while (index < 3 && result >= 0) {
+        if (letters[index] == 'y') {
+            index = index + 1;
+            continue;
+        }
+        result = result + numbers[index];
+        if (result > MAX_VALUE) {
+            break;
+        }
+        index = index + 1;
+    }
+
+    switch (current_char) {
+        case 'A':
+            result = result + 1;
+            break;
+        case 'B':
+            result = result + 2;
+            break;
+        default:
+            result = result + 3;
+    }
+
+    inspect_arrays(numbers, letters);
+    result = (int) current_char;
+    current_char = (char) result;
+    current_char = choose_char(current_char, LETTER_A);
+    global_value = result;
     return 0;
 }

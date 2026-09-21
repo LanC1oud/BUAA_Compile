@@ -29,7 +29,9 @@ public class Lexer {
         
         public int read() throws IOException {
             int chr = reader.read();
-            if (chr == '\n') {
+            if (chr == -1) {
+                return -1;
+            } else if (chr == '\n') {
                 lineno++;
                 lastColumn = column;
                 column = 0;
@@ -40,6 +42,9 @@ public class Lexer {
         }
         
         public void unread(int chr) throws IOException {
+            if (chr == -1) {
+                return;
+            }
             if (chr == '\n') {
                 lineno--;
                 column = lastColumn;
@@ -71,9 +76,9 @@ public class Lexer {
                 continue;
             }
             reader.unread(c);
-            if (isLetter(c) || c == '_') {
+            if (isAsciiLetter(c) || c == '_') {
                 readIdentifier();
-            } else if (isDigit(c)) {
+            } else if (isAsciiDigit(c)) {
                 readNumber();
             } else if (c == '"') {
                 readString();
@@ -93,7 +98,7 @@ public class Lexer {
         StringBuilder identifier = new StringBuilder();
         int c = reader.read();
         Pair<Integer, Integer> start = reader.location();
-        while (Character.isLetterOrDigit(c) || c == '_') {
+        while (isAsciiLetter(c) || isAsciiDigit(c) || c == '_') {
             identifier.append((char) c);
             c = reader.read();
         }
@@ -110,7 +115,7 @@ public class Lexer {
         StringBuilder number = new StringBuilder();
         do {
             number.append((char) c);
-        } while (Character.isDigit(c = reader.read()));
+        } while (isAsciiDigit(c = reader.read()));
         reader.unread(c);
         addToken(TokenType.IntConst, number.toString(), start);
     }
@@ -149,7 +154,14 @@ public class Lexer {
         c = reader.read();
         if (c == '\\') {
             c = reader.read();
-            c = Escapes.TABLE.get((char) c);
+            Character escaped = c == -1 ? null : Escapes.TABLE.get((char) c);
+            if (escaped == null) {
+                // Keep scanning after an invalid escape instead of unboxing
+                // null (which used to abort the whole lexer with NPE).
+                errors.add(ErrorType.InvalidToken, location());
+            } else {
+                c = escaped;
+            }
         }
         addToken(TokenType.CharConst, String.valueOf((char) c), start);
         reader.read();
@@ -158,6 +170,10 @@ public class Lexer {
     private void readSlash() throws IOException {
         int c;
         Pair<Integer, Integer> start = reader.location();
+        // The dispatch code leaves the first slash in the pushback reader.
+        // Consume it before looking at the second character; otherwise
+        // "/*" is mistaken for a line comment starting with the first '/'.
+        reader.read();
         c = reader.read();
         if (c == '/') {
             while (c != -1 && c != '\n') {
@@ -184,18 +200,22 @@ public class Lexer {
             case '|' -> {
                 c = reader.read();
                 if (c != '|') {
-                    errors.add(ErrorType.InvalidToken, location());
+                    errors.add(ErrorType.InvalidToken, new Navigation(start, start));
                     reader.unread(c);
+                    addToken(TokenType.Or, "|", start);
+                } else {
+                    addToken(TokenType.Or, "||", start);
                 }
-                addToken(TokenType.Or, "||", start);
             }
             case '&' -> {
                 c = reader.read();
                 if (c != '&') {
-                    errors.add(ErrorType.InvalidToken, location());
+                    errors.add(ErrorType.InvalidToken, new Navigation(start, start));
                     reader.unread(c);
+                    addToken(TokenType.And, "&", start);
+                } else {
+                    addToken(TokenType.And, "&&", start);
                 }
-                addToken(TokenType.And, "&&", start);
             }
             case '!' -> {
                 if ((c = reader.read()) == '=') {
@@ -230,9 +250,22 @@ public class Lexer {
                 }
             }
             default -> {
-                addToken(Symbols.TABLE.get((char) c), String.valueOf((char) c), start);
+                TokenType type = Symbols.TABLE.get((char) c);
+                if (type == null) {
+                    errors.add(ErrorType.InvalidToken, location());
+                } else {
+                    addToken(type, String.valueOf((char) c), start);
+                }
             }
         }
+    }
+
+    private static boolean isAsciiLetter(int c) {
+        return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
+    }
+
+    private static boolean isAsciiDigit(int c) {
+        return c >= '0' && c <= '9';
     }
     
     public TokenStream emit() {
