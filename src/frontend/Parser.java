@@ -114,7 +114,6 @@ public class Parser {
     }
 
     // ------------------------------------------------------------- compile unit
-
     public Parser parse() {
         // CompUnit -> {Decl} {FuncDef} MainFuncDef
         while (!eof()) {
