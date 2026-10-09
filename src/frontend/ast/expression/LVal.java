@@ -47,14 +47,24 @@ public class LVal extends ASTNode {
     /**
      * 对常量变量的引用求值。
      *
+     * <p>标量常量直接取值；常量数组要再用下标去查元素表，下标本身也必须是编译期常量。
+     *
      * @return 被引用对象的常量值
      * @throws UnsupportedOperationException 符号尚未解析、或该变量不是编译期常量
+     * @throws IndexOutOfBoundsException 常量下标越界
      */
     @Override
     public int calculateConst() {
         if (symbol == null) {
             throw new UnsupportedOperationException(
                     "符号 `" + ident.value() + "` 尚未解析");
+        }
+        if (symbol.getConstantArray() != null) {
+            if (index == null) {
+                throw new UnsupportedOperationException(
+                        "常量数组 `" + ident.value() + "` 整体没有标量值");
+            }
+            return symbol.getConstantArray().get(index.calculateConst());
         }
         return symbol.getConstantValue().getValue();
     }

@@ -19,3 +19,4 @@ final public class FixedValue {
         return Integer.toString(value);
     }
 }
+

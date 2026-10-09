@@ -102,20 +102,22 @@ public class UnaryExp extends ASTNode {
     /** 对操作数施加一元运算符。 */
     private int calculateUnary() {
         int value = operand.calculateConst();
-        TokenType operator = op.getToken().type();
-        if (operator == TokenType.Plus) {
-            return value;
-        }
-        if (operator == TokenType.Minus) {
-            return -value;
-        }
-        throw new UnsupportedOperationException("常量表达式中不能出现逻辑非");
+        return switch (op.getToken().getType()) {
+            case Plus -> value;
+            case Minus -> -value;
+            case Not -> throw new UnsupportedOperationException("常量表达式中不能出现逻辑非");
+            default -> throw new UnsupportedOperationException(
+                    "一元运算符 " + op.getToken() + " 没有编译期值");
+        };
     }
 
     /**
      * 显式类型转换。
      *
-     * <p>窄化为 char 时只保留最低字节，这一点与 C 和参考编译器一致。
+     * <p>2026 文法里 {@code char} 是 <b>unsigned char</b>（取值 0~255，溢出模 256），
+     * 所以窄化到 char 用 {@code value & 0xFF}，而<b>不是</b> C 的 {@code (byte)}：
+     * {@code (char)255} 应当得到 {@code 255}，用有符号字节会错成 {@code -1}。
+     * 参考实现按有符号处理，这里必须改。
      *
      * @param value 待转换的值
      * @param castType 转换目标记号（{@code int} 或 {@code char}）
@@ -127,7 +129,7 @@ public class UnaryExp extends ASTNode {
             return value;
         }
         if (castType.is(TokenType.Char)) {
-            return (byte) value;
+            return value & 0xFF;
         }
         throw new IllegalArgumentException("期望 int 或 char 转换，实际是 " + castType);
     }

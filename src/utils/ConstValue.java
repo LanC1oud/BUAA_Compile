@@ -2,6 +2,14 @@ package utils;
 
 import frontend.token.TokenType;
 
+/**
+ * Evaluation of a binary operator over two 32-bit constant values, mirroring the arithmetic
+ * behaviour of the reference compiler.
+ *
+ * <p>Division and remainder follow Java's (and C's) truncation-towards-zero rule and throw
+ * {@link ArithmeticException} on a zero divisor; callers that must not abort the whole
+ * compilation are expected to catch it.
+ */
 public final class ConstValue {
 
     private ConstValue() {
@@ -28,7 +36,8 @@ public final class ConstValue {
             case And -> left != 0 && right != 0 ? 1 : 0;
             case Or -> left != 0 || right != 0 ? 1 : 0;
             default -> throw new IllegalArgumentException(
-                    "运算符 " + op + " 不是二元运算符");
+                    "Operator " + op + " is not a binary operator");
         };
     }
 }
+

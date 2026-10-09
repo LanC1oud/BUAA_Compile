@@ -1,7 +1,7 @@
 package utils;
 
 public class Configure {
-    
+
     public static String source = "testfile.txt";
     public static String target = HomeworkConfig.getTarget();
     public static String error = "error.txt";

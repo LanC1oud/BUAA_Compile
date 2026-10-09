@@ -37,3 +37,4 @@ final public class SymbolFunction extends Symbol {
         return getType().displayName(false, false) + "Func";
     }
 }
+

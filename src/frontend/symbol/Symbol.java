@@ -63,3 +63,4 @@ abstract public class Symbol implements Comparable<Symbol> {
         return symbolTableIndex + " " + name + " " + getDisplayString();
     }
 }
+

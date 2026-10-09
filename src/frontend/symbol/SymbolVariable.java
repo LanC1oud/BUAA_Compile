@@ -7,6 +7,9 @@ final public class SymbolVariable extends Symbol {
 
     private FixedValue constantValue;
 
+    /** 数组常量的元素表；与 {@link #constantValue} 互斥。 */
+    private FixedArray constantArray;
+
     /** 是否为 {@code static} 修饰的局部变量（文档：static 只修饰局部变量）。 */
     private boolean isStatic = false;
 
@@ -20,11 +23,22 @@ final public class SymbolVariable extends Symbol {
     // ------------------------------------------------------------ 常量值
 
     public boolean hasConstantValue() {
-        return constantValue != null;
+        return constantValue != null || constantArray != null;
     }
 
     public void setConstantValue(FixedValue constantValue) {
         this.constantValue = constantValue;
+    }
+
+    /** 记录数组常量的元素表。 */
+    public void setConstantValue(FixedArray constantArray) {
+        this.constantArray = constantArray;
+        this.constantValue = null;
+    }
+
+    /** @return 数组常量的元素表，或 {@code null}。 */
+    public FixedArray getConstantArray() {
+        return constantArray;
     }
 
     public FixedValue getConstantValue() {
@@ -68,3 +82,4 @@ final public class SymbolVariable extends Symbol {
         return getType().displayName(isConst(), isStatic);
     }
 }
+
