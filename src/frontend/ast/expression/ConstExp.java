@@ -20,4 +20,8 @@ public class ConstExp extends ASTNode {
     protected String getName() {
         return "<ConstExp>";
     }
+    
+    public int calculate() {
+        return addExp.calculateConst();
+    }
 }

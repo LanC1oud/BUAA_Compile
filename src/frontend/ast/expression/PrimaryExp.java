@@ -50,6 +50,21 @@ public class PrimaryExp extends ASTNode {
         return number;
     }
 
+    /**
+     * 按当前分支在编译期求值。
+     *
+     * @return 表达式的值
+     * @throws UnsupportedOperationException 引用到的变量不是编译期常量
+     */
+    @Override
+    public int calculateConst() {
+        return switch (kind) {
+            case Paren -> exp.calculateConst();
+            case LVal -> lval.calculateConst();
+            case Number -> number.calculateConst();
+        };
+    }
+
     @Override
     protected String getName() {
         return "<PrimaryExp>";

@@ -2,6 +2,7 @@ package frontend.ast.expression;
 
 import frontend.ast.ASTNode;
 import frontend.token.Token;
+import frontend.token.TokenType;
 
 /**
  * UnaryExp -> PrimaryExp
@@ -79,6 +80,56 @@ public class UnaryExp extends ASTNode {
     /** @return the operand of a unary operation or of an explicit cast. */
     public UnaryExp getOperand() {
         return operand;
+    }
+
+    /**
+     * 在编译期求出该表达式的值。
+     *
+     * @return 表达式的值
+     * @throws UnsupportedOperationException 函数调用没有编译期值，或常量表达式中出现逻辑非
+     */
+    @Override
+    public int calculateConst() {
+        return switch (kind) {
+            case Primary -> primary.calculateConst();
+            case Call -> throw new UnsupportedOperationException(
+                    "函数调用 `" + ident.value() + "` 没有编译期值");
+            case Unary -> calculateUnary();
+            case Cast -> cast(operand.calculateConst(), castType);
+        };
+    }
+
+    /** 对操作数施加一元运算符。 */
+    private int calculateUnary() {
+        int value = operand.calculateConst();
+        TokenType operator = op.getToken().type();
+        if (operator == TokenType.Plus) {
+            return value;
+        }
+        if (operator == TokenType.Minus) {
+            return -value;
+        }
+        throw new UnsupportedOperationException("常量表达式中不能出现逻辑非");
+    }
+
+    /**
+     * 显式类型转换。
+     *
+     * <p>窄化为 char 时只保留最低字节，这一点与 C 和参考编译器一致。
+     *
+     * @param value 待转换的值
+     * @param castType 转换目标记号（{@code int} 或 {@code char}）
+     * @return 转换后的值
+     * @throws IllegalArgumentException 目标既不是 int 也不是 char
+     */
+    public static int cast(int value, Token castType) {
+        if (castType.is(TokenType.Int)) {
+            return value;
+        }
+        if (castType.is(TokenType.Char)) {
+            return (byte) value;
+        }
+        throw new IllegalArgumentException("期望 int 或 char 转换，实际是 " + castType);
     }
 
     @Override

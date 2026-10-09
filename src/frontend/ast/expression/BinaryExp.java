@@ -2,6 +2,7 @@ package frontend.ast.expression;
 
 import frontend.ast.ASTNode;
 import frontend.token.Token;
+import utils.ConstValue;
 
 public abstract class BinaryExp extends ASTNode {
     private final ASTNode left;
@@ -36,5 +37,14 @@ public abstract class BinaryExp extends ASTNode {
 
     public boolean isLeaf() {
         return op == null;
+    }
+
+    @Override
+    public int calculateConst() {
+        int value = left.calculateConst();
+        if (!isLeaf()) {
+            value = ConstValue.calculate(value, right.calculateConst(), op.type());
+        }
+        return value;
     }
 }

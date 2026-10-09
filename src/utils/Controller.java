@@ -4,7 +4,9 @@ import error.ErrorTable;
 import frontend.Lexer;
 import frontend.Parser;
 import frontend.ParserWatcher;
+import frontend.Traverser;
 import frontend.ast.CompileUnit;
+import frontend.symbol.SymbolTable;
 import frontend.token.TokenStream;
 
 import java.io.FileWriter;
@@ -12,6 +14,7 @@ import java.io.IOException;
 
 public class Controller {
     public static final ErrorTable errors = new ErrorTable();
+    public static final SymbolTable symbols = new SymbolTable();
     
     public static void run() throws IOException {
         
@@ -40,6 +43,15 @@ public class Controller {
             try (FileWriter writer = new FileWriter(errors.noError() ?
                     Configure.target : Configure.error)) {
                 writer.write((errors.noError() ? watcher : errors).toString());
+            }
+            Controller.exit();
+        }
+        
+        // stage 3: Semantic analysis
+        new Traverser(ast).spawn();
+        if (HomeworkConfig.hw == HomeworkConfig.Hw.Semantic) {
+            try (FileWriter writer = new FileWriter(errors.noError() ? Configure.target : Configure.error)) {
+                writer.write((errors.noError() ? symbols.toString() : errors).toString());
             }
             Controller.exit();
         }
