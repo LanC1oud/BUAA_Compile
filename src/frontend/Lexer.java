@@ -23,7 +23,6 @@ public class Lexer {
         private int column = 0;
         private int lastColumn = -1;
 
-
         public Reader(String source) throws IOException {
             reader = new PushbackReader(new FileReader(source));
         }
