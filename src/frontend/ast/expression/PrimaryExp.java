@@ -2,9 +2,7 @@ package frontend.ast.expression;
 
 import frontend.ast.ASTNode;
 
-/**
- * PrimaryExp -> '(' Exp ')' | LVal | Number
- */
+// PrimaryExp -> '(' Exp ')' | LVal | Number
 public class PrimaryExp extends ASTNode {
     public enum Kind {
         Paren, LVal, Number
@@ -50,12 +48,7 @@ public class PrimaryExp extends ASTNode {
         return number;
     }
 
-    /**
-     * 按当前分支在编译期求值。
-     *
-     * @return 表达式的值
-     * @throws UnsupportedOperationException 引用到的变量不是编译期常量
-     */
+    // throws UnsupportedOperationException if a referenced variable is not a constant
     @Override
     public int calculateConst() {
         return switch (kind) {

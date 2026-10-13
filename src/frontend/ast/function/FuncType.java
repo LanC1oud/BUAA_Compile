@@ -4,9 +4,7 @@ import frontend.ast.ASTNode;
 import frontend.token.Token;
 import frontend.token.TokenType;
 
-/**
- * FuncType -> 'void' | 'int' | 'char'
- */
+// FuncType -> 'void' | 'int' | 'char'
 public class FuncType extends ASTNode {
     private final Token token;
 

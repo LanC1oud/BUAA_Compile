@@ -2,9 +2,7 @@ package frontend.ast.statement;
 
 import frontend.ast.expression.Cond;
 
-/**
- * Stmt -> 'while' '(' Cond ')' Stmt
- */
+// Stmt -> 'while' '(' Cond ')' Stmt
 public class WhileStmt extends Stmt {
     private final Cond cond;
     private final Stmt body;

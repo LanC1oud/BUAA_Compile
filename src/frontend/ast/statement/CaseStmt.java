@@ -5,9 +5,7 @@ import frontend.ast.expression.Number;
 import frontend.token.Token;
 import java.util.List;
 
-/**
- * CaseStmt -> 'case' Number ':' { Stmt } | 'default' ':' { Stmt }
- */
+// CaseStmt -> 'case' Number ':' { Stmt } | 'default' ':' { Stmt }
 public class CaseStmt extends ASTNode {
     private final Token keyword;
     private final Number number;
@@ -19,12 +17,11 @@ public class CaseStmt extends ASTNode {
         this.stmts = stmts;
     }
 
-    /** @return the {@code case} or {@code default} keyword token. */
     public Token getKeyword() {
         return keyword;
     }
 
-    /** @return the label value, or {@code null} for the {@code default} branch. */
+    // label value; null for the default branch
     public Number getNumber() {
         return number;
     }

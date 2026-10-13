@@ -4,9 +4,7 @@ import frontend.ast.ASTNode;
 import frontend.token.Token;
 import frontend.token.TokenType;
 
-/**
- * Number -> IntConst | CharConst
- */
+// Number -> IntConst | CharConst
 public class Number extends ASTNode {
     private final Token token;
 
@@ -23,16 +21,7 @@ public class Number extends ASTNode {
         return valueOf(token);
     }
 
-    /**
-     * 读取数字字面量。
-     *
-     * <p>整型常量在本文法中是十进制；字符常量的转义在词法阶段已经解码，所以它的值就是
-     * 字符本身的码位。
-     *
-     * @param token {@code IntConst} 或 {@code CharConst} 记号
-     * @return 字面量的数值
-     * @throws IllegalArgumentException 记号不是这两种字面量
-     */
+    // throws IllegalArgumentException for any other token
     public static int valueOf(Token token) {
         if (token.is(TokenType.IntConst)) {
             return Integer.parseInt(token.value());

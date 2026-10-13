@@ -3,9 +3,7 @@ package frontend.ast.expression;
 import frontend.ast.ASTNode;
 import java.util.List;
 
-/**
- * FuncRParams -> Exp { ',' Exp }
- */
+// FuncRParams -> Exp { ',' Exp }
 public class FuncRParams extends ASTNode {
     private final List<Exp> params;
 

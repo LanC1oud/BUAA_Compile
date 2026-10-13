@@ -2,9 +2,7 @@ package frontend.ast.expression;
 
 import frontend.token.Token;
 
-/**
- * LAndExp -> EqExp | LAndExp '&&' EqExp
- */
+// LAndExp -> EqExp | LAndExp '&&' EqExp
 public class LAndExp extends BinaryExp {
     public LAndExp(EqExp operand) {
         super(operand);

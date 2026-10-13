@@ -3,9 +3,7 @@ package frontend.ast.statement;
 import frontend.ast.expression.Exp;
 import java.util.List;
 
-/**
- * Stmt -> 'switch' '(' Exp ')' '{' { CaseStmt } '}'
- */
+// Stmt -> 'switch' '(' Exp ')' '{' { CaseStmt } '}'
 public class SwitchStmt extends Stmt {
     private final Exp exp;
     private final List<CaseStmt> cases;

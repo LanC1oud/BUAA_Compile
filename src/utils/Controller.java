@@ -14,7 +14,6 @@ import java.io.IOException;
 
 public class Controller {
     public static final ErrorTable errors = new ErrorTable();
-    /** 语义分析产出的符号表；由 {@link frontend.Traverser} 填充。 */
     public static final SymbolTable symbols = new SymbolTable();
     
     public static void run() throws IOException {
@@ -39,7 +38,19 @@ public class Controller {
             Configure.debug.displayTokensWithAst = true;
         }
         ParserWatcher watcher = new ParserWatcher();
-        CompileUnit ast = new Parser(tokens, watcher).parse().emit();
+        CompileUnit ast;
+        try {
+            ast = new Parser(tokens, watcher).parse().emit();
+        } catch (RuntimeException e) {
+            if (Configure.debug.displayErrors) {
+                System.err.println("==> Parsing aborted: " + e);
+            }
+            try (FileWriter writer = new FileWriter(Configure.error)) {
+                writer.write("" + errors);
+            }
+            Controller.exit();
+            return;
+        }
         if (HomeworkConfig.hw == HomeworkConfig.Hw.Syntax) {
             try (FileWriter writer = new FileWriter(errors.noError() ?
                     Configure.target : Configure.error)) {
@@ -49,7 +60,6 @@ public class Controller {
         }
 
         // stage 3: Semantic analysis
-        // 遍历 AST，填充 Controller.symbols 并报出错误 b ~ n
         new Traverser(ast).spawn();
         if (Configure.debug.displaySymbols) {
             System.err.println(symbols);

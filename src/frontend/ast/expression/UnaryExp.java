@@ -4,12 +4,8 @@ import frontend.ast.ASTNode;
 import frontend.token.Token;
 import frontend.token.TokenType;
 
-/**
- * UnaryExp -> PrimaryExp
- * | Ident '(' [FuncRParams] ')'
- * | UnaryOp UnaryExp
- * | '(' BType ')' UnaryExp
- */
+// UnaryExp -> PrimaryExp | Ident '(' [FuncRParams] ')' | UnaryOp
+// UnaryExp | '(' BType ')' UnaryExp
 public class UnaryExp extends ASTNode {
     public enum Kind {
         Primary, Call, Unary, Cast
@@ -58,12 +54,12 @@ public class UnaryExp extends ASTNode {
         return primary;
     }
 
-    /** @return the callee name token for a function call, otherwise {@code null}. */
+    // callee name; null unless this is a call
     public Token getIdent() {
         return ident;
     }
 
-    /** @return the actual parameters, or {@code null} when the call has none. */
+    // actual parameters; null when there are none
     public FuncRParams getParams() {
         return params;
     }
@@ -72,22 +68,16 @@ public class UnaryExp extends ASTNode {
         return op;
     }
 
-    /** @return the {@code int}/{@code char} token of an explicit cast, otherwise {@code null}. */
+    // int/char token of an explicit cast; null otherwise
     public Token getCastType() {
         return castType;
     }
 
-    /** @return the operand of a unary operation or of an explicit cast. */
     public UnaryExp getOperand() {
         return operand;
     }
 
-    /**
-     * 在编译期求出该表达式的值。
-     *
-     * @return 表达式的值
-     * @throws UnsupportedOperationException 函数调用没有编译期值，或常量表达式中出现逻辑非
-     */
+    // throws UnsupportedOperationException for calls and for logical not
     @Override
     public int calculateConst() {
         return switch (kind) {
@@ -99,7 +89,6 @@ public class UnaryExp extends ASTNode {
         };
     }
 
-    /** 对操作数施加一元运算符。 */
     private int calculateUnary() {
         int value = operand.calculateConst();
         return switch (op.getToken().getType()) {
@@ -111,19 +100,8 @@ public class UnaryExp extends ASTNode {
         };
     }
 
-    /**
-     * 显式类型转换。
-     *
-     * <p>2026 文法里 {@code char} 是 <b>unsigned char</b>（取值 0~255，溢出模 256），
-     * 所以窄化到 char 用 {@code value & 0xFF}，而<b>不是</b> C 的 {@code (byte)}：
-     * {@code (char)255} 应当得到 {@code 255}，用有符号字节会错成 {@code -1}。
-     * 参考实现按有符号处理，这里必须改。
-     *
-     * @param value 待转换的值
-     * @param castType 转换目标记号（{@code int} 或 {@code char}）
-     * @return 转换后的值
-     * @throws IllegalArgumentException 目标既不是 int 也不是 char
-     */
+    // explicit cast. char is unsigned char (mod 256), so narrow with & 0xFF, not (byte):
+    // (char)255 must yield 255. throws IllegalArgumentException for other targets
     public static int cast(int value, Token castType) {
         if (castType.is(TokenType.Int)) {
             return value;

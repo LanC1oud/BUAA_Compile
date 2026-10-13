@@ -6,9 +6,7 @@ import frontend.ast.expression.Exp;
 import frontend.token.Token;
 import java.util.List;
 
-/**
- * ConstInitVal -> ConstExp | '{' [ ConstExp { ',' ConstExp } ] '}' | StringConst
- */
+// ConstInitVal -> ConstExp | '{' [ ConstExp { ',' ConstExp } ] '}' | StringConst
 public class ConstInitVal extends ASTNode {
     public enum Kind {
         Exp, List, Str

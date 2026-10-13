@@ -28,7 +28,6 @@ public class Parser {
     private final TokenStream __tokens;
     private final ParserWatcher __watcher;
 
-    /** Used for speculative parsing; rewinds tokens, emitted lines and errors together. */
     private final BackTrace trace;
 
     public Parser(TokenStream tokens, ParserWatcher watcher) {
@@ -38,13 +37,6 @@ public class Parser {
         this.trace = new BackTrace(errors, __tokens, __watcher);
     }
 
-    // ------------------------------------------------------------------ helpers
-
-    /**
-     * Consume the next token, which must have the expected type. A missing ';', ')' or ']'
-     * is recoverable: the matching error is recorded and the offending token is left in the
-     * stream so that the caller can keep analysing the rest of the program.
-     */
     private Token consume(TokenType type) {
         Token token = null;
         try {
@@ -52,12 +44,15 @@ public class Parser {
             __watcher.add(token.toString());
         } catch (IllegalStateException e) {
             if (type.equals(TokenType.Semicolon)) {
+                //i:ExpectedSemicolon
                 errors.add(ErrorType.ExpectedSemicolon,
                         Objects.requireNonNull(__tokens.peek(-1)).location());
             } else if (type.equals(TokenType.RParen)) {
+                //j:ExpectedRParen
                 errors.add(ErrorType.ExpectedRParen,
                         Objects.requireNonNull(__tokens.peek(-1)).location());
             } else if (type.equals(TokenType.RBracket)) {
+                //k:ExpectedRBracket
                 errors.add(ErrorType.ExpectedRBracket,
                         Objects.requireNonNull(__tokens.peek(-1)).location());
             } else {
@@ -143,8 +138,7 @@ public class Parser {
     }
 
     // ------------------------------------------------------------- declarations
-
-    /** Decl -> ConstDecl | VarDecl ; note that {@code <Decl>} is not emitted. */
+    // Decl -> ConstDecl | VarDecl ; note that <Decl> is not emitted.
     private Decl parseDecl() {
         if (among(TokenType.Const)) {
             return parseConstDecl();
@@ -152,12 +146,12 @@ public class Parser {
         return parseVarDecl();
     }
 
-    /** BType -> 'int' | 'char' ; note that {@code <BType>} is not emitted. */
+    // BType -> 'int' | 'char' ; note that <BType> is not emitted.
     private Token parseBType() {
         return consumeAny(TokenType.Int, TokenType.Char);
     }
 
-    /** ConstDecl -> 'const' BType ConstDef { ',' ConstDef } ';' */
+    // ConstDecl -> 'const' BType ConstDef { ',' ConstDef } ';'
     private ConstDecl parseConstDecl() {
         Token constToken = consume(TokenType.Const);
         Token btype = parseBType();
@@ -171,7 +165,7 @@ public class Parser {
         return watch(new ConstDecl(constToken, btype, defs));
     }
 
-    /** ConstDef -> Ident [ '[' ConstExp ']' ] '=' ConstInitVal */
+    // ConstDef -> Ident [ '[' ConstExp ']' ] '=' ConstInitVal
     private ConstDef parseConstDef() {
         Token ident = consume(TokenType.Ident);
         ConstExp length = null;
@@ -184,7 +178,7 @@ public class Parser {
         return watch(new ConstDef(ident, length, parseConstInitVal()));
     }
 
-    /** ConstInitVal -> ConstExp | '{' [ ConstExp { ',' ConstExp } ] '}' | StringConst */
+    // ConstInitVal -> ConstExp | '{' [ ConstExp { ',' ConstExp } ] '}' | StringConst
     private ConstInitVal parseConstInitVal() {
         if (among(TokenType.LBrace)) {
             consume(TokenType.LBrace);
@@ -205,7 +199,7 @@ public class Parser {
         return watch(ConstInitVal.exp(parseConstExp()));
     }
 
-    /** VarDecl -> [ 'static' ] BType VarDef { ',' VarDef } ';' */
+    // VarDecl -> [ 'static' ] BType VarDef { ',' VarDef } ';'
     private VarDecl parseVarDecl() {
         Token staticToken = among(TokenType.Static) ? consume(TokenType.Static) : null;
         Token btype = parseBType();
@@ -219,7 +213,7 @@ public class Parser {
         return watch(new VarDecl(staticToken, btype, defs));
     }
 
-    /** VarDef -> Ident [ '[' ConstExp ']' ] | Ident [ '[' ConstExp ']' ] '=' InitVal */
+    // VarDef -> Ident [ '[' ConstExp ']' ] | Ident [ '[' ConstExp ']' ] '=' InitVal
     private VarDef parseVarDef() {
         Token ident = consume(TokenType.Ident);
         ConstExp length = null;
@@ -236,7 +230,7 @@ public class Parser {
         return watch(new VarDef(ident, length, initVal));
     }
 
-    /** InitVal -> Exp | '{' [ Exp { ',' Exp } ] '}' | StringConst */
+    // InitVal -> Exp | '{' [ Exp { ',' Exp } ] '}' | StringConst
     private InitVal parseInitVal() {
         if (among(TokenType.LBrace)) {
             consume(TokenType.LBrace);
@@ -258,13 +252,12 @@ public class Parser {
     }
 
     // ---------------------------------------------------------------- functions
-
-    /** FuncType -> 'void' | 'int' | 'char' */
+    // FuncType -> 'void' | 'int' | 'char'
     private FuncType parseFuncType() {
         return watch(new FuncType(consumeAny(TokenType.Void, TokenType.Int, TokenType.Char)));
     }
 
-    /** FuncDef -> FuncType Ident '(' [FuncFParams] ')' Block */
+    // FuncDef -> FuncType Ident '(' [FuncFParams] ')' Block
     private FuncDef parseFuncDef() {
         FuncType funcType = parseFuncType();
         Token ident = consume(TokenType.Ident);
@@ -274,7 +267,7 @@ public class Parser {
         return watch(new FuncDef(funcType, ident, params, parseBlock()));
     }
 
-    /** MainFuncDef -> 'int' 'main' '(' ')' Block */
+    // MainFuncDef -> 'int' 'main' '(' ')' Block
     private MainFuncDef parseMainFuncDef() {
         consume(TokenType.Int);
         Token identifier = consume(TokenType.Main);
@@ -283,7 +276,7 @@ public class Parser {
         return watch(new MainFuncDef(identifier, parseBlock()));
     }
 
-    /** FuncFParams -> FuncFParam { ',' FuncFParam } */
+    // FuncFParams -> FuncFParam { ',' FuncFParam }
     private FuncFormalParams parseFuncFParams() {
         List<FuncFormalParam> params = new LinkedList<>();
         params.add(parseFuncFParam());
@@ -294,7 +287,7 @@ public class Parser {
         return watch(new FuncFormalParams(params));
     }
 
-    /** FuncFParam -> BType Ident ['[' ']'] */
+    // FuncFParam -> BType Ident ['[' ']']
     private FuncFormalParam parseFuncFParam() {
         Token btype = parseBType();
         Token ident = consume(TokenType.Ident);
@@ -308,8 +301,7 @@ public class Parser {
     }
 
     // ------------------------------------------------------------------- blocks
-
-    /** Block -> '{' { BlockItem } '}' */
+    // Block -> '{' { BlockItem } '}'
     private Block parseBlock() {
         Block block = new Block();
         consume(TokenType.LBrace);
@@ -320,7 +312,7 @@ public class Parser {
         return watch(block);
     }
 
-    /** BlockItem -> Decl | Stmt ; note that {@code <BlockItem>} is not emitted. */
+    // BlockItem -> Decl | Stmt ; note that <BlockItem> is not emitted.
     private BlockItem parseBlockItem() {
         if (among(TokenType.Const, TokenType.Static, TokenType.Int, TokenType.Char)) {
             return new BlockItem(parseDecl());
@@ -329,8 +321,7 @@ public class Parser {
     }
 
     // --------------------------------------------------------------- statements
-
-    /** Stmt -> ... (see the branches below) */
+    // Stmt -> ... (see the branches below)
     private Stmt parseStmt() {
         if (among(TokenType.LBrace)) {
             return watch(new BlockStmt(parseBlock()));
@@ -376,10 +367,6 @@ public class Parser {
         return watch(new ExpStmt(exp));
     }
 
-    /**
-     * Distinguishes {@code Stmt -> LVal '=' Exp ';'} from {@code Stmt -> [Exp] ';'}.
-     * The LVal is parsed speculatively and every side effect is rolled back.
-     */
     private boolean isAssignStmt() {
         if (!among(TokenType.Ident)) {
             return false;
@@ -397,7 +384,7 @@ public class Parser {
         return assign;
     }
 
-    /** Stmt -> 'if' '(' Cond ')' Stmt [ 'else' Stmt ] */
+    // Stmt -> 'if' '(' Cond ')' Stmt [ 'else' Stmt ]
     private Stmt parseIfStmt() {
         consume(TokenType.If);
         consume(TokenType.LParen);
@@ -412,7 +399,7 @@ public class Parser {
         return watch(new IfStmt(cond, thenStmt, elseStmt));
     }
 
-    /** Stmt -> 'while' '(' Cond ')' Stmt */
+    // Stmt -> 'while' '(' Cond ')' Stmt
     private Stmt parseWhileStmt() {
         consume(TokenType.While);
         consume(TokenType.LParen);
@@ -421,7 +408,7 @@ public class Parser {
         return watch(new WhileStmt(cond, parseStmt()));
     }
 
-    /** Stmt -> 'switch' '(' Exp ')' '{' { CaseStmt } '}' */
+    // Stmt -> 'switch' '(' Exp ')' '{' { CaseStmt } '}'
     private Stmt parseSwitchStmt() {
         consume(TokenType.Switch);
         consume(TokenType.LParen);
@@ -436,7 +423,7 @@ public class Parser {
         return watch(new SwitchStmt(exp, cases));
     }
 
-    /** CaseStmt -> 'case' Number ':' { Stmt } | 'default' ':' { Stmt } */
+    // CaseStmt -> 'case' Number ':' { Stmt } | 'default' ':' { Stmt }
     private CaseStmt parseCaseStmt() {
         Token keyword;
         Number number = null;
@@ -454,7 +441,7 @@ public class Parser {
         return watch(new CaseStmt(keyword, number, stmts));
     }
 
-    /** Stmt -> 'return' [Exp] ';' */
+    // Stmt -> 'return' [Exp] ';'
     private Stmt parseReturnStmt() {
         Token returnToken = consume(TokenType.Return);
         Exp exp = among(TokenType.Semicolon) ? null : parseExp();
@@ -462,7 +449,7 @@ public class Parser {
         return watch(new ReturnStmt(returnToken, exp));
     }
 
-    /** Stmt -> 'printf' '(' StringConst { ',' Exp } ')' ';' */
+    // Stmt -> 'printf' '(' StringConst { ',' Exp } ')' ';'
     private Stmt parsePrintfStmt() {
         Token printfToken = consume(TokenType.Printf);
         consume(TokenType.LParen);
@@ -479,22 +466,22 @@ public class Parser {
 
     // -------------------------------------------------------------- expressions
 
-    /** Exp -> AddExp */
+    // Exp -> AddExp
     private Exp parseExp() {
         return watch(new Exp(parseAddExp()));
     }
 
-    /** ConstExp -> AddExp */
+    // ConstExp -> AddExp
     private ConstExp parseConstExp() {
         return watch(new ConstExp(parseAddExp()));
     }
 
-    /** Cond -> LOrExp */
+    // Cond -> LOrExp
     private Cond parseCond() {
         return watch(new Cond(parseLOrExp()));
     }
 
-    /** LOrExp -> LAndExp | LOrExp '||' LAndExp */
+    // LOrExp -> LAndExp | LOrExp '||' LAndExp
     private LOrExp parseLOrExp() {
         LOrExp exp = watch(new LOrExp(parseLAndExp()));
         while (among(TokenType.Or)) {
@@ -504,7 +491,7 @@ public class Parser {
         return exp;
     }
 
-    /** LAndExp -> EqExp | LAndExp '&&' EqExp */
+    // LAndExp -> EqExp | LAndExp '&&' EqExp
     private LAndExp parseLAndExp() {
         LAndExp exp = watch(new LAndExp(parseEqExp()));
         while (among(TokenType.And)) {
@@ -514,7 +501,7 @@ public class Parser {
         return exp;
     }
 
-    /** EqExp -> RelExp | EqExp ('==' | '!=') RelExp */
+    // EqExp -> RelExp | EqExp ('==' | '!=') RelExp
     private EqExp parseEqExp() {
         EqExp exp = watch(new EqExp(parseRelExp()));
         while (among(TokenType.Eq, TokenType.Neq)) {
@@ -524,7 +511,7 @@ public class Parser {
         return exp;
     }
 
-    /** RelExp -> AddExp | RelExp ('<' | '>' | '<=' | '>=') AddExp */
+    // RelExp -> AddExp | RelExp ('<' | '>' | '<=' | '>=') AddExp
     private RelExp parseRelExp() {
         RelExp exp = watch(new RelExp(parseAddExp()));
         while (among(TokenType.Lt, TokenType.Gt, TokenType.Leq, TokenType.Geq)) {
@@ -534,7 +521,7 @@ public class Parser {
         return exp;
     }
 
-    /** AddExp -> MulExp | AddExp ('+' | '-') MulExp */
+    // AddExp -> MulExp | AddExp ('+' | '-') MulExp
     private AddExp parseAddExp() {
         AddExp exp = watch(new AddExp(parseMulExp()));
         while (among(TokenType.Plus, TokenType.Minus)) {
@@ -544,7 +531,7 @@ public class Parser {
         return exp;
     }
 
-    /** MulExp -> UnaryExp | MulExp ('*' | '/' | '%') UnaryExp */
+    // MulExp -> UnaryExp | MulExp ('*' | '/' | '%') UnaryExp
     private MulExp parseMulExp() {
         MulExp exp = watch(new MulExp(parseUnaryExp()));
         while (among(TokenType.Mult, TokenType.Div, TokenType.Mod)) {
@@ -554,20 +541,12 @@ public class Parser {
         return exp;
     }
 
-    /**
-     * UnaryExp -> PrimaryExp
-     * | Ident '(' [FuncRParams] ')'
-     * | UnaryOp UnaryExp
-     * | '(' BType ')' UnaryExp
-     */
+    // UnaryExp -> PrimaryExp | Ident '(' [FuncRParams] ')' | UnaryOp UnaryExp | '(' BType ')' UnaryExp
     private UnaryExp parseUnaryExp() {
         if (among(TokenType.Plus, TokenType.Minus, TokenType.Not)) {
             UnaryOp op = watch(new UnaryOp(consumeAny(TokenType.Plus, TokenType.Minus, TokenType.Not)));
             return watch(UnaryExp.unary(op, parseUnaryExp()));
         }
-        // '(' BType is only ever the start of an explicit cast: a keyword can never
-        // begin an Exp, so a missing ')' here is still treated as a cast (error j,
-        // reported at the BType token, as required by the spec).
         if (among(TokenType.LParen) && among(1, TokenType.Int, TokenType.Char)) {
             consume(TokenType.LParen);
             Token castType = parseBType();
@@ -584,7 +563,7 @@ public class Parser {
         return watch(UnaryExp.primary(parsePrimaryExp()));
     }
 
-    /** FuncRParams -> Exp { ',' Exp } */
+    // FuncRParams -> Exp { ',' Exp }
     private FuncRParams parseFuncRParams() {
         List<Exp> params = new LinkedList<>();
         params.add(parseExp());
@@ -595,7 +574,7 @@ public class Parser {
         return watch(new FuncRParams(params));
     }
 
-    /** PrimaryExp -> '(' Exp ')' | LVal | Number */
+    // PrimaryExp -> '(' Exp ')' | LVal | Number
     private PrimaryExp parsePrimaryExp() {
         if (among(TokenType.LParen)) {
             consume(TokenType.LParen);
@@ -609,7 +588,7 @@ public class Parser {
         return watch(PrimaryExp.number(parseNumber()));
     }
 
-    /** LVal -> Ident ['[' Exp ']'] */
+    // LVal -> Ident ['[' Exp ']']
     private LVal parseLVal() {
         Token ident = consume(TokenType.Ident);
         Exp index = null;
@@ -621,7 +600,7 @@ public class Parser {
         return watch(new LVal(ident, index));
     }
 
-    /** Number -> IntConst | CharConst */
+    // Number -> IntConst | CharConst
     private Number parseNumber() {
         return watch(new Number(consumeAny(TokenType.IntConst, TokenType.CharConst)));
     }

@@ -3,9 +3,7 @@ package frontend.ast.function;
 import frontend.ast.ASTNode;
 import java.util.List;
 
-/**
- * FuncFParams -> FuncFParam { ',' FuncFParam }
- */
+// FuncFParams -> FuncFParam { ',' FuncFParam }
 public class FuncFormalParams extends ASTNode {
     private final List<FuncFormalParam> params;
 

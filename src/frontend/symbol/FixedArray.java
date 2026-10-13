@@ -10,16 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * An array constant known at compile time.
- *
- * <p>Only one dimension is needed for this grammar, so a flat index maps directly onto a value.
- * Every index that was never written keeps the default value {@code 0}.
- */
 final public class FixedArray {
-    /** Array length, used to reject out-of-range constant subscripts. */
     private final int length;
-    /** Index to value. A missing key means the default value {@code 0}. */
     private final Map<Integer, Integer> values;
 
     public FixedArray(int length) {
@@ -35,13 +27,7 @@ final public class FixedArray {
         values.put(index, value);
     }
 
-    /**
-     * Read a constant element.
-     *
-     * @param index the constant subscript
-     * @return the stored value, or {@code 0} when it was never initialised
-     * @throws IndexOutOfBoundsException if the subscript is outside the array
-     */
+    // read one constant element; throws IndexOutOfBoundsException when out of range
     public int get(int index) {
         if (index < 0 || index >= length) {
             throw new IndexOutOfBoundsException(
@@ -50,12 +36,6 @@ final public class FixedArray {
         return values.getOrDefault(index, 0);
     }
 
-    /**
-     * Collect every element of an initialiser into a flat array of the given length.
-     *
-     * <p>Braces are flattened, so a nested list is accepted as well; a value that cannot be
-     * evaluated propagates its exception to the caller.
-     */
     public static FixedArray from(int length, ConstInitVal init) {
         FixedArray array = new FixedArray(length);
         if (init.getKind() == ConstInitVal.Kind.Str) {
@@ -72,11 +52,7 @@ final public class FixedArray {
         return array;
     }
 
-    /**
-     * Collect every element of an initialiser into a flat array of the given length.
-     *
-     * @see #from(int, ConstInitVal)
-     */
+    // @see #from(int, ConstInitVal)
     public static FixedArray from(int length, InitVal init) {
         FixedArray array = new FixedArray(length);
         if (init.getKind() == InitVal.Kind.Str) {
@@ -93,12 +69,6 @@ final public class FixedArray {
         return array;
     }
 
-    /**
-     * Build the element list of a string initialiser, including the terminating {@code '\0'}.
-     *
-     * <p>The token value has already had its escapes decoded by the lexer, so the characters can be
-     * copied across directly; indices beyond the array length are dropped.
-     */
     private static FixedArray fromString(int length, Token string) {
         FixedArray array = new FixedArray(length);
         String content = string.value();
@@ -123,4 +93,3 @@ final public class FixedArray {
         return builder.append('}').toString();
     }
 }
-

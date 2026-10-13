@@ -2,9 +2,7 @@ package frontend.ast.expression;
 
 import frontend.token.Token;
 
-/**
- * RelExp -> AddExp | RelExp ('<' | '>' | '<=' | '>=') AddExp
- */
+// RelExp -> AddExp | RelExp ('<' | '>' | '<=' | '>=') AddExp
 public class RelExp extends BinaryExp {
     public RelExp(AddExp operand) {
         super(operand);

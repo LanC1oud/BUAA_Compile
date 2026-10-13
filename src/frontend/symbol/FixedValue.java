@@ -1,8 +1,5 @@
 package frontend.symbol;
 
-/**
- * 编译期已知的标量常量值。
- */
 final public class FixedValue {
     private final int value;
 
@@ -19,4 +16,3 @@ final public class FixedValue {
         return Integer.toString(value);
     }
 }
-

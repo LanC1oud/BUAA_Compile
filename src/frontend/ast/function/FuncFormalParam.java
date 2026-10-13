@@ -3,9 +3,7 @@ package frontend.ast.function;
 import frontend.ast.ASTNode;
 import frontend.token.Token;
 
-/**
- * FuncFParam -> BType Ident ['[' ']']
- */
+// FuncFParam -> BType Ident ['[' ']']
 public class FuncFormalParam extends ASTNode {
     private final Token btype;
     private final Token ident;
@@ -25,7 +23,6 @@ public class FuncFormalParam extends ASTNode {
         return ident;
     }
 
-    /** @return {@code true} for {@code int a[]}, {@code false} for {@code int a}. */
     public boolean isArray() {
         return array;
     }

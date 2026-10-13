@@ -2,9 +2,7 @@ package frontend.ast.statement;
 
 import frontend.token.Token;
 
-/**
- * Stmt -> 'continue' ';'
- */
+// Stmt -> 'continue' ';'
 public class ContinueStmt extends Stmt {
     private final Token token;
 
@@ -12,7 +10,6 @@ public class ContinueStmt extends Stmt {
         this.token = token;
     }
 
-    /** @return the {@code continue} keyword, needed to report error m at the right line. */
     public Token getToken() {
         return token;
     }

@@ -3,9 +3,7 @@ package frontend.ast.expression;
 import frontend.ast.ASTNode;
 import frontend.token.Token;
 
-/**
- * UnaryOp -> '+' | '-' | '!'
- */
+// UnaryOp -> '+' | '-' | '!'
 public class UnaryOp extends ASTNode {
     private final Token token;
 

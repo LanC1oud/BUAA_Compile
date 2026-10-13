@@ -2,9 +2,7 @@ package frontend.ast.expression;
 
 import frontend.ast.ASTNode;
 
-/**
- * Cond -> LOrExp
- */
+// Cond -> LOrExp
 public class Cond extends ASTNode {
     private final LOrExp lOrExp;
 

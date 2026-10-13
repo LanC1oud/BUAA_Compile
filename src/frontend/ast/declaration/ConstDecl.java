@@ -3,9 +3,7 @@ package frontend.ast.declaration;
 import frontend.token.Token;
 import java.util.List;
 
-/**
- * ConstDecl -> 'const' BType ConstDef { ',' ConstDef } ';'
- */
+// ConstDecl -> 'const' BType ConstDef { ',' ConstDef } ';'
 public class ConstDecl extends Decl {
     private final Token constToken;
     private final Token btype;

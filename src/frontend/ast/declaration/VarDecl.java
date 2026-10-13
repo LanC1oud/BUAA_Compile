@@ -3,9 +3,7 @@ package frontend.ast.declaration;
 import frontend.token.Token;
 import java.util.List;
 
-/**
- * VarDecl -> [ 'static' ] BType VarDef { ',' VarDef } ';'
- */
+// VarDecl -> [ 'static' ] BType VarDef { ',' VarDef } ';'
 public class VarDecl extends Decl {
     private final Token staticToken;
     private final Token btype;
