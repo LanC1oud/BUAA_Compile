@@ -722,13 +722,18 @@ final public class Traverser {
         if (operandType == null || outer.getOp() == null) {
             return;
         }
-        if (!(outer.getOperand() instanceof UnaryExp inner)) {
+        // getOperand() 的返回类型本就是 UnaryExp，且只有 Unary/Cast 两种形态才非空，
+        // 所以普通空值判断即可，不必用 instanceof 模式（保持 Java 17 语言级别兼容）。
+        UnaryExp inner = outer.getOperand();
+        if (inner == null) {
             return;
         }
         if (inner.getKind() != UnaryExp.Kind.Unary || inner.getOp() == null) {
             return;
         }
-        if (inner.getOperand() instanceof UnaryExp deeper
+        // deeper 同理，只判空。
+        UnaryExp deeper = inner.getOperand();
+        if (deeper != null
                 && deeper.getKind() == UnaryExp.Kind.Unary
                 && deeper.getOp() != null
                 && deeper.getOp().getToken().is(outer.getOp().getToken())) {

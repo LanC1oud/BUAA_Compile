@@ -67,12 +67,22 @@ public final class CompilerUi extends JFrame {
 
     // ---- 组件 ----
     private final CodeEditor editor = new CodeEditor();
-    private final JTabbedPane outputTabs = new JTabbedPane();
-    private final JTabbedPane resultTabs = new JTabbedPane();
+    /**
+     * 顶层按<b>工作方式</b>划分：单次编译 / 批量编译。
+     *
+     * <p>批量编译是"另一种干活的方式"，而「编译结果」「错误」「阶段对比」是
+     * <b>单次编译的结果视图</b>——两者不在同一层级，所以不并列。
+     */
+    private final JTabbedPane modeTabs = new JTabbedPane();
+    /** 单次编译的各个结果视图。 */
+    private final JTabbedPane viewTabs = new JTabbedPane();
+    /** 错误视图，供"编译报错后自动切过去"使用。 */
+    private JComponent errorPanel;
     private final TextPanel payloadArea = new TextPanel();
     private final TextPanel logArea = new TextPanel();
     private final AstTreePanel astPanel = new AstTreePanel();
     private final SyntaxPanel syntaxPanel = new SyntaxPanel();
+    private final BatchPanel batchPanel = new BatchPanel();
     private final StageStatsPanel statsPanel = new StageStatsPanel();
 
     private final DefaultTableModel errorModel;
@@ -128,7 +138,7 @@ public final class CompilerUi extends JFrame {
         root.setBorder(new EmptyBorder(8, 10, 8, 10));
         root.add(buildTop(), BorderLayout.NORTH);
 
-        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, editor, buildOutputTabs());
+        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, editor, buildRightPane());
         split.setResizeWeight(0.52);
         split.setDividerLocation(640);
         root.add(split, BorderLayout.CENTER);
@@ -208,18 +218,32 @@ public final class CompilerUi extends JFrame {
         return row;
     }
 
-    private JComponent buildOutputTabs() {
-        // 统计面板里点「错误数」列 → 切到「错误」页
-        statsPanel.setOnErrorColumnClicked(() -> outputTabs.setSelectedIndex(1));
+    private JComponent buildRightPane() {
+        // 批量编译面板复用同一套调试开关，并把进展写到主状态栏。
+        batchPanel.setSettingsSupplier(this::currentSettings);
+        batchPanel.setStatusConsumer(this::setStatus);
 
-        resultTabs.addTab("编译结果", payloadArea);
-        resultTabs.addTab("近似 AST", astPanel);
-        outputTabs.addTab("输出", resultTabs);
-        outputTabs.addTab("错误", buildErrorTab());
-        outputTabs.addTab("阶段对比", statsPanel);
-        outputTabs.addTab("文法速查", syntaxPanel);
-        outputTabs.addTab("日志", logArea);
-        return outputTabs;
+        // 单次编译的视图平铺在一层里（不再套一层「输出」）。
+        errorPanel = buildErrorTab();
+        viewTabs.addTab("编译结果", payloadArea);
+        viewTabs.addTab("近似 AST", astPanel);
+        viewTabs.addTab("错误", errorPanel);
+        viewTabs.addTab("阶段对比", statsPanel);
+        viewTabs.addTab("文法速查", syntaxPanel);
+        viewTabs.addTab("日志", logArea);
+
+        // 统计面板里点「错误数」列 → 切到「错误」视图
+        statsPanel.setOnErrorColumnClicked(() -> showView(errorPanel));
+
+        modeTabs.addTab("单次编译", viewTabs);
+        modeTabs.addTab("批量编译", batchPanel);
+        return modeTabs;
+    }
+
+    /** 切到单次编译下的某个视图（会先把顶层切回「单次编译」）。 */
+    private void showView(JComponent view) {
+        modeTabs.setSelectedComponent(viewTabs);
+        viewTabs.setSelectedComponent(view);
     }
 
     private JComponent buildErrorTab() {
@@ -398,7 +422,7 @@ public final class CompilerUi extends JFrame {
                     } else if (last.noError()) {
                         setStatus("「" + until.displayName() + "」通过，可以导出了。");
                     } else {
-                        outputTabs.setSelectedIndex(1);
+                        showView(errorPanel);
                         setStatus("「" + until.displayName() + "」报错 "
                                 + lastDisplayErrors.size() + " 处；点错误行可跳到源码。");
                     }
@@ -410,7 +434,7 @@ public final class CompilerUi extends JFrame {
                     lastDisplayErrors = List.of();
                     statsPanel.reset();
                     payloadArea.setText(stackTrace(ex.getCause()));
-                    outputTabs.setSelectedIndex(0);
+                    showView(payloadArea);
                     setStatus("编译失败：" + ex.getCause());
                 } finally {
                     if (temp != null) {
@@ -438,13 +462,12 @@ public final class CompilerUi extends JFrame {
                 %s
 
                 说明：遇到严重非法输入时，Parser 会直接抛异常而不是像其他情况那样
-                记录错误码继续解析。已经跑完的阶段的产物仍可在「输出」页查看，
+                记录错误码继续解析。已经跑完的阶段的产物仍可在「编译结果」视图查看，
                 错误表里也已收录中断前记录到的错误。
 
                 （仓库里的 testfile.invalid-sysy.bak 就是一个会触发这种情况的例子。）
                 """.formatted(until.displayName(), crash));
-        resultTabs.setSelectedIndex(0);
-        outputTabs.setSelectedIndex(0);
+        showView(payloadArea);
     }
 
     private void showStage(Stage stage) {
@@ -626,6 +649,8 @@ public final class CompilerUi extends JFrame {
         running = value;
         runButton.setEnabled(!value);
         exportButton.setEnabled(!value && !lastResults.isEmpty());
+        // 管线共用全局静态状态，批量与单次编译不能同时跑。
+        batchPanel.setEnabled(!value);
         setCursor(Cursor.getPredefinedCursor(value ? Cursor.WAIT_CURSOR : Cursor.DEFAULT_CURSOR));
     }
 

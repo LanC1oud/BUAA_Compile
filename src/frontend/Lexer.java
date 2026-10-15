@@ -24,7 +24,12 @@ public class Lexer {
         private int lastColumn = -1;
 
         public Reader(String source) throws IOException {
-            reader = new PushbackReader(new FileReader(source));
+            this(new FileReader(source));
+        }
+
+        /** 直接从任意字符流读入。前端外壳批量编译时用它读内存中的源码，免去临时文件。 */
+        public Reader(java.io.Reader source) {
+            reader = new PushbackReader(source);
         }
 
         public int read() throws IOException {
@@ -67,6 +72,20 @@ public class Lexer {
     public Lexer(String source) throws IOException {
         this.source = source;
         reader = new Reader(source);
+    }
+
+    /**
+     * 直接对一段源码内容做词法分析，不经过文件。
+     *
+     * <p>给编译器前端外壳（{@code ui/}）的批量编译用：一次要处理很多样例，
+     * 没必要为每个样例写一个临时文件。{@code label} 只作记录，
+     * 不参与读取（词法结果里不带文件名）。
+     *
+     * <p>命令行路径 {@link #Lexer(String)} 的行为一字未改。
+     */
+    public Lexer(String source, String label) {
+        this.source = label;
+        reader = new Reader(new java.io.StringReader(source));
     }
 
     public Lexer lex() throws IOException {
