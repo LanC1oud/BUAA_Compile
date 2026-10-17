@@ -75,6 +75,11 @@ public class TokenStream implements BackTrace.Traceable {
     public Token peek() { return peek(0);}
     
     public boolean eof() { return peek(0) == null;}
+
+    public int position() {
+        assertFrozen();
+        return index;
+    }
     
     public String toString() {
         return tokens.stream().map(Token::toString).collect(Collectors.joining("\n"));

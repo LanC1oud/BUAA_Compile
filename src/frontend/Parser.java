@@ -108,6 +108,12 @@ public class Parser {
         return __tokens.eof();
     }
 
+    private boolean atExpressionStart() {
+        return among(TokenType.Plus, TokenType.Minus, TokenType.Not,
+                TokenType.LParen, TokenType.Ident, TokenType.IntConst, TokenType.CharConst,
+                TokenType.Int, TokenType.Char);
+    }
+
     // ------------------------------------------------------------- compile unit
     public Parser parse() {
         // CompUnit -> {Decl} {FuncDef} MainFuncDef
@@ -219,7 +225,10 @@ public class Parser {
         ConstExp length = null;
         if (among(TokenType.LBracket)) {
             consume(TokenType.LBracket);
-            length = parseConstExp();
+            // 下标表达式缺了（如 int a[;）就不要去解析它，直接让 consume(RBracket) 报错误 k。
+            if (atExpressionStart()) {
+                length = parseConstExp();
+            }
             consume(TokenType.RBracket);
         }
         InitVal initVal = null;
@@ -262,7 +271,19 @@ public class Parser {
         FuncType funcType = parseFuncType();
         Token ident = consume(TokenType.Ident);
         consume(TokenType.LParen);
-        FuncFormalParams params = among(TokenType.RParen) ? null : parseFuncFParams();
+        // 形参必须以 int/char 开头；看到 '{' 说明参数表已结束、缺的其实是 ')'，
+        // 这里不把 '{' 当形参解析，交给下面的 consume(RParen) 报错误 j。
+        boolean hasParams;
+        if (among(TokenType.RParen, TokenType.LBrace)) {
+            hasParams = false;
+        } else if (atExpressionStart()) {
+            hasParams = true;
+        } else {
+            // 其它意外记号：跳过它，让 consume(RParen) 报缺右括号，避免整个解析崩掉。
+            __tokens.next();
+            hasParams = false;
+        }
+        FuncFormalParams params = hasParams ? parseFuncFParams() : null;
         consume(TokenType.RParen);
         return watch(new FuncDef(funcType, ident, params, parseBlock()));
     }
@@ -306,7 +327,12 @@ public class Parser {
         Block block = new Block();
         consume(TokenType.LBrace);
         while (!among(TokenType.RBrace) && !eof()) {
+            int before = __tokens.peek() == null ? -1 : __tokens.position();
             block.addBlock(parseBlockItem());
+            // 兜底：万一某个分支没能消费记号，强制前进，避免死循环。
+            if (__tokens.peek() != null && __tokens.position() == before) {
+                __tokens.next();
+            }
         }
         block.setEndToken(consume(TokenType.RBrace));
         return watch(block);

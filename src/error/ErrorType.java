@@ -30,4 +30,12 @@ public enum ErrorType {
     public String toDebugString() {
         return String.format("Error(%s, %s)", this.name(), type);
     }
+
+    public int priority() {
+        return switch (this) {
+            case InvalidToken -> 30;
+            case ExpectedSemicolon, ExpectedRParen, ExpectedRBracket -> 20;
+            default -> 10;
+        };
+    }
 }

@@ -101,7 +101,7 @@ ui/                             图形前端外壳（不参与评测）
 └── compilerui/gui/             Swing 界面
 
 docs/编译器设计报告.md            设计报告
-build.sh / run-ui.sh            构建与启动脚本
+run.sh / run.bat               一键入口：需要时先编译，再启动界面（bash / Windows 原生）
 testfile*.sysy                  测试用例
 ```
 
@@ -151,12 +151,45 @@ IDEA 里直接运行 `src/Compiler.java` 的 `main` 即可。
 
 ### 3.3 图形前端方式
 
-前端外壳独立在 `ui/`，两条路可以并用。
+前端外壳独立在 `ui/`。每平台一个入口脚本，**需要时先编译，再启动界面**：
+
+| 平台 | 命令 |
+| --- | --- |
+| Windows | `run.bat`（双击亦可） |
+| macOS / Linux | `./run.sh` |
+
+```bat
+run.bat                :: 需要时先编译，然后开界面
+run.bat --build-only   :: 只编译，不开界面
+run.bat --force        :: 强制重编（源码没改也编）
+run.bat --help
+```
 
 ```bash
-./build.sh      # 编译 src/ + ui/ → build/classes
-./run-ui.sh     # 打开窗口
+./run.sh --build-only  # 只编译
+./run.sh --force       # 强制重编
+./run.sh --help
 ```
+
+**什么时候会自动编译**：`build/` 产物不存在，或 `*.java` 比 `build/classes/.stamp`
+（上次成功编译后写的标记）新。两个脚本用同一个标记文件，所以在 Windows 和 Unix 之间
+来回切也不会白重编。标记只在 `javac` 成功后写入、每次编译前先删，因此编译失败后下次
+一定重试，不会拿旧 class 冒充最新。注意：**删掉或重命名源文件不会触发重编**（旧 class
+会留在 `build/` 里），这种情况用 `--force`。
+
+**JDK 17+**：`ui/` 用了 `record` / `var` / 文本块，JDK 8 编译不了。
+
+- Windows：自动探测，优先级 `JAVA_HOME` → `Program Files\Java` 等系统目录 →
+  `%USERPROFILE%\.jdks` → `PATH` 上的 javac，同级取版本最高的，
+  所以 `PATH` 上若是 JDK 8 会被跳过。
+- macOS / Linux：优先 `$JAVA_HOME`，其次 `PATH` 上的 javac（版本不够会直接报错提示）。
+
+> `run.sh` 是 bash 脚本，**Windows 原生跑不了**：系统没有能解释 `#!/usr/bin/env bash`
+> 的程序（`.sh` 没有文件关联，`bash` 也不在 `PATH` 上），报"找不到解释器"。
+> Windows 上用 `run.bat`；非要用 bash 就用
+> `"C:\Program Files\Git\bin\bash.exe" ./run.sh`（需 Git Bash）。
+> `.gitattributes` 已把 `*.sh` 固定成 LF、`*.bat` 固定成 CRLF，避免换行符把脚本弄坏
+> （LF 的 `.bat` 会被 cmd.exe 按字节切碎，CRLF 的 `.sh` 会让 shebang 变成 `bash\r`）。
 
 界面页签：
 
