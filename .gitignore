@@ -23,3 +23,5 @@ testfile.invalid-sysy.bak
 tools
 tests
 
+# pdf2md 工具（根目录 pdf2md_tool）：运行/构建产物不入库
+pdf2md_tool
