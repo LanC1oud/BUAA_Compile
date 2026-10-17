@@ -1,0 +1,12 @@
+# 换行符约定：仓库里一律存 LF，检出到工作区时按文件类型决定。
+#
+# 为什么需要这条：core.autocrlf=true 会把 run.sh 检出成 CRLF，
+# 于是 shebang 变成 "#!/usr/bin/env bash\r"，bash 会去找一个叫 bash\r 的程序，
+# 报 "/usr/bin/env: bad interpreter: No such file or directory"。
+*.sh  text eol=lf
+
+# Windows 批处理必须是 CRLF：cmd.exe 按字节解析，LF-only 的 .bat 会行错位、
+# 把半行内容当成命令执行。
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf

@@ -6,6 +6,9 @@ out/
 # macOS
 .DS_Store
 
+# 构建产物（build.sh / build.bat 的输出）
+build/
+
 # 运行/评测产物
 lexer.txt
 parser.txt
@@ -16,3 +19,7 @@ mips.txt
 
 # 本地测试备份
 testfile.invalid-sysy.bak
+
+tools
+tests
+
