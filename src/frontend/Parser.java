@@ -110,8 +110,7 @@ public class Parser {
 
     private boolean atExpressionStart() {
         return among(TokenType.Plus, TokenType.Minus, TokenType.Not,
-                TokenType.LParen, TokenType.Ident, TokenType.IntConst, TokenType.CharConst,
-                TokenType.Int, TokenType.Char);
+                TokenType.LParen, TokenType.Ident, TokenType.IntConst, TokenType.CharConst);
     }
 
     // ------------------------------------------------------------- compile unit
@@ -276,7 +275,7 @@ public class Parser {
         boolean hasParams;
         if (among(TokenType.RParen, TokenType.LBrace)) {
             hasParams = false;
-        } else if (atExpressionStart()) {
+        } else if (among(TokenType.Int, TokenType.Char)) {
             hasParams = true;
         } else {
             // 其它意外记号：跳过它，让 consume(RParen) 报缺右括号，避免整个解析崩掉。
@@ -470,7 +469,9 @@ public class Parser {
     // Stmt -> 'return' [Exp] ';'
     private Stmt parseReturnStmt() {
         Token returnToken = consume(TokenType.Return);
-        Exp exp = among(TokenType.Semicolon) ? null : parseExp();
+        // Exp 可选；缺少分号时也可能直接遇到 } 或下一条语句的关键字。
+        // 只有看到表达式的起始符才解析，缺少的分号交给 consume 恢复。
+        Exp exp = atExpressionStart() ? parseExp() : null;
         consume(TokenType.Semicolon);
         return watch(new ReturnStmt(returnToken, exp));
     }
@@ -582,7 +583,9 @@ public class Parser {
         if (among(TokenType.Ident) && among(1, TokenType.LParen)) {
             Token ident = consume(TokenType.Ident);
             consume(TokenType.LParen);
-            FuncRParams params = among(TokenType.RParen) ? null : parseFuncRParams();
+            // 空实参调用缺少 ')' 时，下一个符号可能是 ';'、运算符等，
+            // 不能把它强行作为实参解析，否则会使整个语法分析提前中断。
+            FuncRParams params = atExpressionStart() ? parseFuncRParams() : null;
             consume(TokenType.RParen);
             return watch(UnaryExp.call(ident, params));
         }
