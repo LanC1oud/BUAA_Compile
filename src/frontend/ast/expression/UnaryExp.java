@@ -18,6 +18,11 @@ public class UnaryExp extends ASTNode {
     private final UnaryOp op;
     private final Token castType;
     private final UnaryExp operand;
+    private boolean charResult;
+
+    public void setCharResult(boolean charResult) {
+        this.charResult = charResult;
+    }
 
     private UnaryExp(Kind kind, PrimaryExp primary, Token ident, FuncRParams params,
                      UnaryOp op, Token castType, UnaryExp operand) {
@@ -80,13 +85,14 @@ public class UnaryExp extends ASTNode {
     // throws UnsupportedOperationException for calls and for logical not
     @Override
     public int calculateConst() {
-        return switch (kind) {
+        int value = switch (kind) {
             case Primary -> primary.calculateConst();
             case Call -> throw new UnsupportedOperationException(
                     "函数调用 `" + ident.value() + "` 没有编译期值");
             case Unary -> calculateUnary();
             case Cast -> cast(operand.calculateConst(), castType);
         };
+        return charResult ? value & 0xFF : value;
     }
 
     private int calculateUnary() {

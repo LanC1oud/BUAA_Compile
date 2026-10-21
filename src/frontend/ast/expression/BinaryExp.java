@@ -8,6 +8,12 @@ public abstract class BinaryExp extends ASTNode {
     private final ASTNode left;
     private final Token op;
     private final ASTNode right;
+    private boolean charResult;
+
+    // 语义分析确定类型后，char 常量运算需要在每一步回绕，不能只截断最终值。
+    public void setCharResult(boolean charResult) {
+        this.charResult = charResult;
+    }
 
     protected BinaryExp(ASTNode left) {
         this.left = left;
@@ -45,6 +51,6 @@ public abstract class BinaryExp extends ASTNode {
         if (!isLeaf()) {
             value = ConstValue.calculate(value, right.calculateConst(), op.getType());
         }
-        return value;
+        return charResult ? value & 0xFF : value;
     }
 }

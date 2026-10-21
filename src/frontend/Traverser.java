@@ -56,7 +56,6 @@ final public class Traverser {
 
     private boolean returnTypeIsVoid = false;
     private Type currentFunctionType = null;
-    private boolean returnWithValueFound = false;
 
     private int loopDepth = 0;
     private int breakDepth = 0;
@@ -97,13 +96,17 @@ final public class Traverser {
             if (symbols.addParameter(symbol, param.getIdent().value(), paramType) == null) {
                 //b:DuplicatedDeclaration
                 errors.add(ErrorType.DuplicatedDeclaration, param.getIdent().location());
+                // 重名只影响作用域中的定义，不能改变函数声明的形参数量。
+                SymbolVariable duplicate = new SymbolVariable(param.getIdent().value(),
+                        paramType, false, symbols.currentScopeId());
+                duplicate.setFromParam();
+                symbol.addParameter(duplicate);
             }
         }
 
         Type declaredReturn = Type.from(func.getFuncType());
         returnTypeIsVoid = func.getFuncType().isVoid();
         currentFunctionType = declaredReturn;
-        returnWithValueFound = false;
         visitBlock(func.getBlock());
         checkMissingReturn(func.getBlock(), func.getFuncType().isVoid());
         symbols.exitScope();
@@ -116,14 +119,17 @@ final public class Traverser {
         symbols.newScope();
         returnTypeIsVoid = false;
         currentFunctionType = Type.Int;
-        returnWithValueFound = false;
         visitBlock(main.getBlock());
         checkMissingReturn(main.getBlock(), false);
         symbols.exitScope();
     }
 
     private void checkMissingReturn(Block body, boolean isVoid) {
-        if (isVoid || returnWithValueFound || body == null) {
+        if (isVoid || body == null) {
+            return;
+        }
+        List<BlockItem> items = body.getItems();
+        if (!items.isEmpty() && items.get(items.size() - 1).getItem() instanceof ReturnStmt) {
             return;
         }
         Token end = body.getEndToken();
@@ -177,7 +183,7 @@ final public class Traverser {
             if (decl.isStatic()) {
                 symbol.setStatic();
             }
-            analyzeInitVal(def.getInitVal(), declared);
+            analyzeInitVal(def.getInitVal(), declared, symbol.isGlobal());
             if (symbol.isGlobal() || symbol.isStatic()) {
                 recordVariableValue(symbol, declared, def.getInitVal());
             }
@@ -188,7 +194,10 @@ final public class Traverser {
         if (length == null) {
             return base;
         }
-        analyzeConstExp(length);
+        Type lengthType = analyzeConstExp(length);
+        if (lengthType != null && !lengthType.isInt()) {
+            errors.add(ErrorType.MismatchedParameterType, lineOf(length));
+        }
         Integer size = ConstFolder.fold(length);
         if (size == null || size <= 0) {
             return Type.ofArray(base, 0);
@@ -247,25 +256,25 @@ final public class Traverser {
             return;
         }
         if (init.getKind() == ConstInitVal.Kind.Str) {
-            checkStringLength(init.getString(), declared);
+            checkStringInitializer(init.getString(), declared);
             return;
         }
         analyzeConstElements(init.getElements(), declared);
     }
 
-    private void analyzeInitVal(InitVal init, Type declared) {
+    private void analyzeInitVal(InitVal init, Type declared, boolean constContext) {
         if (init == null) {
             return;
         }
         if (!declared.isArray()) {
             if (init.getKind() == InitVal.Kind.Exp) {
-                Type actual = analyzeExp(init.getExp());
+                Type actual = analyzeAddExp(init.getExp().getAddExp(), constContext);
                 checkInitializerType(actual, declared, init.getExp());
             }
             return;
         }
         if (init.getKind() == InitVal.Kind.Str) {
-            checkStringLength(init.getString(), declared);
+            checkStringInitializer(init.getString(), declared);
             return;
         }
         List<Exp> elements = init.getElements();
@@ -277,11 +286,8 @@ final public class Traverser {
             errors.add(ErrorType.MismatchedParameterType, initTokenLine(init));
         }
         for (Exp element : elements) {
-            Type actual = analyzeExp(element);
-            if (actual != null && actual.isBasic() && !actual.equals(declared.getElementType())) {
-                //e:MismatchedParameterType
-                errors.add(ErrorType.MismatchedParameterType, initTokenLine(init));
-            }
+            Type actual = analyzeAddExp(element.getAddExp(), constContext);
+            checkInitializerType(actual, declared.getElementType(), element);
         }
     }
 
@@ -290,15 +296,17 @@ final public class Traverser {
             return;
         }
         for (ConstExp element : elements) {
-            analyzeConstExp(element);
+            Type actual = analyzeConstExp(element);
+            checkInitializerType(actual, declared.getElementType(), element);
         }
     }
 
-    private void checkStringLength(Token string, Type declared) {
-        if (string == null || declared.getLength() <= 0) {
+    private void checkStringInitializer(Token string, Type declared) {
+        if (string == null) {
             return;
         }
-        if (string.value().length() + 1 > declared.getLength()) {
+        // 文法允许字符串按数组长度截断，不要求为结尾的 '\0' 额外留空间。
+        if (!declared.getElementType().isChar()) {
             //e:MismatchedParameterType
             errors.add(ErrorType.MismatchedParameterType, string.location());
         }
@@ -386,6 +394,9 @@ final public class Traverser {
     private void analyzeSwitch(SwitchStmt stmt) {
         Type selector = analyzeExp(stmt.getExp());
         boolean selectorIsBasic = selector != null && selector.isBasic();
+        if (selector != null && !selectorIsBasic) {
+            errors.add(ErrorType.MismatchedParameterType, lineOf(stmt.getExp()));
+        }
 
         Set<Integer> usedLabels = new HashSet<>();
         boolean defaultSeen = false;
@@ -406,7 +417,7 @@ final public class Traverser {
                         if (!usedLabels.add(value)) {
                             //n:DuplicatedCaseLabel
                             errors.add(ErrorType.DuplicatedCaseLabel,
-                                    number.getToken().location());
+                                    caseStmt.getKeyword().location());
                         }
                     }
                     Type labelType = number.getToken().is(TokenType.CharConst) ? Type.Char : Type.Int;
@@ -435,7 +446,7 @@ final public class Traverser {
             errors.add(ErrorType.AssignToConstant, target.getIdent().location());
         }
         Type right = analyzeExp(stmt.getExp());
-        if (left != null && right != null && !compatible(left, right)) {
+        if (left != null && right != null && (!left.isBasic() || !left.equals(right))) {
             //e:MismatchedParameterType
             errors.add(ErrorType.MismatchedParameterType, lineOf(target));
         }
@@ -447,7 +458,6 @@ final public class Traverser {
             return;
         }
         Type actual = analyzeExp(stmt.getExp());
-        returnWithValueFound = true;
         if (returnTypeIsVoid) {
             //f:MismatchedReturnType
             errors.add(ErrorType.MismatchedReturnType, stmt.getReturnToken().location());
@@ -455,7 +465,7 @@ final public class Traverser {
         }
         Type declared = currentFunctionType;
         if (actual != null && declared != null
-                && actual.isBasic() && declared.isBasic() && !actual.equals(declared)) {
+                && !actual.equals(declared)) {
             //e:MismatchedParameterType
             errors.add(ErrorType.MismatchedParameterType, stmt.getReturnToken().location());
         }
@@ -599,8 +609,12 @@ final public class Traverser {
         }
         Type left = analyzeOperand(binary.getLeft(), constContext);
         if (binary.isLeaf()) {
-            put(node, left);
-            return left;
+            Type result = resultIsInt && left != null ? Type.Int : left;
+            if (resultIsInt && left != null && !left.isBasic()) {
+                errors.add(ErrorType.MismatchedParameterType, lineOf(binary.getLeft()));
+            }
+            put(node, result);
+            return result;
         }
         Type right = analyzeOperand(binary.getRight(), constContext);
 
@@ -715,7 +729,7 @@ final public class Traverser {
                     exp.getOp().getToken().location());
             return null;
         }
-        return operand;
+        return exp.getOp().getToken().is(TokenType.Not) ? Type.Int : operand;
     }
 
     private void checkConsecutiveUnary(UnaryExp outer, Type operandType) {
@@ -729,14 +743,6 @@ final public class Traverser {
             return;
         }
         if (inner.getKind() != UnaryExp.Kind.Unary || inner.getOp() == null) {
-            return;
-        }
-        // deeper 同理，只判空。
-        UnaryExp deeper = inner.getOperand();
-        if (deeper != null
-                && deeper.getKind() == UnaryExp.Kind.Unary
-                && deeper.getOp() != null
-                && deeper.getOp().getToken().is(outer.getOp().getToken())) {
             return;
         }
         if (outer.getOp().getToken().is(inner.getOp().getToken())) {
@@ -757,8 +763,13 @@ final public class Traverser {
         }
 
         SymbolFunction function = symbols.getFunction(ident.value());
+        if (symbols.getVariable(ident.value()) != null) {
+            // 已定义的变量不能当函数调用；局部变量也会隐藏同名的全局函数。
+            errors.add(ErrorType.MismatchedParameterType, ident.location());
+            return null;
+        }
         if (function == null) {
-            //c:UndefinedReference (also for calling a variable)
+            //c:UndefinedReference
             errors.add(ErrorType.UndefinedReference, ident.location());
             return null;
         }
@@ -823,8 +834,9 @@ final public class Traverser {
         Token ident = lval.getIdent();
         SymbolVariable symbol = symbols.getVariable(ident.value());
         if (symbol == null) {
-            //c:UndefinedReference
-            errors.add(ErrorType.UndefinedReference, ident.location());
+            errors.add(symbols.getFunction(ident.value()) == null
+                    ? ErrorType.UndefinedReference : ErrorType.MismatchedParameterType,
+                    ident.location());
             return null;
         }
         if (constContext && !symbol.isConst()) {
@@ -844,7 +856,7 @@ final public class Traverser {
             errors.add(ErrorType.MismatchedParameterType, ident.location());
             return null;
         }
-        Type index = analyzeExp(lval.getIndex());
+        Type index = analyzeAddExp(lval.getIndex().getAddExp(), constContext);
         if (index != null && !index.isInt()) {
             //e:MismatchedParameterType
             errors.add(ErrorType.MismatchedParameterType, ident.location());
@@ -857,6 +869,11 @@ final public class Traverser {
     private void put(ASTNode node, Type type) {
         if (node != null && type != null) {
             types.put(node, type);
+            if (node instanceof BinaryExp binary) {
+                binary.setCharResult(type.isChar());
+            } else if (node instanceof UnaryExp unary) {
+                unary.setCharResult(type.isChar());
+            }
         }
     }
 

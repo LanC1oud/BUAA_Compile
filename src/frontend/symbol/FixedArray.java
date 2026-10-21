@@ -5,6 +5,7 @@ import frontend.ast.declaration.InitVal;
 import frontend.ast.expression.ConstExp;
 import frontend.ast.expression.Exp;
 import frontend.token.Token;
+import utils.ConstFolder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,7 @@ final public class FixedArray {
         return values.getOrDefault(index, 0);
     }
 
+    // 初值有语义错误、无法求值时返回 null，由语义分析继续报告后续错误。
     public static FixedArray from(int length, ConstInitVal init) {
         FixedArray array = new FixedArray(length);
         if (init.getKind() == ConstInitVal.Kind.Str) {
@@ -43,10 +45,14 @@ final public class FixedArray {
         }
         int index = 0;
         if (init.getKind() == ConstInitVal.Kind.Exp) {
-            array.set(index, init.getExp().calculate());
+            Integer value = ConstFolder.fold(init.getExp());
+            if (value == null) return null;
+            array.set(index, value);
         } else {
             for (ConstExp element : init.getElements()) {
-                array.set(index++, element.calculate());
+                Integer value = ConstFolder.fold(element);
+                if (value == null) return null;
+                array.set(index++, value);
             }
         }
         return array;
@@ -60,10 +66,14 @@ final public class FixedArray {
         }
         int index = 0;
         if (init.getKind() == InitVal.Kind.Exp) {
-            array.set(index, init.getExp().calculateConst());
+            Integer value = ConstFolder.fold(init.getExp());
+            if (value == null) return null;
+            array.set(index, value);
         } else {
             for (Exp element : init.getElements()) {
-                array.set(index++, element.calculateConst());
+                Integer value = ConstFolder.fold(element);
+                if (value == null) return null;
+                array.set(index++, value);
             }
         }
         return array;

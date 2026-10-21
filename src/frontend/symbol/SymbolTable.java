@@ -112,7 +112,8 @@ final public class SymbolTable {
     }
 
     public boolean declaredInCurrentScope(String name) {
-        return stack.peek().containsKey(name) || isReserved(name);
+        return stack.peek().containsKey(name) || isReserved(name)
+                || (stack.size() == 1 && allFunctions.containsKey(name));
     }
 
     // ------------------------------------------------------------------ 函数
@@ -158,7 +159,7 @@ final public class SymbolTable {
     private void installRuntimeFunctions() {
         library("get_int", Type.Int);
         library("get_char", Type.Char);
-        library("get_string", Type.Int, Type.CharArray, Type.Int);
+        library("get_string", Type.Void, Type.CharArray, Type.Int);
         library("put_int", Type.Void, Type.Int);
         library("put_char", Type.Void, Type.Char);
         library("put_string", Type.Void, Type.CharArray);
