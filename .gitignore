@@ -9,6 +9,10 @@ out/
 # 构建产物（build.sh / build.bat 的输出）
 build/
 
+# Python 测试生成工具缓存
+__pycache__/
+*.pyc
+
 # 运行/评测产物
 lexer.txt
 parser.txt

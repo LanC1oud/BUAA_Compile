@@ -179,3 +179,22 @@ run.bat --help
 - **阶段对比**：各阶段耗时、产物行数、token/节点/符号数，以及错误数演变。
 - **文法速查**：关键字 / 运算符 / 转义字符，数据直接读 `src/` 的三张表
 - **日志**：stdout/stderr 捕获。
+
+---
+
+## 四、文法驱动的测试生成
+
+独立命令行工具 `testgen/` 可根据已有文法和新增 EBNF 规则，批量生成可复现的 `testfile.txt` 及独立的词法、语法、符号表、错误预期。
+
+```powershell
+python -m testgen --count 20 --seed 42 --out build/generated
+python -m testgen --rule "UnaryExp -> '++' LVal | LVal '++'" --count 30 --out build/generated-inc
+python -m testgen --suite boundary --out build/generated-boundary
+python -m testgen --suite mixed --rules testgen/examples/inc.ebnf --count 30 --scale 2 --out build/generated-inc-extremes
+```
+
+仅生成需要 Python 3.10+，无需第三方包；增加 `--check` 可与当前 Java 编译器逐个比较，需要 JDK 17+。完整程序采用受控语义模型；任意新文法可先用 `--mode syntax` 生成片段，复杂新语义需要补充契约。详见 [文法测试生成器](docs/文法测试生成器.md)。
+
+边界套件覆盖 `a`～`n`、类型/作用域组合、错误恢复及四档压力规模；`++` 有独立边界扩展。`--official-zip` 可重复指定官方包，保留原答案并生成重命名/空行变体，提供来源和实际覆盖统计。范围与验证结果见 [极端测试覆盖与官方样例分析](docs/极端测试覆盖与官方样例分析.md)。
+
+新增运算符、表达式、语句、声明或类型时，可按 [文法增添通用指南](docs/文法增添通用指南.md) 梳理规则契约、修改文件、分层实现与验证，并复用其中的具体扩展文档模板。

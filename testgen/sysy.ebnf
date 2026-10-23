@@ -1,0 +1,42 @@
+CompUnit -> {Decl} {FuncDef} MainFuncDef
+Decl -> ConstDecl | VarDecl
+ConstDecl -> 'const' BType ConstDef {',' ConstDef} ';'
+BType -> 'int' | 'char'
+ConstDef -> Ident ['[' ConstExp ']'] '=' ConstInitVal
+ConstInitVal -> ConstExp | '{' [ConstExp {',' ConstExp}] '}' | StringConst
+VarDecl -> ['static'] BType VarDef {',' VarDef} ';'
+VarDef -> Ident ['[' ConstExp ']'] | Ident ['[' ConstExp ']'] '=' InitVal
+InitVal -> Exp | '{' [Exp {',' Exp}] '}' | StringConst
+FuncDef -> FuncType Ident '(' [FuncFParams] ')' Block
+MainFuncDef -> 'int' 'main' '(' ')' Block
+FuncType -> 'void' | 'int' | 'char'
+FuncFParams -> FuncFParam {',' FuncFParam}
+FuncFParam -> BType Ident ['[' ']']
+Block -> '{' {BlockItem} '}'
+BlockItem -> Decl | Stmt
+Stmt -> LVal '=' Exp ';'
+      | [Exp] ';'
+      | Block
+      | 'if' '(' Cond ')' Stmt ['else' Stmt]
+      | 'while' '(' Cond ')' Stmt
+      | 'switch' '(' Exp ')' '{' {CaseStmt} '}'
+      | 'break' ';'
+      | 'continue' ';'
+      | 'return' [Exp] ';'
+      | 'printf' '(' StringConst {',' Exp} ')' ';'
+CaseStmt -> 'case' Number ':' {Stmt} | 'default' ':' {Stmt}
+Exp -> AddExp
+Cond -> LOrExp
+LVal -> Ident ['[' Exp ']']
+PrimaryExp -> '(' Exp ')' | LVal | Number
+Number -> IntConst | CharConst
+UnaryExp -> PrimaryExp | Ident '(' [FuncRParams] ')' | UnaryOp UnaryExp | '(' BType ')' UnaryExp
+UnaryOp -> '+' | '-' | '!'
+FuncRParams -> Exp {',' Exp}
+MulExp -> UnaryExp | MulExp ('*' | '/' | '%') UnaryExp
+AddExp -> MulExp | AddExp ('+' | '-') MulExp
+RelExp -> AddExp | RelExp ('<' | '>' | '<=' | '>=') AddExp
+EqExp -> RelExp | EqExp ('==' | '!=') RelExp
+LAndExp -> EqExp | LAndExp '&&' EqExp
+LOrExp -> LAndExp | LOrExp '||' LAndExp
+ConstExp -> AddExp
