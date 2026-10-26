@@ -3,6 +3,10 @@
 *.iml
 out/
 
+# 前端外壳的构建产物与本地偏好
+build/
+.compiler-ui.properties
+
 # macOS
 .DS_Store
 
@@ -22,7 +26,11 @@ llvm_ir.txt
 mips.txt
 
 # 本地测试备份
-testfile.invalid-sysy.bak
+testfiles/testfile.invalid-sysy.bak
+
+# 前端批量编译的产物与本地样例集
+output/
+testfile/
 
 tools
 tests
