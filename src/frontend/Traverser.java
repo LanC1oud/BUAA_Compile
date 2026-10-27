@@ -716,6 +716,7 @@ final public class Traverser {
     }
 
     private Type analyzeUnaryOp(UnaryExp exp, boolean constContext) {
+        
         Type operand = analyzeUnaryExp(exp.getOperand(), constContext);
         if (exp.getOp() != null && exp.getOp().getToken().is(TokenType.Not) && !insideCondition) {
             //e:MismatchedParameterType
@@ -737,7 +738,7 @@ final public class Traverser {
             return;
         }
         // getOperand() 的返回类型本就是 UnaryExp，且只有 Unary/Cast 两种形态才非空，
-        // 所以普通空值判断即可，不必用 instanceof 模式（保持 Java 17 语言级别兼容）。
+        // 所以普通空值判断即可，不必用 instanceof 模式
         UnaryExp inner = outer.getOperand();
         if (inner == null) {
             return;

@@ -4,8 +4,7 @@ import frontend.ast.ASTNode;
 import frontend.token.Token;
 import frontend.token.TokenType;
 
-// UnaryExp -> PrimaryExp | Ident '(' [FuncRParams] ')' | UnaryOp
-// UnaryExp | '(' BType ')' UnaryExp
+// UnaryExp -> PrimaryExp | Ident '(' [FuncRParams] ')' | UnaryOp UnaryExp | '(' BType ')' UnaryExp
 public class UnaryExp extends ASTNode {
     public enum Kind {
         Primary, Call, Unary, Cast
