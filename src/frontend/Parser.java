@@ -270,19 +270,14 @@ public class Parser {
         FuncType funcType = parseFuncType();
         Token ident = consume(TokenType.Ident);
         consume(TokenType.LParen);
-        // 形参必须以 int/char 开头；看到 '{' 说明参数表已结束、缺的其实是 ')'，
-        // 这里不把 '{' 当形参解析，交给下面的 consume(RParen) 报错误 j。
-        boolean hasParams;
-        if (among(TokenType.RParen, TokenType.LBrace)) {
-            hasParams = false;
-        } else if (among(TokenType.Int, TokenType.Char)) {
-            hasParams = true;
-        } else {
-            // 其它意外记号：跳过它，让 consume(RParen) 报缺右括号，避免整个解析崩掉。
-            __tokens.next();
-            hasParams = false;
+        FuncFormalParams params = null;
+        if (among(TokenType.Int, TokenType.Char)) {
+            params = parseFuncFParams();
         }
-        FuncFormalParams params = hasParams ? parseFuncFParams() : null;
+        if (!among(TokenType.RParen, TokenType.LBrace)) {
+            throw new IllegalStateException(
+                    "函数参数表后应为 ')'，缺少 ')' 时应紧接函数体 '{'");
+        }
         consume(TokenType.RParen);
         return watch(new FuncDef(funcType, ident, params, parseBlock()));
     }
