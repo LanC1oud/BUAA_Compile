@@ -11,6 +11,8 @@
 | [幂运算 `**`](文法扩展-幂运算符.md) | 插入优先级层、结合性、AST 递归、常量求值、定义域 | `PowerExp`、`parsePowerExp()`、`analyzePowerExp()`、`powInt32()` |
 | [复合赋值 `+=`](文法扩展-复合赋值.md) | 赋值语句判别与回溯、类型一致、左值只求值一次 | `CompoundAssignStmt`、`isAssignStmt()`、`analyzeCompoundAssign()` |
 | [`do…while` 循环](文法扩展-do-while循环.md) | 新关键字、新语句、循环上下文、作用域、跳转目标 | `DoWhileStmt`、`parseDoWhileStmt()`、`analyzeDoWhile()` |
+| [2022 期中：repeat…until 与十六进制整数](2022期中-repeat-until与十六进制整数.md) | 考试词法 / 语法输出、数字扫描、后测试循环、版本基线差异 | `readNumber()`、`parseRepeatUntilStmt()`、`parseNumber()` |
+| [期中：Assign、三目语句、输入与 ForStmt](期中-Assign复合赋值与三目语句及ForStmt.md) | 复合赋值集合、条件右侧回溯、专用输入、for 头共享与分隔符 | `parseAssign()`、`parseAssignedStmt()`、`parseForStmt()` |
 
 建议按 `~` → `**` → `+=` → `do…while` → `++` 阅读。每份方案可独立实施；相互组合时按第 3 节合并共同改动。
 
