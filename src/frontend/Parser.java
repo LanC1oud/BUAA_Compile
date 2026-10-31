@@ -386,22 +386,20 @@ public class Parser {
         consume(TokenType.Semicolon);
         return watch(new ExpStmt(exp));
     }
-
+    
     private boolean isAssignStmt() {
         if (!among(TokenType.Ident)) {
             return false;
         }
         trace.save();
-        boolean assign = false;
         try {
             parseLVal();
-            assign = among(TokenType.Assign);
+            return among(TokenType.Assign);
         } catch (RuntimeException e) {
-            assign = false;
+            return false;
         } finally {
             trace.restore();
         }
-        return assign;
     }
 
     // Stmt -> 'if' '(' Cond ')' Stmt [ 'else' Stmt ]
