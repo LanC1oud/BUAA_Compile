@@ -70,6 +70,10 @@ public final class PipelineCheck {
 
             CompileResult result = pipeline.resultOf(stage);
             if (result == null) {
+                if (stage == Stage.LLVM && !pipeline.rawErrors().isEmpty()) {
+                    System.out.println("  [ OK ] 前端错误阻止 IR 生成");
+                    continue;
+                }
                 // 解析器中断是编译器自身的健壮性问题，不是界面的错误：
                 // 只要中断消息明确，就算"已正确报告"。
                 String crash = pipeline.crashMessage();
@@ -120,6 +124,8 @@ public final class PipelineCheck {
             second.compile(source.toString(), stage);
             CompileResult a = first.resultOf(stage);
             CompileResult b = second.resultOf(stage);
+            if (stage == Stage.LLVM && a == null && b == null && first.rawErrors().equals(second.rawErrors())
+                    && !first.rawErrors().isEmpty()) continue;
             String crashA = first.crashMessage();
             String crashB = second.crashMessage();
             if (crashA != null || crashB != null) {

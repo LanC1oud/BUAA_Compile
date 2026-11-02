@@ -24,7 +24,9 @@ public class Number extends ASTNode {
     // throws IllegalArgumentException for any other token
     public static int valueOf(Token token) {
         if (token.is(TokenType.IntConst)) {
-            return Integer.parseInt(token.value());
+            // The magnitude in -2147483648 is parsed before its unary minus.
+            // Retain its i32 bit pattern instead of overflowing Java's signed parser.
+            return Integer.parseUnsignedInt(token.value());
         }
         if (token.is(TokenType.CharConst)) {
             return token.value().isEmpty() ? 0 : token.value().charAt(0);

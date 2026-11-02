@@ -1,0 +1,123 @@
+// Syntax test: elif chains and function declarations.
+// According to this screenshot, both declarations and definitions are FuncDef.
+
+const int SMALL = 10;
+const int LARGE = 100;
+
+// Declarations: one parameter, multiple parameters, void, array parameter.
+int classify(int value);
+int sum(int left, int right);
+void emit(int value);
+int first(int data[]);
+
+int classify(int value) {
+    int result = 0;
+    if (value < 0) {
+        result = -1;
+    } elif (value == 0) {
+        result = 0;
+    } elif (value < SMALL) {
+        result = 1;
+    } elif (value < LARGE) {
+        result = 2;
+    } else {
+        result = 3;
+    }
+    return result;
+}
+
+// A declaration after a definition; empty parameter list and void return type.
+void idle();
+
+int sum(int left, int right) {
+    return left + right;
+}
+
+// Empty parameter list and int return type.
+int zero();
+
+void emit(int value) {
+    printf("result=%d\n", value);
+    return;
+}
+
+int first(int data[]) {
+    return data[0];
+}
+
+int zero() {
+    return 0;
+}
+
+void idle() {
+    return;
+}
+
+int main() {
+    int x = 0;
+    int y = 2;
+    int result = 0;
+    int data[3] = {4, 5, 6};
+    int elifValue = 7;
+
+    // Zero elif, no else; a single-statement body.
+    if (x == 0)
+        result = result + 1;
+
+    // One elif, no else.
+    if (x < 0) {
+        result = result + 100;
+    } elif (x == 0) {
+        result = result + 2;
+    }
+
+    // One elif and an else; no braces on the three bodies.
+    if (y < 0)
+        result = result + 100;
+    elif (y == 2)
+        result = result + 4;
+    else
+        result = result + 200;
+
+    // Nested chains; braces make the ownership of each elif unambiguous.
+    if (x == 0) {
+        if (y == 1) {
+            result = result + 100;
+        } elif (y == 2) {
+            result = result + 8;
+        } else {
+            result = result + 200;
+        }
+    } elif (x == 1) {
+        result = result + 300;
+    } else {
+        result = result + 400;
+    }
+
+    // Empty Stmt bodies and no final else.
+    if (x < 0)
+        ;
+    elif (x == 0)
+        ;
+    elif (x > 0) {
+        result = result + 500;
+    }
+
+    // Function calls and logical operators in an elif chain.
+    if (classify(-1) == -1 && classify(0) == 0) {
+        result = result + 16;
+    } elif (classify(5) == 1 || classify(50) == 2) {
+        result = result + 600;
+    } elif (classify(100) == 3) {
+        result = result + 700;
+    } else {
+        result = result + 800;
+    }
+
+    result = sum(result, first(data));
+    result = result + zero() + elifValue;
+    idle();
+    emit(result);
+    printf("elifValue=%d\n", elifValue);
+    return 0;
+}

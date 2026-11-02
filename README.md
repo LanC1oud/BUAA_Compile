@@ -5,7 +5,7 @@
 - 词法分析 ✅
 - 语法分析 ✅
 - 语义分析 ✅
-- 中间代码生成
+- LLVM IR 生成 ✅
 - 代码优化
 - 目标代码生成
 
@@ -23,7 +23,7 @@
 | 1 词法分析 | `frontend/Lexer.java`、`frontend/token/` | `lexer.txt`（token 序列） | ✅ 完成 |
 | 2 语法分析 | `frontend/Parser.java`、`frontend/ast/` | `parser.txt`（token + 语法树先序） | ✅ 完成 |
 | 3 语义分析 | `frontend/Traverser.java`、`frontend/symbol/` | `symbol.txt`（符号表） | ✅ 完成 |
-| 4 中间代码生成 | 待实现 | `llvm_ir.txt` | ⬜ 未开始 |
+| 4 中间代码生成 | `llvm/`、`frontend/SemanticInfo.java` | `llvm_ir.txt` | ✅ 完成（LLVM 12） |
 | 5 代码优化 | 待实现 | — | ⬜ 未开始 |
 | 6 目标代码生成 | 待实现 | `mips.txt` | ⬜ 未开始 |
 
@@ -109,7 +109,7 @@ testfile*.sysy                  测试用例
 
 ## 二、目前所处开发阶段
 
-**第 3 阶段（语义分析）刚完成，正在进入第 4 阶段（中间代码生成）之前。**
+**第 4 阶段（LLVM IR 生成）已完成。** 支持 2026 SysY 的 int/char、函数、数组、显式转换、短路、while、switch、static 及六个运行时接口；命令行和 UI 默认生成 LLVM IR。
 
 已完成：
 
@@ -135,7 +135,7 @@ testfile*.sysy                  测试用例
 ```bash
 # 1) 准备输入：把待编译源码放到项目根的 testfile.txt
 #    阶段开关改 src/utils/HomeworkConfig.java 里的 hw 字段
-#      public static Hw hw = Hw.Semantic;   // Lexer / Syntax / Semantic
+#      public static Hw hw = Hw.Llvm;   // Lexer / Syntax / Semantic / Llvm
 
 # 2) 编译
 javac -encoding UTF-8 -d out/production/BUAA_Compile $(find src -name '*.java')
@@ -144,10 +144,27 @@ javac -encoding UTF-8 -d out/production/BUAA_Compile $(find src -name '*.java')
 java -cp out/production/BUAA_Compile Compiler
 ```
 
-产物落在项目根，按阶段不同：`lexer.txt` / `parser.txt` / `symbol.txt`；
+产物落在项目根，按阶段不同：`lexer.txt` / `parser.txt` / `symbol.txt` / `llvm_ir.txt`；
 有错时写 `error.txt`。
 
 IDEA 里直接运行 `src/Compiler.java` 的 `main` 即可。
+
+### LLVM IR 阶段
+
+默认读取 `testfile.txt` 并生成 `llvm_ir.txt`，编译过程不读取程序运行时的标准输入。可通过参数保留前面阶段或指定文件：
+
+```powershell
+java -cp build/llvm-tests/classes Compiler --stage Llvm --source tests/official-llvm.sysy --output build/program.ll
+java -cp build/llvm-tests/classes Compiler --stage Semantic
+python tools/setup-llvm12.py
+python tests/run-llvm-tests.py
+pwsh -NoProfile -File tests/run-semantic-tests.ps1
+pwsh -NoProfile -File tools/pack.ps1
+```
+
+`tests/run-llvm-tests.py` 会先用 JDK 17 兼容选项编译项目，再使用 LLVM 12.0.0 验证并执行全部用例。工具链只安装到 `build/llvm12/`；课程运行时的兼容副本及重新生成方法见 [运行时说明](runtime/README.md)。提交包在 `out/Compiler-jdk17.zip`，只依赖 JDK 17 标准库。
+
+逐条任务的实现、函数和源码行号见 [LLVM IR 阶段任务完成对应表](docs/LLVM%20IR阶段任务完成对应表.md)。修改前快照及回滚脚本在 `backups/before-llvm-20261101-234349/`，包含当时未提交的代码与文档。
 
 ### 3.3 图形前端方式
 

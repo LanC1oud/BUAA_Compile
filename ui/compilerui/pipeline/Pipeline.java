@@ -11,6 +11,7 @@ import frontend.Lexer;
 import frontend.Parser;
 import frontend.ParserWatcher;
 import frontend.Traverser;
+import llvm.IrGenerator;
 import frontend.ast.CompileUnit;
 import frontend.symbol.SymbolTable;
 import frontend.token.TokenStream;
@@ -31,7 +32,7 @@ import java.util.Objects;
  * 编译器前端管线：{@code utils.Controller} 的"库版本"。
  *
  * <p>Controller 面向命令行评测——读静态配置、每个阶段结束就 {@code System.exit(0)}，
- * 因此没法被界面反复调用。这个类把同样的三个阶段抽成可重复调用、返回结果对象、
+ * 这个类把词法、语法、语义、LLVM 四个阶段抽成可重复调用、返回结果对象、
  * 不退出 JVM 的接口。
  *
  * <p><b>本类不是线程安全的。</b> 它要复用 {@code Controller.errors} /
@@ -203,9 +204,10 @@ public final class Pipeline {
         start = System.nanoTime();
         log = new StringBuilder();
         CompileUnit ast = astHolder[0];
-        Captured<Void> traversed = capture(() -> {
-            new Traverser(ast).spawn();
-            return null;
+        Captured<Traverser> traversed = capture(() -> {
+            Traverser traverser = new Traverser(ast);
+            traverser.spawn();
+            return traverser;
         });
         long semanticMillis = millisSince(start);
         log.append(traversed.log());
@@ -213,6 +215,15 @@ public final class Pipeline {
         record(Stage.SEMANTIC, symbolText, errors, log,
                 new StageStats(Stage.SEMANTIC, semanticMillis, 0,
                         symbolText.lines().count(), "符号"));
+        if (until == Stage.SEMANTIC || !errors.noError()) return;
+        start = System.nanoTime();
+        Captured<llvm.IrModule> generated = capture(() ->
+                new IrGenerator(traversed.value().getSemanticInfo(), Configure.optimize ? Configure.irPasses : List.of()).generate(ast));
+        String ir = generated.value().toString();
+        long instructions = generated.value().getFunctions().stream().flatMap(f -> f.getBlocks().stream())
+                .mapToLong(b -> b.getInstructions().size()).sum();
+        record(Stage.LLVM, ir, errors, new StringBuilder(generated.log()),
+                new StageStats(Stage.LLVM, millisSince(start), 0, instructions, "指令"));
     }
 
     private static long millisSince(long startNanos) {

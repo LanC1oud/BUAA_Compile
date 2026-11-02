@@ -31,9 +31,9 @@ public record CompilerSettings(Stage stage,
         // （ParserWatcher 靠这个开关决定记不记录）。关掉的话 parser.txt 会是空的，
         // 而且「近似 AST」页也没东西可看。
         return new CompilerSettings(
-                Stage.SEMANTIC,
+                Stage.LLVM,
                 ".",
-                Stage.SEMANTIC.defaultFileName(),
+                Stage.LLVM.defaultFileName(),
                 false,
                 false, false, true, true);
     }

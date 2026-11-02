@@ -172,7 +172,7 @@ public final class CompilerUi extends JFrame {
             stageButtons.put(stage, radio);
             row.add(radio);
         }
-        stageButtons.get(Stage.SEMANTIC).setSelected(true);
+        stageButtons.get(Stage.LLVM).setSelected(true);
 
         row.add(javax.swing.Box.createHorizontalStrut(14));
         JButton open = new JButton("打开文件…");
@@ -317,7 +317,7 @@ public final class CompilerUi extends JFrame {
                 return entry.getKey();
             }
         }
-        return Stage.SEMANTIC;
+        return Stage.LLVM;
     }
 
     /** 换阶段时同步默认文件名。 */
@@ -418,7 +418,8 @@ public final class CompilerUi extends JFrame {
                     }
                     CompileResult last = collected.get(until);
                     if (last == null) {
-                        setStatus("没有产出结果");
+                        showView(errorPanel);
+                        setStatus("前端报错，LLVM IR 未生成（" + lastDisplayErrors.size() + " 处错误）");
                     } else if (last.noError()) {
                         setStatus("「" + until.displayName() + "」通过，可以导出了。");
                     } else {
@@ -473,7 +474,9 @@ public final class CompilerUi extends JFrame {
     private void showStage(Stage stage) {
         CompileResult result = lastResults.get(stage);
         if (result == null) {
-            payloadArea.setText("（尚未运行到「" + stage.displayName() + "」阶段，点击「▶ 运行」）");
+            payloadArea.setText(stage == Stage.LLVM && !pipeline.rawErrors().isEmpty()
+                    ? "前端检查未通过，未生成 LLVM IR。请查看「错误」页。"
+                    : "（尚未运行到「" + stage.displayName() + "」阶段，点击「▶ 运行」）");
             logArea.setText("");
             astPanel.setAstText(null);
             return;
@@ -555,9 +558,16 @@ public final class CompilerUi extends JFrame {
         Path target = dir.resolve(fileName);
         try {
             Files.createDirectories(dir);
+            boolean irFailed = stage == Stage.LLVM && (chosen.stage() != Stage.LLVM || !chosen.noError());
+            if (irFailed) {
+                Files.deleteIfExists(dir.resolve("llvm_ir.txt"));
+                target = dir.resolve("error.txt");
+            }
+            String exportText = irFailed ? pipeline.rawErrors() : chosen.outputText();
+            if (irFailed && exportText.isEmpty()) exportText = "# IR generation aborted: " + pipeline.crashMessage();
             // 这里写的就是产物原文：有错时与 error.txt 同格式，没有被界面改写。
             Files.writeString(target,
-                    chosen.outputText() + (trailingNewlineBox.isSelected() ? "\n" : ""),
+                    exportText + (trailingNewlineBox.isSelected() ? "\n" : ""),
                     StandardCharsets.UTF_8);
             setStatus("已导出 " + chosen.stage().displayName() + " → " + target
                     + (chosen.noError() ? "" : "（内容为原始错误格式）"));

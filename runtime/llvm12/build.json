@@ -1,0 +1,31 @@
+{
+  "clang": "LLVM (http://llvm.org/):\n  LLVM version 12.0.0\n  Optimized build.\n  Default target: x86_64-pc-windows-msvc\n  Host CPU: goldmont",
+  "command": [
+    "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\llvm12\\Library\\bin\\clang-12.exe",
+    "-cc1",
+    "-triple",
+    "x86_64-pc-windows-msvc",
+    "-emit-llvm",
+    "-O0",
+    "-fno-signed-char",
+    "-fms-extensions",
+    "-fms-compatibility",
+    "-fms-compatibility-version=19.29",
+    "-D_CRT_SECURE_NO_WARNINGS",
+    "-internal-isystem",
+    "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\llvm12\\Library\\lib\\clang\\12.0.0\\include",
+    "-internal-isystem",
+    "D:\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\include",
+    "-internal-isystem",
+    "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.22621.0\\ucrt",
+    "-internal-isystem",
+    "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.22621.0\\shared",
+    "runtime/libsysy.c",
+    "-o",
+    "runtime/llvm12/libsysy.ll"
+  ],
+  "source_sha256": {
+    "libsysy.c": "b34b45741d0dfb886d094a8379e8ec311b283a4b647ba69b66fcfb99996c4895",
+    "libsysy.h": "6ed223dca7b161254fe53626e196180355a44c890704e9309829bec4f12505bb"
+  }
+}

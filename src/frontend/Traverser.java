@@ -61,6 +61,9 @@ final public class Traverser {
     private int breakDepth = 0;
 
     private final Map<ASTNode, Type> types = new IdentityHashMap<>();
+    private final SemanticInfo semanticInfo = new SemanticInfo();
+
+    public SemanticInfo getSemanticInfo() { return semanticInfo; }
 
     private boolean insideCondition = false;
 
@@ -88,6 +91,7 @@ final public class Traverser {
                     func.getIdent().value(), Type.from(func.getFuncType()), symbols.currentScopeId());
         }
 
+        semanticInfo.bind(func, symbol);
         symbols.newScope();
         List<FuncFormalParam> params = func.getParams() == null
                 ? List.of() : func.getParams().getParams();
@@ -102,6 +106,7 @@ final public class Traverser {
                 duplicate.setFromParam();
                 symbol.addParameter(duplicate);
             }
+            semanticInfo.bind(param, symbol.getParameters().get(symbol.getParameters().size() - 1));
         }
 
         Type declaredReturn = Type.from(func.getFuncType());
@@ -165,6 +170,7 @@ final public class Traverser {
                 continue;
             }
             symbol.setConst();
+            semanticInfo.bind(def, symbol);
             analyzeConstInitVal(def.getInitVal(), declared);
             recordConstantValue(symbol, declared, def.getInitVal());
         }
@@ -183,6 +189,7 @@ final public class Traverser {
             if (decl.isStatic()) {
                 symbol.setStatic();
             }
+            semanticInfo.bind(def, symbol);
             analyzeInitVal(def.getInitVal(), declared, symbol.isGlobal());
             if (symbol.isGlobal() || symbol.isStatic()) {
                 recordVariableValue(symbol, declared, def.getInitVal());
@@ -774,6 +781,7 @@ final public class Traverser {
             errors.add(ErrorType.UndefinedReference, ident.location());
             return null;
         }
+        semanticInfo.bind(exp, function);
         if (constContext) {
             //c:UndefinedReference
             errors.add(ErrorType.UndefinedReference, ident.location());
@@ -821,7 +829,9 @@ final public class Traverser {
         if (number == null || number.getToken() == null) {
             return null;
         }
-        return number.getToken().is(TokenType.CharConst) ? Type.Char : Type.Int;
+        Type type = number.getToken().is(TokenType.CharConst) ? Type.Char : Type.Int;
+        put(number, type);
+        return type;
     }
 
     private Type analyzeLVal(LVal lval, boolean constContext) {
@@ -870,6 +880,7 @@ final public class Traverser {
     private void put(ASTNode node, Type type) {
         if (node != null && type != null) {
             types.put(node, type);
+            semanticInfo.putType(node, type);
             if (node instanceof BinaryExp binary) {
                 binary.setCharResult(type.isChar());
             } else if (node instanceof UnaryExp unary) {

@@ -198,7 +198,7 @@ public final class BatchRunner {
         pipeline.setSettings(settings);
         try {
             // 三个阶段一次跑完，产物后面按阶段分别落盘。
-            pipeline.compileContent(sample.source(), sample.path().toString(), Stage.SEMANTIC);
+            pipeline.compileContent(sample.source(), sample.path().toString(), Stage.LLVM);
         } catch (IOException e) {
             return new SampleOutcome(sample, List.of(), null,
                     e.getClass().getSimpleName() + ": " + e.getMessage());
@@ -219,6 +219,8 @@ public final class BatchRunner {
         Path dir = outputDir.resolve(resultDirName(sample));
         try {
             Files.createDirectories(dir);
+            Files.deleteIfExists(dir.resolve("llvm_ir.txt"));
+            Files.deleteIfExists(dir.resolve("error.txt"));
             for (CompileResult result : results) {
                 writeProduct(dir, result);
             }

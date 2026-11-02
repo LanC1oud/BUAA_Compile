@@ -1,39 +1,39 @@
-# IDE
-.idea/
+# IDE 与界面本地设置
+/.idea/
 *.iml
-out/
+/.compiler-ui.properties
 
-# 前端外壳的构建产物与本地偏好
-build/
-.compiler-ui.properties
+# 构建、打包及本地工具链产物
+/build/
+/out/
+*.class
 
-# macOS
-.DS_Store
+# 编译器在项目根目录生成的评测输出；保留子目录中的同名测试答案
+/lexer.txt
+/parser.txt
+/symbol.txt
+/error.txt
+/llvm_ir.txt
+/mips.txt
 
-# 构建产物（build.sh / build.bat 的输出）
-build/
+# 界面批量导出、本地样例与回滚备份
+/output/
+/testfile/
+/backups/
+/testfiles/testfile.invalid-sysy.bak
 
-# Python 测试生成工具缓存
+# 本地测试与辅助工具（保持原有忽略设置，不影响已被 Git 跟踪的文件）
+/tests/
+/tools/
+/testgen/
+/pdf2md_tool/
+
+# Python 缓存
 __pycache__/
 *.pyc
+*.pyo
 
-# 运行/评测产物
-lexer.txt
-parser.txt
-error.txt
-symbol.txt
-llvm_ir.txt
-mips.txt
-
-# 本地测试备份
-testfiles/testfile.invalid-sysy.bak
-
-# 前端批量编译的产物与本地样例集
-output/
-testfile/
-
-tools
-tests
-
-# pdf2md 工具（根目录 pdf2md_tool）：运行/构建产物不入库
-pdf2md_tool
+# 系统生成文件
+.DS_Store
+Thumbs.db
+Desktop.ini

@@ -162,18 +162,18 @@ public final class StageStatsPanel extends JPanel {
             previous = count;
         }
 
-        int finalErrors = errorCounts.getOrDefault(until, 0);
+        int finalErrors = errorCounts.getOrDefault(until, previous == null ? 0 : previous);
         // 分两行写：面板宽度有限，挤一行会被裁掉。
         summary.setText(String.format(
                 "<html>跑到 <b>%s</b>，总耗时 <b>%d ms</b>"
-                        + "（词法 %d / 语法 %d / 语义 %d）<br>"
+                        + "（词法 %d / 语法 %d / 语义 %d / IR %d）<br>"
                         + "规模：token <b>%d</b>　AST 节点 <b>%d</b>　符号 <b>%d</b>"
-                        + "　最终错误 <b>%d</b></html>",
+                        + "　IR 指令 <b>%d</b>　最终错误 <b>%d</b></html>",
                 until.displayName(), totalMillis,
                 millisOf(stats.get(Stage.LEXER)), millisOf(stats.get(Stage.SYNTAX)),
-                millisOf(stats.get(Stage.SEMANTIC)),
+                millisOf(stats.get(Stage.SEMANTIC)), millisOf(stats.get(Stage.LLVM)),
                 metricOf(stats.get(Stage.LEXER)), metricOf(stats.get(Stage.SYNTAX)),
-                metricOf(stats.get(Stage.SEMANTIC)), finalErrors));
+                metricOf(stats.get(Stage.SEMANTIC)), metricOf(stats.get(Stage.LLVM)), finalErrors));
     }
 
     public void reset() {
