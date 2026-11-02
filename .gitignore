@@ -27,6 +27,8 @@
 /tools/
 /testgen/
 /pdf2md_tool/
+/docs/
+/src/docs/
 
 # Python 缓存
 __pycache__/
