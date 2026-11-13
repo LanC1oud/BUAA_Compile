@@ -19,6 +19,7 @@ public class UnaryExp extends ASTNode {
     private final UnaryExp operand;
     private boolean charResult;
 
+    // 记录结果是否为 char，供求值时按 8 位回绕
     public void setCharResult(boolean charResult) {
         this.charResult = charResult;
     }
@@ -81,7 +82,7 @@ public class UnaryExp extends ASTNode {
         return operand;
     }
 
-    // throws UnsupportedOperationException for calls and for logical not
+    // 按一元表达式类别求值；函数调用和逻辑非不可折叠
     @Override
     public int calculateConst() {
         int value = switch (kind) {
@@ -94,6 +95,7 @@ public class UnaryExp extends ASTNode {
         return charResult ? value & 0xFF : value;
     }
 
+    // 计算一元正号或负号的结果
     private int calculateUnary() {
         int value = operand.calculateConst();
         return switch (op.getToken().getType()) {

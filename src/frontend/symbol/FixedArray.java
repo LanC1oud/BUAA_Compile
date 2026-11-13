@@ -15,20 +15,23 @@ final public class FixedArray {
     private final int length;
     private final Map<Integer, Integer> values;
 
+    // 建立指定长度的零初值数组
     public FixedArray(int length) {
         this.length = length;
         this.values = new HashMap<>();
     }
 
+    // 取编译期数组长度
     public int getLength() {
         return length;
     }
 
+    // 记录指定下标的初值
     public void set(int index, int value) {
         values.put(index, value);
     }
 
-    // read one constant element; throws IndexOutOfBoundsException when out of range
+    // 读取元素初值：未赋初值为零，越界则抛出异常
     public int get(int index) {
         if (index < 0 || index >= length) {
             throw new IndexOutOfBoundsException(
@@ -58,7 +61,7 @@ final public class FixedArray {
         return array;
     }
 
-    // @see #from(int, ConstInitVal)
+    // 从变量初值构造数组，无法求值时返回 null
     public static FixedArray from(int length, InitVal init) {
         FixedArray array = new FixedArray(length);
         if (init.getKind() == InitVal.Kind.Str) {
@@ -79,6 +82,7 @@ final public class FixedArray {
         return array;
     }
 
+    // 按数组长度存入字符，剩余位置补零
     private static FixedArray fromString(int length, Token string) {
         FixedArray array = new FixedArray(length);
         String content = string.value();
@@ -91,6 +95,7 @@ final public class FixedArray {
         return array;
     }
 
+    // 按下标顺序显示所有元素的初值
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("{");

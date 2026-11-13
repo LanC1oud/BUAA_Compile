@@ -14,10 +14,12 @@ public class ConstExp extends ASTNode {
         return addExp;
     }
 
+    // 将常量表达式委托给内部加减表达式求值
     public int calculate() {
         return addExp.calculateConst();
     }
 
+    // 通过统一入口对常量表达式求值
     @Override
     public int calculateConst() {
         return addExp.calculateConst();

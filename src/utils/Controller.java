@@ -89,9 +89,14 @@ public class Controller {
             Files.writeString(Path.of(Configure.error), errors.toString(), StandardCharsets.UTF_8);
             return;
         }
-        IrGenerator generator = new IrGenerator(traverser.getSemanticInfo(), Configure.optimize ? Configure.irPasses : java.util.List.of());
+        
+        IrGenerator generator = new IrGenerator(traverser.getSemanticInfo(), Configure.optimize ?
+                Configure.irPasses : java.util.List.of());
         String ir = generator.generate(ast).toString();
-        if (Configure.irBeforeOptimization != null) Files.writeString(Path.of(Configure.irBeforeOptimization), generator.getUnoptimizedIr(), StandardCharsets.UTF_8);
+        if (Configure.irBeforeOptimization != null) {
+            Files.writeString(Path.of(Configure.irBeforeOptimization),
+                    generator.getUnoptimizedIr(), StandardCharsets.UTF_8);
+        }
         Files.writeString(Path.of(Configure.target), ir, StandardCharsets.UTF_8);
     }
     

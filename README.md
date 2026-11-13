@@ -151,11 +151,11 @@ IDEA 里直接运行 `src/Compiler.java` 的 `main` 即可。
 
 ### LLVM IR 阶段
 
-默认读取 `testfile.txt` 并生成 `llvm_ir.txt`，编译过程不读取程序运行时的标准输入。可通过参数保留前面阶段或指定文件：
+`Compiler` 保持原始入口，直接运行其 `main` 即可。阶段只通过 `src/utils/HomeworkConfig.java` 中的 `hw` 字段手动切换；输入、输出路径在 `src/utils/Configure.java` 中配置，不使用命令行参数。
+
+当前配置为 `Hw.Llvm`，读取 `testfile.txt` 并生成 `llvm_ir.txt`。如需语义分析，将 `hw` 改为 `Hw.Semantic` 后重新编译运行，输出自动切换为 `symbol.txt`。编译过程不读取程序运行时的标准输入。
 
 ```powershell
-java -cp build/llvm-tests/classes Compiler --stage Llvm --source tests/official-llvm.sysy --output build/program.ll
-java -cp build/llvm-tests/classes Compiler --stage Semantic
 python tools/setup-llvm12.py
 python tests/run-llvm-tests.py
 pwsh -NoProfile -File tests/run-semantic-tests.ps1

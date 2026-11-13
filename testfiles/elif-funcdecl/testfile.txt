@@ -1,123 +1,33 @@
-// Syntax test: elif chains and function declarations.
-// According to this screenshot, both declarations and definitions are FuncDef.
-
-const int SMALL = 10;
-const int LARGE = 100;
-
-// Declarations: one parameter, multiple parameters, void, array parameter.
-int classify(int value);
-int sum(int left, int right);
-void emit(int value);
-int first(int data[]);
-
-int classify(int value) {
-    int result = 0;
-    if (value < 0) {
-        result = -1;
-    } elif (value == 0) {
-        result = 0;
-    } elif (value < SMALL) {
-        result = 1;
-    } elif (value < LARGE) {
-        result = 2;
-    } else {
-        result = 3;
-    }
-    return result;
-}
-
-// A declaration after a definition; empty parameter list and void return type.
-void idle();
-
-int sum(int left, int right) {
-    return left + right;
-}
-
-// Empty parameter list and int return type.
-int zero();
-
-void emit(int value) {
-    printf("result=%d\n", value);
-    return;
-}
-
-int first(int data[]) {
-    return data[0];
-}
-
-int zero() {
-    return 0;
-}
-
-void idle() {
-    return;
-}
-
+int x1 = -7;
+int x2 = 7;
+int x3 = 12;
+int x4 = -12;
+int x5 = 16;
+int x6 = -16;
 int main() {
-    int x = 0;
-    int y = 2;
-    int result = 0;
-    int data[3] = {4, 5, 6};
-    int elifValue = 7;
-
-    // Zero elif, no else; a single-statement body.
-    if (x == 0)
-        result = result + 1;
-
-    // One elif, no else.
-    if (x < 0) {
-        result = result + 100;
-    } elif (x == 0) {
-        result = result + 2;
-    }
-
-    // One elif and an else; no braces on the three bodies.
-    if (y < 0)
-        result = result + 100;
-    elif (y == 2)
-        result = result + 4;
-    else
-        result = result + 200;
-
-    // Nested chains; braces make the ownership of each elif unambiguous.
-    if (x == 0) {
-        if (y == 1) {
-            result = result + 100;
-        } elif (y == 2) {
-            result = result + 8;
-        } else {
-            result = result + 200;
-        }
-    } elif (x == 1) {
-        result = result + 300;
-    } else {
-        result = result + 400;
-    }
-
-    // Empty Stmt bodies and no final else.
-    if (x < 0)
-        ;
-    elif (x == 0)
-        ;
-    elif (x > 0) {
-        result = result + 500;
-    }
-
-    // Function calls and logical operators in an elif chain.
-    if (classify(-1) == -1 && classify(0) == 0) {
-        result = result + 16;
-    } elif (classify(5) == 1 || classify(50) == 2) {
-        result = result + 600;
-    } elif (classify(100) == 3) {
-        result = result + 700;
-    } else {
-        result = result + 800;
-    }
-
-    result = sum(result, first(data));
-    result = result + zero() + elifValue;
-    idle();
-    emit(result);
-    printf("elifValue=%d\n", elifValue);
+    printf("-7 MOD 4 = %d\n-7 MOD -4 = %d\n", x1 % 4, x1 % -4);
+    printf("7 MOD 4 = %d\n7 MOD -4 = %d\n", x2 % 4, x2 % -4);
+    printf("The ans should be -3, -3, 3, 3\n");
+    printf("12 MOD 2 = %d\n12 MOD -2 = %d\n", x3 % 2, x3 % -2);
+    printf("-12 MOD 2 = %d\n-12 MOD -2 = %d\n", x4 % 2, x4 % -2);
+    printf("The ans should be 0, 0, 0, 0\n");
+    printf("12 MOD 8 = %d\n12 MOD -8 = %d\n", x3 % 8, x3 % -8);
+    printf("-12 MOD 8 = %d\n-12 MOD -8 = %d\n", x4 % 8, x4 % -8);
+    printf("The ans should be 4, 4, -4, -4\n");
+    printf("16 MOD 4 = %d\n16 MOD -4 = %d\n", x5 % 4, x5 % -4);
+    printf("-16 MOD 4 = %d\n-16 MOD -4 = %d\n", x6 % 4, x6 % -4);
+    printf("The ans should be 0, 0, 0, 0\n");
+    printf("-7 / 4 = %d\n-7 / -4 = %d\n", x1 / 4, x1 / -4);
+    printf("7 / 4 = %d\n7 / -4 = %d\n", x2 / 4, x2 / -4);
+    printf("The ans should be -1, 1, 1, -1\n");
+    printf("12 / 2 = %d\n12 / -2 = %d\n", x3 / 2, x3 / -2);
+    printf("-12 / 2 = %d\n-12 / -2 = %d\n", x4 / 2, x4 / -2);
+    printf("The ans should be 6, -6, -6, 6\n");
+    printf("12 / 8 = %d\n12 / -8 = %d\n", x3 / 8, x3 / -8);
+    printf("-12 / 8 = %d\n-12 / -8 = %d\n", x4 / 8, x4 / -8);
+    printf("The ans should be 1, -1, -1, 1\n");
+    printf("16 / 4 = %d\n16 / -4 = %d\n", x5 / 4, x5 / -4);
+    printf("-16 / 4 = %d\n-16 / -4 = %d\n", x6 / 4, x6 / -4);
+    printf("The ans should be 4, -4, -4, 4\n");
     return 0;
 }

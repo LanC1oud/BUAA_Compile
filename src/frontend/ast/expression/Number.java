@@ -16,12 +16,13 @@ public class Number extends ASTNode {
         return token;
     }
 
+    // 读取整数字面量或字符字面量的值
     @Override
     public int calculateConst() {
         return valueOf(token);
     }
 
-    // throws IllegalArgumentException for any other token
+    // 把整数字面量或字符记号转为编译期整数值
     public static int valueOf(Token token) {
         if (token.is(TokenType.IntConst)) {
             // The magnitude in -2147483648 is parsed before its unary minus.

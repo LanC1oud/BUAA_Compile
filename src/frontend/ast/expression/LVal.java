@@ -20,25 +20,27 @@ public class LVal extends ASTNode {
         return ident;
     }
 
-    // subscript expression; null for a scalar variable
+    // 取数组下标表达式，未写下标时返回 null
     public Exp getIndex() {
         return index;
     }
 
+    // 判断左值是否写了数组下标
     public boolean isArrayElement() {
         return index != null;
     }
 
-    // resolved symbol; null before semantic analysis
+    // 取语义分析绑定的符号，尚未绑定时返回 null
     public SymbolVariable getSymbol() {
         return symbol;
     }
 
+    // 保存名字查找命中的变量符号
     public void setSymbol(SymbolVariable symbol) {
         this.symbol = symbol;
     }
 
-    // throws UnsupportedOperationException if the symbol is unresolved or not a constant
+    // 从已绑定符号读取标量常量值或数组元素值
     @Override
     public int calculateConst() {
         if (symbol == null) {
