@@ -31,9 +31,7 @@ import frontend.ast.statement.ReturnStmt;
 import frontend.ast.statement.Stmt;
 import frontend.ast.statement.SwitchStmt;
 import frontend.ast.statement.WhileStmt;
-import frontend.symbol.SymbolFunction;
-import frontend.symbol.SymbolTable;
-import frontend.symbol.SymbolVariable;
+import frontend.symbol.*;
 import frontend.symbol.type.SymbolType;
 import frontend.symbol.type.Type;
 import frontend.token.Token;
@@ -231,12 +229,12 @@ final public class Traverser {
         if (!declared.isArray()) {
             Integer value = ConstFolder.fold(init.getExp());
             if (value != null) {
-                symbol.setConstantValue(new frontend.symbol.FixedValue(value));
+                symbol.setConstantValue(new FixedValue(value));
             }
             return;
         }
         if (declared.getLength() > 0) {
-            symbol.setConstantValue(frontend.symbol.FixedArray.from(
+            symbol.setConstantValue(FixedArray.from(
                     declared.getLength(), init));
         }
     }
@@ -245,12 +243,12 @@ final public class Traverser {
     private void recordVariableValue(SymbolVariable symbol, Type declared, InitVal init) {
         if (!declared.isArray()) {
             if (init == null) {
-                symbol.setConstantValue(new frontend.symbol.FixedValue(0));
+                symbol.setConstantValue(new FixedValue(0));
                 return;
             }
             Integer value = ConstFolder.fold(init.getExp());
             if (value != null) {
-                symbol.setConstantValue(new frontend.symbol.FixedValue(value));
+                symbol.setConstantValue(new FixedValue(value));
             }
             return;
         }
@@ -258,10 +256,10 @@ final public class Traverser {
             return;
         }
         if (init == null) {
-            symbol.setConstantValue(new frontend.symbol.FixedArray(declared.getLength()));
+            symbol.setConstantValue(new FixedArray(declared.getLength()));
             return;
         }
-        symbol.setConstantValue(frontend.symbol.FixedArray.from(declared.getLength(), init));
+        symbol.setConstantValue(FixedArray.from(declared.getLength(), init));
     }
 
     // ConstInitVal：常量初值
