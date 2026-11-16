@@ -6,6 +6,7 @@ import llvm.type.IrType;
 import java.util.ArrayList;
 import java.util.List;
 
+/** 保存函数中的有序指令，块本身也可作为跳转目标。 */
 public final class BasicBlock extends Value {
     private final Function parent;
     private final List<Instruction> instructions = new ArrayList<>();
@@ -23,10 +24,12 @@ public final class BasicBlock extends Value {
         return List.copyOf(instructions);
     }
 
+    // 检查块是否以跳转、返回等终结指令收尾
     public boolean isTerminated() {
         return !instructions.isEmpty() && instructions.get(instructions.size() - 1).isTerminator();
     }
 
+    // 向未终结的块追加一条属于本块的指令
     public void append(Instruction instruction) {
         if (isTerminated())
             throw new IllegalStateException("Instruction after terminator");
@@ -35,6 +38,7 @@ public final class BasicBlock extends Value {
         instructions.add(instruction);
     }
 
+    // 将栈槽分配集中插在块首，排在已有 alloca 之后
     public void prependAlloca(Instruction instruction) {
         if (instruction.getParent() != this || instruction.getOpcode() != Instruction.Opcode.ALLOCA)
             throw new IllegalArgumentException("Expected entry alloca");
@@ -44,6 +48,7 @@ public final class BasicBlock extends Value {
         instructions.add(index, instruction);
     }
 
+    // 删除未被引用的指令，同时解除它对操作数的引用
     public void remove(Instruction instruction) {
         if (!instruction.getUses().isEmpty())
             throw new IllegalStateException("Instruction is still used");

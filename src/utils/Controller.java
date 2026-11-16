@@ -90,6 +90,7 @@ public class Controller {
             return;
         }
         
+        // stage 4: LLVM IR
         IrGenerator generator = new IrGenerator(traverser.getSemanticInfo(), Configure.optimize ?
                 Configure.irPasses : java.util.List.of());
         String ir = generator.generate(ast).toString();

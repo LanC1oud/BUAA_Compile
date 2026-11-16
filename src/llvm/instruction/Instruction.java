@@ -6,7 +6,7 @@ import llvm.value.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Structured opcode + typed operands; text is produced only by IrPrinter. */
+/** 保存操作码、结果类型和操作数，由 IrPrinter 统一输出文本。 */
 public final class Instruction extends Value {
     public enum Opcode {
         ALLOCA,
@@ -34,6 +34,7 @@ public final class Instruction extends Value {
     private final List<Value> operands;
     private final String predicate;
 
+    // 构造指令，并在各操作数上登记使用关系
     public Instruction(BasicBlock parent, Opcode opcode, IrType type, String name, String predicate,
                        List<? extends Value> operands) {
         super(type, name);
@@ -61,6 +62,7 @@ public final class Instruction extends Value {
         return List.copyOf(operands);
     }
 
+    // 替换同类型操作数，并更新新旧值的使用记录
     public void replaceOperand(int index, Value value) {
         Value old = operands.get(index);
         if (!old.getType().equals(value.getType()))
@@ -70,12 +72,14 @@ public final class Instruction extends Value {
         value.addUse(this, index);
     }
 
+    // 解除该指令对所有操作数的引用
     public void detachOperands() {
         for (int i = 0; i < operands.size(); i++)
             operands.get(i).removeUse(this, i);
         operands.clear();
     }
 
+    // 判断是否为跳转、返回或不可达等基本块终结指令
     public boolean isTerminator() {
         return opcode == Opcode.BR || opcode == Opcode.RET || opcode == Opcode.UNREACHABLE;
     }

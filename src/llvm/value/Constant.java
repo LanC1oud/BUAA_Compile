@@ -4,6 +4,7 @@ import llvm.type.IrType;
 
 import java.util.List;
 
+/** 表示整数或数组常量，可用于操作数和初值。 */
 public final class Constant extends Value {
     private final int number;
     private final List<Constant> elements;
@@ -14,6 +15,7 @@ public final class Constant extends Value {
         this.elements = List.copyOf(elements);
     }
 
+    // 创建整数常量，i1 和 i8 只保留对应位宽的低位
     public static Constant integer(IrType type, int value) {
         if (!type.isInteger())
             throw new IllegalArgumentException("Expected integer type");
@@ -24,6 +26,7 @@ public final class Constant extends Value {
                 List.of());
     }
 
+    // 检查元素数量和类型后构造数组常量
     public static Constant array(IrType type, List<Constant> elements) {
         if (type.kind() != IrType.Kind.ARRAY || type.length() != elements.size() ||
                 elements.stream().anyMatch(c -> !c.getType().equals(type.element())))

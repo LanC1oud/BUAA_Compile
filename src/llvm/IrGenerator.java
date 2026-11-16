@@ -18,7 +18,7 @@ import llvm.verify.IrVerifier;
 
 import java.util.*;
 
-/** AST lowering. Each instance belongs to exactly one compilation. */
+/** 根据 AST 和语义信息生成 IR，每个实例处理一次编译。 */
 public final class IrGenerator {
     private final SemanticInfo info;
     private final IrModule module = new IrModule();
@@ -40,15 +40,17 @@ public final class IrGenerator {
         this.passes = List.copyOf(passes);
     }
 
+    // 取得执行优化 Pass 前保存的 IR 文本
     public String getUnoptimizedIr() {
         return unoptimizedIr;
     }
 
+    // 入口：声明运行库，生成全局对象，登记并生成函数，再校验及按需优化
     public IrModule generate(CompileUnit ast) {
         installRuntime();
         for (Decl decl : ast.getDeclarations())
             emitDecl(decl);
-        // Register identities before bodies: this supports recursion without changing frontend visibility.
+        // 先登记函数再生成函数体，使递归调用能找到已经绑定的函数。
         for (FuncDef def : ast.getFunctions()) {
             SymbolFunction symbol = info.functionOf(def);
             Function function = module.addFunction(new Function(symbol.getName(),
@@ -71,6 +73,7 @@ public final class IrGenerator {
         return module;
     }
 
+    // 声明运行库的输入输出函数
     private void installRuntime() {
         external("get_int", IrType.I32);
         external("get_char", IrType.I8);
@@ -84,6 +87,7 @@ public final class IrGenerator {
         module.addFunction(new Function(name, result, List.of(params), true));
     }
 
+    // 绑定形参存储：数组直接用指针，标量存入栈槽；随后生成函数体
     private void emitFunction(FuncDef def) {
         Function function = functions.get(info.functionOf(def));
         builder.enterFunction(function);
@@ -103,6 +107,7 @@ public final class IrGenerator {
         finishFunction();
     }
 
+    // 为未终结的尾块补上 ret void 或 unreachable
     private void finishFunction() {
         if (!builder.isTerminated()) {
             if (builder.getFunction().getReturnType().equals(IrType.VOID))
@@ -112,6 +117,7 @@ public final class IrGenerator {
         }
     }
 
+    // 将常量或变量声明拆成各个定义处理
     private void emitDecl(Decl decl) {
         if (decl instanceof ConstDecl c)
             for (ConstDef def : c.getDefs())
@@ -121,6 +127,7 @@ public final class IrGenerator {
                 emitDefinition(def, def.getInitVal());
     }
 
+    // 全局和静态变量写入模块，自动局部变量分配栈槽并在声明处初始化
     private void emitDefinition(ASTNode def, ASTNode init) {
         SymbolVariable symbol = info.variableOf(def);
         Type sourceType = (Type) symbol.getType();
@@ -171,6 +178,7 @@ public final class IrGenerator {
         }
     }
 
+    // 将符号中记录的初值转为标量或数组 IR 常量
     private Constant constantInitializer(SymbolVariable symbol, IrType type) {
         if (type.kind() != IrType.Kind.ARRAY)
             return Constant.integer(type, symbol.getConstantValue().getValue());
@@ -183,7 +191,7 @@ public final class IrGenerator {
         return Constant.array(type, elements);
     }
 
-    /** Lvalues return an address, never the loaded value. Array parameters already are T*. */
+    // 取得左值地址；数组元素用 GEP 定位，数组形参已有指针
     private Value emitAddress(LVal lval) {
         Value address = addresses.get(lval.getSymbol());
         if (address == null)
@@ -195,6 +203,7 @@ public final class IrGenerator {
         return Constant.integer(IrType.I32, n);
     }
 
+    // 递归生成表达式的值；标量左值用 load，数组传递首元素指针
     private Value emitValue(ASTNode node) {
         if (node instanceof Exp e)
             return emitValue(e.getAddExp());
@@ -266,6 +275,7 @@ public final class IrGenerator {
         throw new IllegalStateException("Unsupported expression: " + node.getClass());
     }
 
+    // 查找语义阶段绑定的函数，求出实参并生成 call
     private Value emitCall(UnaryExp call) {
         SymbolFunction symbol = info.functionOf(call);
         Function function = functions.get(symbol);
@@ -278,6 +288,7 @@ public final class IrGenerator {
         return builder.call(function, args);
     }
 
+    // 按源码顺序生成块内的声明和语句，遇到终结指令后停止
     private void emitBlock(Block block) {
         for (BlockItem item : block.getItems()) {
             if (builder.isTerminated())
@@ -289,6 +300,7 @@ public final class IrGenerator {
         }
     }
 
+    // 按语句类型分派；break 和 continue 跳到各自目标栈的栈顶
     private void emitStmt(Stmt stmt) {
         if (stmt == null || builder.isTerminated())
             return;
@@ -322,6 +334,7 @@ public final class IrGenerator {
             throw new IllegalStateException("Unsupported statement: " + stmt.getClass());
     }
 
+    // 拆分格式串的普通文本和占位符，调用对应的运行库函数
     private void emitPrintf(PrintfStmt stmt) {
         List<Value> args = new ArrayList<>();
         if (stmt.getArgs() != null)
@@ -347,13 +360,14 @@ public final class IrGenerator {
         emitText(literal.toString());
     }
 
+    // 复用模块中的字符串常量，并将首元素地址传给 put_string
     private void emitText(String text) {
         if (text.isEmpty())
             return;
         builder.call(module.getFunction("put_string"), List.of(builder.gep(module.internString(text), integer(0))));
     }
 
-    /** Branch-based short circuit lowering; no speculative RHS evaluation and no phi nodes. */
+    // 将条件转成真假跳转，&& 和 || 仅在需要时进入右操作数块
     private void emitCond(ASTNode node, BasicBlock yes, BasicBlock no) {
         if (node instanceof Cond c) {
             emitCond(c.getLOrExp(), yes, no);
@@ -379,6 +393,7 @@ public final class IrGenerator {
         builder.branch(builder.compare("ne", value, Constant.integer(value.getType(), 0)), yes, no);
     }
 
+    // 生成 if 的分支，有 else 时按需合流
     private void emitIf(IfStmt stmt) {
         BasicBlock thenBlock = builder.newBlock(), alternative = builder.newBlock();
         emitCond(stmt.getCond(), thenBlock, alternative);
@@ -404,6 +419,7 @@ public final class IrGenerator {
         builder.positionAt(merge);
     }
 
+    // 生成条件、循环体和出口；continue 回条件块，break 去出口
     private void emitWhile(WhileStmt stmt) {
         BasicBlock condition = builder.newBlock(), body = builder.newBlock(), exit = builder.newBlock();
         builder.branch(condition);
@@ -419,6 +435,7 @@ public final class IrGenerator {
         builder.positionAt(exit);
     }
 
+    // 逐个比较 case；未终结的分支顺接下一标签，break 跳到出口
     private void emitSwitch(SwitchStmt stmt) {
         Value selector = emitValue(stmt.getExp());
         BasicBlock exit = builder.newBlock(), fallback = exit;

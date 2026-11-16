@@ -2,6 +2,7 @@ package llvm.value;
 
 import llvm.type.IrType;
 
+/** 表示函数入口接收到的一个形参值。 */
 public final class Argument extends Value {
     private final Function parent;
 
