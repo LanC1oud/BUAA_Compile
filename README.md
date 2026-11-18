@@ -114,23 +114,6 @@ java -cp out/production/BUAA_Compile Compiler
 
 IDEA 里直接运行 `src/Compiler.java` 的 `main` 即可。
 
-### LLVM IR 阶段
-
-`Compiler` 保持原始入口，直接运行其 `main` 即可。阶段只通过 `src/utils/HomeworkConfig.java` 中的 `hw` 字段手动切换；输入、输出路径在 `src/utils/Configure.java` 中配置，不使用命令行参数。
-
-当前配置为 `Hw.Llvm`，读取 `testfile.txt` 并生成 `llvm_ir.txt`。如需语义分析，将 `hw` 改为 `Hw.Semantic` 后重新编译运行，输出自动切换为 `symbol.txt`。编译过程不读取程序运行时的标准输入。
-
-```powershell
-python tools/setup-llvm12.py
-python tests/run-llvm-tests.py
-pwsh -NoProfile -File tests/run-semantic-tests.ps1
-pwsh -NoProfile -File tools/pack.ps1
-```
-
-`tests/run-llvm-tests.py` 会先用 JDK 17 兼容选项编译项目，再使用 LLVM 12.0.0 验证并执行全部用例。工具链只安装到 `build/llvm12/`；课程运行时的兼容副本及重新生成方法见 [运行时说明](runtime/README.md)。提交包在 `out/Compiler-jdk17.zip`，只依赖 JDK 17 标准库。
-
-逐条任务的实现、函数和源码行号见 [LLVM IR 阶段任务完成对应表](docs/LLVM%20IR阶段任务完成对应表.md)。修改前快照及回滚脚本在 `backups/before-llvm-20261101-234349/`，包含当时未提交的代码与文档。
-
 ### 图形前端方式
 
 前端外壳独立在 `ui/`。每平台一个入口脚本，**需要时先编译，再启动界面**：
