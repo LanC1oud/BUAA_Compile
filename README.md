@@ -11,9 +11,9 @@
 
 ---
 
-## 一、编译器架构
+## 编译器架构
 
-### 1.1 阶段划分
+### 阶段划分
 
 编译器按"每个阶段可独立验收"的方式组织，阶段开关在 `src/utils/HomeworkConfig.java`，
 驱动入口是 `src/utils/Controller.java`。
@@ -30,7 +30,7 @@
 出错时错误信息写入 `error.txt`（`src/utils/Configure.java` 里配置），
 格式为 `行号 错误码`，如 `5 i`。
 
-### 1.2 数据流
+### 数据流
 
 ```
 源文件 testfile.txt
@@ -52,27 +52,7 @@
 - **`error.ErrorTable`** —— 错误收集表，实现 `BackTrace.Traceable`
 - **`frontend.symbol.SymbolTable`** —— 符号表，作用域栈 + 输出列表
 
-### 1.3 关键设计
-
-**回溯（`utils/BackTrace`）** —— 语法分析需要在不改变文法（不消除左递归、不提取左公因子）的前提下做
-预测分析，因此实现了 `Traceable` 快照机制。`Parser` 用一个 `BackTrace` 同时握住
-`ErrorTable`、`TokenStream`、`ParserWatcher` 三者，投机解析后一并回滚
-（典型用例：`isAssignStmt()` 区分 `LVal '=' Exp` 与 `[Exp] ';'`）。
-
-**错误恢复** —— 缺 `;` / `)` / `]` 属于可恢复错误：记录对应错误码后把当前 token
-留在流里继续解析，因此一次编译可以报出多个错误，而不是遇到第一个错误就退出。
-错误码覆盖 `a` ~ `n` 共 14 种（见 `error/ErrorType.java`）。
-
-**AST 分包** —— `frontend/ast/` 按文法结构分为
-`declaration` / `function` / `statement` / `expression` / `block`，
-共 43 个节点类（另有 `ASTNode` 基类），每个节点负责把自己的名字 `watch()` 进输出流，
-因此 `parser.txt` 是解析过程的直接记录，不需要额外的序列化代码。
-
-**常量折叠** —— `utils/ConstFolder`、`utils/ConstValue` 提供编译期求值，
-`ASTNode.calculateConst()` 是统一入口；数组长度、`const` 初值、`case` 标签、
-下标上限都依赖它。
-
-### 1.4 目录结构
+### 目录结构
 
 ```
 src/
@@ -107,28 +87,13 @@ testfile*.sysy                  测试用例
 
 ---
 
-## 二、目前所处开发阶段
+## 构建与运行
 
-**第 4 阶段（LLVM IR 生成）已完成。** 支持 2026 SysY 的 int/char、函数、数组、显式转换、短路、while、switch、static 及六个运行时接口；命令行和 UI 默认生成 LLVM IR。
-
-已完成：
-
-- 词法分析：45 种 token（另有 EOF），注释、字符/字符串转义、非法 token（错误 `a`）全部处理
-- 语法分析：覆盖 2026 版全部文法，AST 共 43 个节点类，带错误恢复与回溯
-- 语义分析：符号表（作用域编号、7 个运行时库函数预注册、`main` 为保留字不进符号表）、
-  类型检查、`b` ~ `n` 全部 13 种语义错误、常量折叠
-- 图形前端外壳：传代码 / 选阶段 / 选导出目录，含行号、语法高亮、错误单击跳转、
-  文法速查、近似 AST 视图、阶段耗时与规模统计
-
----
-
-## 三、构建与运行
-
-### 3.1 环境要求
+### 环境要求
 
 - **JDK 17 或更高**
 
-### 3.2 命令行方式
+### 命令行方式
 
 在项目根目录：
 
@@ -166,7 +131,7 @@ pwsh -NoProfile -File tools/pack.ps1
 
 逐条任务的实现、函数和源码行号见 [LLVM IR 阶段任务完成对应表](docs/LLVM%20IR阶段任务完成对应表.md)。修改前快照及回滚脚本在 `backups/before-llvm-20261101-234349/`，包含当时未提交的代码与文档。
 
-### 3.3 图形前端方式
+### 图形前端方式
 
 前端外壳独立在 `ui/`。每平台一个入口脚本，**需要时先编译，再启动界面**：
 
@@ -188,18 +153,9 @@ run.bat --help
 ./run.sh --help
 ```
 
-界面页签：
-
-- **输出 → 编译结果 / 近似 AST**：该阶段产物；近似 AST 是按先序文本分组的折叠视图。
-- **错误**：可读错误表，格式 `line行号：错误码——错误类型英文名`
-  （如 `line5：i——ExpectedSemicolon`），**点一行即跳到源码对应行**。
-- **阶段对比**：各阶段耗时、产物行数、token/节点/符号数，以及错误数演变。
-- **文法速查**：关键字 / 运算符 / 转义字符，数据直接读 `src/` 的三张表
-- **日志**：stdout/stderr 捕获。
-
 ---
 
-## 四、文法驱动的测试生成
+## 文法驱动的测试生成
 
 独立命令行工具 `testgen/` 可根据已有文法和新增 EBNF 规则，批量生成可复现的 `testfile.txt` 及独立的词法、语法、符号表、错误预期。
 
@@ -209,9 +165,3 @@ python -m testgen --rule "UnaryExp -> '++' LVal | LVal '++'" --count 30 --out bu
 python -m testgen --suite boundary --out build/generated-boundary
 python -m testgen --suite mixed --rules testgen/examples/inc.ebnf --count 30 --scale 2 --out build/generated-inc-extremes
 ```
-
-仅生成需要 Python 3.10+，无需第三方包；增加 `--check` 可与当前 Java 编译器逐个比较，需要 JDK 17+。完整程序采用受控语义模型；任意新文法可先用 `--mode syntax` 生成片段，复杂新语义需要补充契约。详见 [文法测试生成器](docs/文法测试生成器.md)。
-
-边界套件覆盖 `a`～`n`、类型/作用域组合、错误恢复及四档压力规模；`++` 有独立边界扩展。`--official-zip` 可重复指定官方包，保留原答案并生成重命名/空行变体，提供来源和实际覆盖统计。范围与验证结果见 [极端测试覆盖与官方样例分析](docs/极端测试覆盖与官方样例分析.md)。
-
-新增运算符、表达式、语句、声明或类型时，可按 [文法增添通用指南](docs/文法增添通用指南.md) 梳理规则契约、修改文件、分层实现与验证，并复用其中的具体扩展文档模板。具体方案统一收录于 [文法扩展示例集](docs/文法扩展示例/README.md)，目前包含 `++`、`~`、`**`、`+=` 和 `do…while`。
