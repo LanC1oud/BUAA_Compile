@@ -13,7 +13,6 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 
 final public class SymbolTable {
-    // 作用域编号按进入顺序分配，不是按嵌套深度；空作用域照样占号，官方样例的 5 length Int 印证了这一点。
     private static int counter = 1;
 
     private static final Set<String> RESERVED = Set.of(
@@ -43,19 +42,6 @@ final public class SymbolTable {
 
     // ------------------------------------------------------------------ 作用域
 
-    /**
-     * 把这张表恢复到"刚构造完"的状态：作用域栈只剩全局作用域、编号从 1 重新开始、
-     * 已声明符号与输出列表全部清空，运行时库函数重新预注册。
-     *
-     * <p>编译器前端外壳（{@code ui/}）复用 {@code Controller.symbols} 用：
-     * 那个字段是 {@code static final}，替换引用会被 JVM 拒绝
-     * （Java 21 下 {@code Field.set} 对 final 字段抛 {@code IllegalAccessException}，
-     * {@code MethodHandles.findStaticVarHandle} 对 final 字段返回只读句柄），
-     * 所以只能原地复位。
-     *
-     * <p>{@code counter} 是静态字段，必须一并复位，否则每编译一次作用域编号就往上累，
-     * 第二次编译输出的 {@code symbol.txt} 就会和第一次不同。
-     */
     public void clear() {
         allVariables.clear();
         allFunctions.clear();

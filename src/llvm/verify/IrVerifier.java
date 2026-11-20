@@ -7,14 +7,13 @@ import llvm.value.*;
 
 import java.util.*;
 
-/** 输出前检查 IR 的结构和类型，发现不一致时抛出异常。 */
+/** Structural and type invariants, checked before publishing any generated module. */
 public final class IrVerifier {
     private static void require(boolean condition, String message) {
         if (!condition)
             throw new IllegalStateException("Invalid IR: " + message);
     }
 
-    // 检查名称、归属、基本块终结、跳转目标及值的使用关系
     public void verify(IrModule module) {
         Set<String> names = new HashSet<>();
         Set<Value> values = Collections.newSetFromMap(new IdentityHashMap<>());
@@ -80,7 +79,6 @@ public final class IrVerifier {
             }
     }
 
-    // 按操作码检查操作数个数、类型和结果类型
     private void verifyInstruction(Instruction i) {
         List<Value> a = i.getOperands();
         IrType result = i.getType();
