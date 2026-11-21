@@ -121,7 +121,11 @@ public final class CompilerUi extends JFrame {
         };
         errorTable = new JTable(errorModel);
 
-        setContentPane(buildRoot());
+        JTabbedPane workspaces = new JTabbedPane();
+        workspaces.addTab("SysY 编译", buildRoot());
+        workspaces.addTab("LLVM IR 运行", new IrRunPanel());
+        workspaces.addTab("SysY IDE（实验）", new SysyIdePanel());
+        setContentPane(workspaces);
         applyFont(getContentPane());
         loadPreferences();
         pack();

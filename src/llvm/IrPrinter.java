@@ -7,8 +7,9 @@ import llvm.type.IrType;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/** LLVM 12 textual format with typed pointers. All identifiers are explicitly named. */
+// 将结构化 IR 打印为 LLVM 12 的带类型指针文本
 public final class IrPrinter {
+    // 按全局对象、函数和基本块顺序输出完整模块
     public String print(IrModule module) {
         StringBuilder out = new StringBuilder("; SysY 2026 / LLVM 12 typed pointers\n\n");
         for (GlobalVariable g : module.getGlobals()) {
@@ -51,6 +52,7 @@ public final class IrPrinter {
         return out.toString();
     }
 
+    // 输出值的引用文本：常量内容或带 @、% 前缀的名字
     public String ref(Value value) {
         if (value instanceof Constant c) {
             if (c.getType().kind() != IrType.Kind.ARRAY)
@@ -63,10 +65,12 @@ public final class IrPrinter {
         return (value instanceof GlobalVariable || value instanceof Function ? "@" : "%") + value.getName();
     }
 
+    // 输出“类型 值引用”形式的操作数
     public String typed(Value value) {
         return value.getType() + " " + ref(value);
     }
 
+    // 将一条指令格式化为 LLVM 文本
     private String instruction(Instruction instruction) {
         List<Value> operands = instruction.getOperands();
         IrType resultType = instruction.getType();
