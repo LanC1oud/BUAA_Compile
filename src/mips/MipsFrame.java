@@ -6,7 +6,7 @@ import llvm.value.*;
 import java.util.*;
 import static mips.MipsLayout.*;
 
-/** 固定栈帧布局；基础路径为每个结果分配独立槽位。 */
+// 保存函数栈帧布局，并提供未优化的槽位分配方式
 public final class MipsFrame {
     public final Map<Value, Integer> objects = new IdentityHashMap<>();
     public final Map<Value, Integer> slots = new IdentityHashMap<>();
@@ -14,6 +14,7 @@ public final class MipsFrame {
     public final int returnAddress;
     public final boolean needsReturnAddress;
 
+    // 接收已有的对象偏移、值槽和栈帧大小
     public MipsFrame(Map<Value, Integer> objects, Map<Value, Integer> slots,
                      int size, int returnAddress, boolean needsReturnAddress) {
         this.objects.putAll(objects);
@@ -23,6 +24,7 @@ public final class MipsFrame {
         this.needsReturnAddress = needsReturnAddress;
     }
 
+    // 为形参、局部对象和指令结果分配独立栈空间
     public MipsFrame(Function function) {
         int outgoing = 0;
         for (BasicBlock block : function.getBlocks())

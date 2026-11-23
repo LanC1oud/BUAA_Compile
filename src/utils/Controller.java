@@ -17,6 +17,8 @@ import java.nio.file.Path;
 import llvm.IrGenerator;
 import llvm.IrModule;
 import mips.MipsGenerator;
+import mips.MipsModule;
+import mips.pass.OptimizedMipsGenerator;
 
 public class Controller {
     public static final ErrorTable errors = new ErrorTable();
@@ -109,8 +111,12 @@ public class Controller {
 
         // stage 5: MIPS
         if (HomeworkConfig.hw == HomeworkConfig.Hw.Mips) {
-            String assembly = new MipsGenerator(Configure.optimize, Configure.optimize ? Configure.mipsPasses : java.util.List.of())
-                    .generate(module).toString();
+            MipsModule lowered;
+            if (Configure.optimize)
+                lowered = new OptimizedMipsGenerator(Configure.mipsPasses).generate(module);
+            else
+                lowered = new MipsGenerator().generate(module);
+            String assembly = lowered.toString();
             Files.writeString(Path.of("llvm_ir.txt"), ir, StandardCharsets.UTF_8);
             Files.writeString(Path.of(Configure.target), assembly, StandardCharsets.UTF_8);
         } else Files.writeString(Path.of(Configure.target), ir, StandardCharsets.UTF_8);

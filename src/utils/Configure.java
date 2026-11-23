@@ -6,7 +6,7 @@ public class Configure {
     public static String target = HomeworkConfig.getTarget();
     public static String error = "error.txt";
     // Initial MIPS optimizations are enabled; --no-optimize keeps the baseline path available.
-    public static boolean optimize = true;
+    public static boolean optimize = false;
     public static java.util.List<llvm.pass.IrPass> irPasses = java.util.List.of();
     public static java.util.List<mips.pass.MipsPass> mipsPasses =
             java.util.List.of(new mips.pass.RemoveRedundantJumps());

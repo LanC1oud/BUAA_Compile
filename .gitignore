@@ -32,6 +32,7 @@
 /pdf2md_tool/
 /docs/验证结果/
 /src/docs/
+/examples/
 
 # Python 缓存
 __pycache__/

@@ -7,10 +7,12 @@ import mips.MipsFrame;
 import java.util.*;
 import static mips.MipsLayout.*;
 
-/** 剔除可重算/无用值，复用块内回退槽，并省去叶子函数的返回地址槽。 */
+// 复用临时值栈槽，省去无用槽位和叶子函数返回地址槽
 final class MipsFrameOptimization {
+    // 禁止实例化栈帧优化工具类
     private MipsFrameOptimization() { }
 
+    // 根据使用分析分配对象和回退槽，并复用块内槽位
     static MipsFrame allocate(Function function, MipsFunctionPlan plan) {
         Map<Value, Integer> objects = new IdentityHashMap<>();
         Map<Value, Integer> slots = new IdentityHashMap<>();
@@ -68,5 +70,6 @@ final class MipsFrameOptimization {
         return new MipsFrame(objects, slots, size, returnAddress, callsFunction);
     }
 
+    // 记录临时值的末次使用位置与占用槽号
     private record Interval(int end, int slot) { }
 }

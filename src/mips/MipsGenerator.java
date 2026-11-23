@@ -4,33 +4,22 @@ import llvm.IrModule;
 import llvm.instruction.Instruction;
 import llvm.type.IrType;
 import llvm.value.*;
-import mips.pass.MipsPass;
-import mips.pass.MipsGenerationOptimization;
 import static mips.MipsLayout.*;
 
 import java.util.*;
 
-/**
- * 将结构化 LLVM IR 降低为 MIPS32；可选优化委托给 mips.pass。
- * $t0-$t2 计算，$t9 处理大偏移，不占用 $at/$k0/$k1 或 $s 寄存器。
- * 每个函数一次分配固定栈帧，包含调用传参区、局部对象、值槽和 $ra。
- */
-public final class MipsGenerator {
-    private final MipsGenerationOptimization optimization;
-    private final List<MipsPass> passes;
+// 将结构化 LLVM IR 按基础规则转换为 MIPS
+public class MipsGenerator {
     private MipsModule output;
     private final Map<Value, String> labels = new IdentityHashMap<>();
-    private MipsFrame frame;
+    protected MipsFrame frame;
     private String epilogue;
     private int nextBranch;
 
-    public MipsGenerator() { this(List.of()); }
-    public MipsGenerator(List<MipsPass> passes) { this(false, passes); }
-    public MipsGenerator(boolean optimize, List<MipsPass> passes) {
-        this.optimization = optimize ? new MipsGenerationOptimization(new Emission()) : null;
-        this.passes = List.copyOf(passes);
-    }
+    // 创建基础 MIPS 生成器
+    public MipsGenerator() { }
 
+    // 入口：分配标签，生成全局数据、启动入口与函数
     public MipsModule generate(IrModule module) {
         output = new MipsModule();
         labels.clear();
@@ -54,8 +43,7 @@ public final class MipsGenerator {
             output.data(label(global) + ": # " + global.getName());
             emitConstant(global.getInitializer());
         }
-        output.text("main:");
-        // MARS 的初始 $sp 不保证八字节对齐；入口统一对齐后再调用用户 main。
+        text("main:");
         emit("li $t0, -8");
         emit("and $sp, $sp, $t0");
         jump("jal", label(main));
@@ -63,10 +51,10 @@ public final class MipsGenerator {
         emit("syscall");
         for (Function function : module.getFunctions())
             if (!function.isExternal()) emitFunction(function);
-        for (MipsPass pass : passes) pass.run(output);
         return output;
     }
 
+    // 按类型将全局初始化常量输出到数据段
     private void emitConstant(Constant constant) {
         if (constant.getType().kind() != IrType.Kind.ARRAY) {
             boolean byteObject = sizeOf(constant.getType()) == 1;
@@ -84,7 +72,6 @@ public final class MipsGenerator {
                 List<String> values = new ArrayList<>();
                 for (int j = i; j < Math.min(i + 16, elements.size()); j++) {
                     int number = elements.get(j).getNumber();
-                    // MARS 检查 .byte 的有符号范围；用相同位模式的负数字面值避免警告。
                     values.add(Integer.toString(sizeOf(constant.getType().element()) == 1 ? (byte) number : number));
                 }
                 output.data("    " + directive + String.join(", ", values));
@@ -94,39 +81,70 @@ public final class MipsGenerator {
         }
     }
 
+    // 递归判断标量或数组常量是否全为零
     private boolean isZero(Constant c) {
         return c.getType().kind() == IrType.Kind.ARRAY
                 ? c.getElements().stream().allMatch(this::isZero) : c.getNumber() == 0;
     }
 
-    private void emitFunction(Function function) {
-        frame = optimization == null ? new MipsFrame(function) : optimization.beginFunction(function);
+    // 分配栈帧，保存形参并生成函数体与共同出口
+    protected void emitFunction(Function function) {
+        frame = createFrame(function);
         epilogue = label(function) + "_return";
-        output.text(label(function) + ": # " + function.getName() + ", frame=" + frame.size);
+        text(label(function) + ": # " + function.getName() + ", frame=" + frame.size);
         addOffset("$sp", "$sp", -frame.size);
-        if (frame.needsReturnAddress) memory("sw", "$ra", frame.returnAddress, "$sp");
+        if (frame.needsReturnAddress)
+            memory("sw", "$ra", frame.returnAddress, "$sp");
         for (int i = 0; i < function.getArguments().size(); i++) {
-            Argument argument = function.getArguments().get(i);
-            if (optimization != null && optimization.discard(argument)) continue;
-            if (i < 4) emit("move $t0, $a" + i);
-            else memory("lw", "$t0", Math.addExact(frame.size, Math.multiplyExact(i - 4, 4)), "$sp");
-            save(argument, "$t0");
+            emitArgument(function.getArguments().get(i), i);
         }
-        for (BasicBlock block : function.getBlocks()) {
-            if (optimization != null) optimization.beginBlock(block);
-            output.text(label(block) + ":");
-            List<Instruction> instructions = block.getInstructions();
-            for (int position = 0; position < instructions.size(); position++) emitInstruction(instructions.get(position), position);
-        }
-        if (optimization != null) optimization.endFunction();
-        output.text(epilogue + ":");
-        if (frame.needsReturnAddress) memory("lw", "$ra", frame.returnAddress, "$sp");
+        for (BasicBlock block : function.getBlocks()) emitBlock(block);
+        text(epilogue + ":");
+        if (frame.needsReturnAddress)
+            memory("lw", "$ra", frame.returnAddress, "$sp");
         addOffset("$sp", "$sp", frame.size);
         jump("jr", "$ra");
     }
 
-    private void emitInstruction(Instruction instruction, int position) {
-        if (optimization != null && optimization.tryInstruction(instruction, position)) return;
+    // 为当前函数构建固定栈帧布局
+    protected MipsFrame createFrame(Function function) { return new MipsFrame(function); }
+
+    // 取得寄存器或调用方栈中的形参，并保存到当前函数的值槽
+    protected void emitArgument(Argument argument, int index) {
+        if (index < 4) emit("move $t0, $a" + index);
+        else memory("lw", "$t0", Math.addExact(frame.size, Math.multiplyExact(index - 4, 4)), "$sp");
+        save(argument, "$t0");
+    }
+
+    // 输出基本块标签，并依次生成块内指令
+    protected void emitBlock(BasicBlock block) {
+        text(label(block) + ":");
+        List<Instruction> instructions = block.getInstructions();
+        for (int position = 0; position < instructions.size(); position++)
+            emitInstruction(instructions.get(position), position);
+    }
+
+    // 根据分支操作数生成无条件或条件跳转
+    protected void emitBranch(Instruction instruction) {
+        List<Value> operands = instruction.getOperands();
+        if (operands.size() == 1) jump("j", label(operands.get(0)));
+        else {
+            load(operands.get(0), "$t0");
+            emitConditionalBranch(operands.get(1), operands.get(2));
+        }
+    }
+
+    // 根据 $t0 的真假选择出口，条件分支仅跨越一个绝对跳转
+    protected void emitConditionalBranch(Value yes, Value no) {
+        String nearby = nextBranchLabel();
+        jump("beq", "$t0, $zero, " + nearby);
+        jump("j", label(yes));
+        text(nearby + ":");
+        jump("j", label(no));
+    }
+
+    // 按 IR 操作码生成对应的 MIPS 指令
+    protected void emitInstruction(Instruction instruction, int position) {
         List<Value> operands = instruction.getOperands();
         switch (instruction.getOpcode()) {
             case ALLOCA -> { /* 地址可以从固定的 $sp 与偏移重新计算，无需额外槽位。 */ }
@@ -150,22 +168,7 @@ public final class MipsGenerator {
             }
             case GEP -> gep(instruction);
             case CALL -> call(instruction);
-            case BR -> {
-                if (operands.size() == 1) {
-                    if (optimization != null) optimization.spillLiveOut();
-                    jump("j", label(operands.get(0)));
-                }
-                else {
-                    load(operands.get(0), "$t0");
-                    if (optimization != null) optimization.spillLiveOut();
-                    String nearby = "__mips_branch" + nextBranch++;
-                    // 条件分支只跳过一个绝对跳转，避免大函数超出 16 位分支范围。
-                    jump("beq", "$t0, $zero, " + nearby);
-                    jump("j", label(operands.get(1)));
-                    output.text(nearby + ":");
-                    jump("j", label(operands.get(2)));
-                }
-            }
+            case BR -> emitBranch(instruction);
             case RET -> {
                 if (!operands.isEmpty()) load(operands.get(0), "$v0");
                 jump("j", epilogue);
@@ -174,6 +177,7 @@ public final class MipsGenerator {
         }
     }
 
+    // 生成整数算术指令并保存计算结果
     private void arithmetic(Instruction instruction) {
         load(instruction.getOperands().get(0), "$t0");
         load(instruction.getOperands().get(1), "$t1");
@@ -198,6 +202,7 @@ public final class MipsGenerator {
         save(instruction, "$t2");
     }
 
+    // 按比较谓词生成值为零或一的结果
     private void compare(Instruction instruction) {
         var operands = instruction.getOperands();
         load(operands.get(0), "$t0");
@@ -222,6 +227,7 @@ public final class MipsGenerator {
         save(instruction, "$t2");
     }
 
+    // 按各层元素大小计算下标对应的地址
     private void gep(Instruction instruction) {
         List<Value> operands = instruction.getOperands();
         load(operands.get(0), "$t0");
@@ -241,9 +247,9 @@ public final class MipsGenerator {
         save(instruction, "$t0");
     }
 
+    // 按调用约定放置实参，调用函数或内建系统服务
     private void call(Instruction instruction) {
         List<Value> operands = instruction.getOperands();
-        Function callee = (Function) operands.get(0);
         for (int i = 1; i < operands.size(); i++) {
             if (i <= 4) load(operands.get(i), "$a" + (i - 1));
             else {
@@ -251,7 +257,12 @@ public final class MipsGenerator {
                 memory("sw", "$t0", Math.multiplyExact(i - 5, 4), "$sp");
             }
         }
-        if (optimization != null) optimization.beforeCall();
+        invokeCall(instruction);
+    }
+
+    // 执行函数或内建系统调用，并保存非 void 返回值
+    protected void invokeCall(Instruction instruction) {
+        Function callee = (Function) instruction.getOperands().get(0);
         if (callee.isExternal()) {
             int syscall = switch (callee.getName()) {
                 case "get_int" -> 5;
@@ -268,29 +279,38 @@ public final class MipsGenerator {
         if (!instruction.getType().equals(IrType.VOID)) save(instruction, "$v0");
     }
 
-    private void load(Value value, String register) {
-        if (optimization != null && optimization.tryLoad(value, register)) return;
-        if (value instanceof Constant c) emit("li " + register + ", " + c.getNumber());
-        else if (value instanceof GlobalVariable) emit("la " + register + ", " + label(value));
-        else if (frame.objects.containsKey(value)) addOffset(register, "$sp", frame.objects.get(value));
+    // 将 IR 值或对象地址装入寄存器，必要时从值槽读取
+    protected void load(Value value, String register) {
+        if (value instanceof Constant c)
+            emit("li " + register + ", " + c.getNumber());
+        else if (value instanceof GlobalVariable)
+            emit("la " + register + ", " + label(value));
+        else if (frame.objects.containsKey(value))
+            addOffset(register, "$sp", frame.objects.get(value));
         else {
             Integer offset = frame.slots.get(value);
-            if (offset == null) throw new IllegalArgumentException("No stack slot for " + value.getName());
+            if (offset == null)
+                throw new IllegalArgumentException("No stack slot for " + value.getName());
             memory("lw", register, offset, "$sp");
         }
-        if (optimization != null) optimization.loaded(value, register);
     }
 
-    private void save(Value value, String register) {
-        if (optimization != null && optimization.discard(value)) return;
-        if (value.getType().bits() == 8) emit("andi " + register + ", " + register + ", 255");
-        else if (value.getType().bits() == 1) emit("andi " + register + ", " + register + ", 1");
-        if (optimization == null || !optimization.trySave(value, register))
-            memory("sw", register, frame.slots.get(value), "$sp");
-        if (optimization != null) optimization.loaded(value, register);
+    // 按整数位宽截断结果，再保存到寄存器或栈槽
+    protected void save(Value value, String register) {
+        normalize(value, register);
+        memory("sw", register, frame.slots.get(value), "$sp");
     }
 
-    private void signExtend(String register, IrType type) {
+    // 按 IR 结果位宽规范化寄存器中的整数
+    protected void normalize(Value value, String register) {
+        if (value.getType().bits() == 8)
+            emit("andi " + register + ", " + register + ", 255");
+        else if (value.getType().bits() == 1)
+            emit("andi " + register + ", " + register + ", 1");
+    }
+
+    // 按 IR 位宽将窄整数符号扩展到三十二位
+    protected void signExtend(String register, IrType type) {
         if (type.bits() > 0 && type.bits() < 32) {
             int shift = 32 - type.bits();
             emit("sll " + register + ", " + register + ", " + shift);
@@ -298,46 +318,53 @@ public final class MipsGenerator {
         }
     }
 
-    private void memory(String opcode, String register, int offset, String base) {
-        if (shortImmediate(offset)) emit(opcode + " " + register + ", " + offset + "(" + base + ")");
+    // 生成访存指令，大偏移借助临时寄存器合成地址
+    protected void memory(String opcode, String register, int offset, String base) {
+        if (shortImmediate(offset))
+            emit(opcode + " " + register + ", " + offset + "(" + base + ")");
         else {
             addOffset("$t9", base, offset);
             emit(opcode + " " + register + ", 0($t9)");
         }
     }
 
-    private void addOffset(String target, String base, int offset) {
-        if (optimization != null && optimization.redundantOffset(target, base, offset)) return;
-        if (shortImmediate(offset)) emit("addiu " + target + ", " + base + ", " + offset);
+    // 计算基地址加偏移，处理超出十六位范围的立即数
+    protected void addOffset(String target, String base, int offset) {
+        if (shortImmediate(offset))
+            emit("addiu " + target + ", " + base + ", " + offset);
         else {
             emit("li $t9, " + offset);
             emit("addu " + target + ", " + base + ", $t9");
         }
     }
 
-    private String label(Value value) {
+    // 查询 IR 对象的汇编标签，缺失时报告错误
+    protected String label(Value value) {
         String label = labels.get(value);
-        if (label == null) throw new IllegalArgumentException("Missing assembly label for " + value.getName());
+        if (label == null)
+            throw new IllegalArgumentException("Missing assembly label for " + value.getName());
         return label;
     }
-    private void emit(String instruction) {
-        if (optimization != null) optimization.onEmit(instruction);
-        output.text("    " + instruction);
-    }
-    private void jump(String opcode, String target) { emit(opcode + " " + target); emit("nop"); }
 
-    private final class Emission implements MipsEmission {
-        public void emit(String instruction) { MipsGenerator.this.emit(instruction); }
-        public void text(String line) { output.text(line); }
-        public void load(Value value, String register) { MipsGenerator.this.load(value, register); }
-        public void save(Value value, String register) { MipsGenerator.this.save(value, register); }
-        public void memory(String opcode, String register, int offset, String base) {
-            MipsGenerator.this.memory(opcode, register, offset, base);
-        }
-        public void addOffset(String target, String base, int offset) { MipsGenerator.this.addOffset(target, base, offset); }
-        public void signExtend(String register, IrType type) { MipsGenerator.this.signExtend(register, type); }
-        public void jump(String opcode, String target) { MipsGenerator.this.jump(opcode, target); }
-        public String label(Value value) { return MipsGenerator.this.label(value); }
-        public String nextBranchLabel() { return "__mips_branch" + nextBranch++; }
+    // 向代码段输出一条缩进的汇编指令
+    protected void emit(String instruction) {
+        text("    " + instruction);
     }
+
+    // 输出跳转指令并补充延迟槽空指令
+    protected void jump(String opcode, String target) {
+        emit(opcode + " " + target);
+        emit("nop");
+    }
+
+    // 向当前模块追加标签等不缩进的代码段文本
+    protected void text(String line) {
+        output.text(line);
+    }
+
+    // 分配一个不重复的辅助分支标签
+    protected String nextBranchLabel() {
+        return "__mips_branch" + nextBranch++;
+    }
+
 }

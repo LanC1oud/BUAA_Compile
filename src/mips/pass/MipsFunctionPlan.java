@@ -5,16 +5,19 @@ import llvm.type.IrType;
 import llvm.value.*;
 import java.util.*;
 
-/** 不修改 IR 的函数内分析：重算值、融合比较、块内末次使用与跨块结果。 */
+// 分析值的使用位置、跨块使用和可融合的比较
 final class MipsFunctionPlan {
     private final MipsConstants constants;
     private final Map<Value, Boolean> stackAddresses = new IdentityHashMap<>();
     private final Set<Value> crossBlock = Collections.newSetFromMap(new IdentityHashMap<>());
     private final Set<Instruction> fused = Collections.newSetFromMap(new IdentityHashMap<>());
+
+    // 记录分支可融合的比较及其真假方向是否反转
     record Comparison(Instruction instruction, boolean inverted) { }
     private final Map<Instruction, Comparison> branches = new IdentityHashMap<>();
     private final Map<BasicBlock, Map<Value, Integer>> lastUses = new IdentityHashMap<>();
 
+    // 扫描函数，建立比较融合与值使用位置的分析结果
     MipsFunctionPlan(Function function, MipsConstants constants) {
         this.constants = constants;
         for (BasicBlock block : function.getBlocks()) {
@@ -65,25 +68,37 @@ final class MipsFunctionPlan {
         }
     }
 
+    // 判断值是否可确定为常量零
     private boolean isZero(Value value) {
         Constant constant = constants.get(value);
         return constant != null && constant.getNumber() == 0;
     }
 
+    // 取得分支可融合的比较信息
     Comparison comparisonFor(Instruction branch) { return branches.get(branch); }
+
+    // 判断指令是否已被融合进分支
     boolean isFused(Instruction instruction) { return fused.contains(instruction); }
+
+    // 判断指令结果是否被其他基本块使用
     boolean crossesBlock(Value value) { return crossBlock.contains(value); }
+
+    // 取得值在指定块内的末次使用位置，未使用时返回负一
     int lastUse(Value value, BasicBlock block) { return lastUses.get(block).getOrDefault(value, -1); }
+
+    // 判断值在当前位置之后或其他基本块中是否仍需使用
     boolean liveAfter(Value value, BasicBlock block, int position) {
         return crossesBlock(value) || lastUse(value, block) > position;
     }
 
+    // 判断指令结果是否需要分配回退栈槽
     boolean needsSlot(Instruction instruction) {
         return !instruction.getType().equals(IrType.VOID) && instruction.getOpcode() != Instruction.Opcode.ALLOCA
                 && !instruction.getUses().isEmpty() && constants.get(instruction) == null
                 && !isFused(instruction) && !isStackAddress(instruction);
     }
 
+    // 判断值是否为可重算的局部对象地址或全常量下标地址
     boolean isStackAddress(Value value) {
         Boolean cached = stackAddresses.get(value);
         if (cached != null) return cached;

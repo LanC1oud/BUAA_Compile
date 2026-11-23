@@ -3,23 +3,27 @@
 编译流程为 `源程序 → AST 与语义信息 → IrModule → MipsModule → mips.txt`。
 默认目标为 MIPS，`Compiler --stage llvm` 保留原 LLVM 输出能力。后端不修改 IR，生成 MIPS 时同时输出 `llvm_ir.txt`。
 
+逐指令学习示例见 [LLVM IR 到 MIPS 逐指令翻译详解](LLVM%20IR到MIPS逐指令翻译详解.md)，包含完整源码、真实栈布局与 62 条 IR 的汇编对照。
+
 ## 模块划分
 
-`MipsGenerator` 遍历 `IrModule` 的全局对象、函数、基本块和指令，负责基础降低、调用约定与指令发射，仅通过调用接入可选优化。
+`MipsGenerator` 遍历 `IrModule` 的全局对象、函数、基本块和指令，只负责基础降低、调用约定与指令发射，不导入或调用 `mips.pass`，也不接收优化开关或 Pass 列表。
 `MipsModule` 分开保存数据段和文本段；`MipsPrinter` 输出可由 MARS 汇编的文本。
 `MipsFrame` 保存栈帧布局并提供基础分配方式；`MipsLayout` 统一存储大小、对齐和立即数范围。
 所有后端优化集中在 `mips/pass/`：
 
 | 类 | 职责 |
 | --- | --- |
-| `MipsGenerationOptimization` | 生成期间的优化入口：常量条件、地址折叠、算术指令选择、比较分支融合、寄存器缓存及无用结果处理 |
+| `OptimizedMipsGenerator` | 优化生成器；继承基础生成器，直接管理生成状态、常量条件、地址折叠、算术指令选择、比较分支融合及寄存器缓存，并执行生成后的 Pass |
 | `MipsConstants` | 不修改 IR 的常量分析 |
 | `MipsFunctionPlan` | 块内末次使用、跨块结果、可重算地址和比较融合分析 |
 | `MipsLocalRegisters` | 块内 `$t3～$t8` 分配及按需写回 |
 | `MipsFrameOptimization` | 栈槽复用、无用槽剔除和叶子函数返回地址槽省略 |
 | `MipsPass` / `RemoveRedundantJumps` | 生成完成后的目标代码优化接口及冗余跳转删除 |
 
-生成期间的优化通过 `MipsEmission` 调用生成器的基础发射操作。优化器保管分析结果与寄存器状态，生成器在函数、基本块、指令、加载/保存和调用边界调用优化器。未接管的操作继续走基础降低路径。
+`Controller` 和 UI 的 `Pipeline` 在入口选择生成器：关闭优化使用 `new MipsGenerator()`，开启优化使用 `new OptimizedMipsGenerator(Configure.mipsPasses)`。基础生成器的每个方法都实现基础行为；优化生成器通过方法覆盖接入优化，未接管的操作调用 `super` 复用基础实现，避免维护两份完整翻译代码。依赖方向是 `pass/ → mips/`。
+
+`OptimizedMipsGenerator` 直接调用继承的发射方法，不再通过独立接口和适配器转发。函数分析、栈帧分析、块内寄存器管理仍由各自的辅助类负责；所有优化状态、指令选择和后处理 Pass 调度均位于 `pass/` 内。
 这类优化依赖 IR 的类型、使用关系及栈帧信息，因此保留在降低期间执行；生成后的文本优化继续使用 `MipsPass.run(MipsModule)`。两者都归入 `mips/pass/`，与已有 `IrPass` 分开执行。
 各轮改动、代码入口和实测结果统一记录在 [优化日志](优化日志.md)。
 

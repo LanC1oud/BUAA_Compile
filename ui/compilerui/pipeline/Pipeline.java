@@ -13,6 +13,7 @@ import frontend.ParserWatcher;
 import frontend.Traverser;
 import llvm.IrGenerator;
 import mips.MipsGenerator;
+import mips.pass.OptimizedMipsGenerator;
 import frontend.ast.CompileUnit;
 import frontend.symbol.SymbolTable;
 import frontend.token.TokenStream;
@@ -227,8 +228,11 @@ public final class Pipeline {
                 new StageStats(Stage.LLVM, millisSince(start), 0, instructions, "指令"));
         if (until == Stage.LLVM) return;
         start = System.nanoTime();
-        Captured<mips.MipsModule> lowered = capture(() ->
-                new MipsGenerator(settings.optimize(), settings.optimize() ? Configure.mipsPasses : List.of()).generate(generated.value()));
+        Captured<mips.MipsModule> lowered = capture(() -> {
+            if (settings.optimize())
+                return new OptimizedMipsGenerator(Configure.mipsPasses).generate(generated.value());
+            return new MipsGenerator().generate(generated.value());
+        });
         String assembly = lowered.value().toString();
         long mipsInstructions = lowered.value().getText().stream().filter(line -> line.startsWith("    ")).count();
         record(Stage.MIPS, assembly, errors, new StringBuilder(lowered.log()),
@@ -259,7 +263,7 @@ public final class Pipeline {
                 ok ? payload : null,
                 ok ? null : text,
                 errors.size(),
-                log.length() == 0 ? "" : log.toString(),
+                log.isEmpty() ? "" : log.toString(),
                 new StageStats(stage, stats.millis(), text.lines().count(),
                         stats.metric(), stats.metricName())));
     }

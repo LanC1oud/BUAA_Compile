@@ -89,7 +89,7 @@ public final class MipsPipelineRegression {
         check(assembly.equals(generator.generate(module).toString()), "generator reuse state leakage");
         check(before.equals(module.toString()), "backend mutated IR");
         Files.writeString(out.resolve("model.s"), assembly);
-        MipsGenerator optimized = new MipsGenerator(true, List.of(new mips.pass.RemoveRedundantJumps()));
+        MipsGenerator optimized = new mips.pass.OptimizedMipsGenerator(List.of(new mips.pass.RemoveRedundantJumps()));
         String faster = optimized.generate(module).toString();
         check(faster.equals(optimized.generate(module).toString()), "optimized generator reuse state leakage");
         check(before.equals(module.toString()), "optimized backend mutated IR");

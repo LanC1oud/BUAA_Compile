@@ -1,33 +1,15 @@
-int x1 = -7;
-int x2 = 7;
-int x3 = 12;
-int x4 = -12;
-int x5 = 16;
-int x6 = -16;
+int global_var = 2026;
+int long_array[20] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+
+int func(int x, int y, int i, int j, int k, int m, int n) {
+    int res = x + y;
+    return res;
+}
+
 int main() {
-    printf("-7 MOD 4 = %d\n-7 MOD -4 = %d\n", x1 % 4, x1 % -4);
-    printf("7 MOD 4 = %d\n7 MOD -4 = %d\n", x2 % 4, x2 % -4);
-    printf("The ans should be -3, -3, 3, 3\n");
-    printf("12 MOD 2 = %d\n12 MOD -2 = %d\n", x3 % 2, x3 % -2);
-    printf("-12 MOD 2 = %d\n-12 MOD -2 = %d\n", x4 % 2, x4 % -2);
-    printf("The ans should be 0, 0, 0, 0\n");
-    printf("12 MOD 8 = %d\n12 MOD -8 = %d\n", x3 % 8, x3 % -8);
-    printf("-12 MOD 8 = %d\n-12 MOD -8 = %d\n", x4 % 8, x4 % -8);
-    printf("The ans should be 4, 4, -4, -4\n");
-    printf("16 MOD 4 = %d\n16 MOD -4 = %d\n", x5 % 4, x5 % -4);
-    printf("-16 MOD 4 = %d\n-16 MOD -4 = %d\n", x6 % 4, x6 % -4);
-    printf("The ans should be 0, 0, 0, 0\n");
-    printf("-7 / 4 = %d\n-7 / -4 = %d\n", x1 / 4, x1 / -4);
-    printf("7 / 4 = %d\n7 / -4 = %d\n", x2 / 4, x2 / -4);
-    printf("The ans should be -1, 1, 1, -1\n");
-    printf("12 / 2 = %d\n12 / -2 = %d\n", x3 / 2, x3 / -2);
-    printf("-12 / 2 = %d\n-12 / -2 = %d\n", x4 / 2, x4 / -2);
-    printf("The ans should be 6, -6, -6, 6\n");
-    printf("12 / 8 = %d\n12 / -8 = %d\n", x3 / 8, x3 / -8);
-    printf("-12 / 8 = %d\n-12 / -8 = %d\n", x4 / 8, x4 / -8);
-    printf("The ans should be 1, -1, -1, 1\n");
-    printf("16 / 4 = %d\n16 / -4 = %d\n", x5 / 4, x5 / -4);
-    printf("-16 / 4 = %d\n-16 / -4 = %d\n", x6 / 4, x6 / -4);
-    printf("The ans should be 4, -4, -4, 4\n");
-    return 0;
+    int a = 10;
+    int b = 15;
+    int c, d, e, f, g;
+    int ans = func(a, b, c, d, e, f, g);
+    return ans + global_var;
 }

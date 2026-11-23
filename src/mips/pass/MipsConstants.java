@@ -5,10 +5,11 @@ import llvm.value.*;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-/** 仅供后端重算常量使用，不替换 IR，也不传播可变内存的内容。 */
+// 分析可重算的整数常量，不修改 IR 或传播可变内存
 final class MipsConstants {
     private final Map<Value, Constant> values = new IdentityHashMap<>();
 
+    // 扫描函数指令并记录可在编译期求出的结果
     MipsConstants(Function function) {
         for (BasicBlock block : function.getBlocks()) {
             for (Instruction instruction : block.getInstructions()) {
@@ -18,8 +19,10 @@ final class MipsConstants {
         }
     }
 
+    // 取得字面常量或已求出的常量，未知时返回空值
     Constant get(Value value) { return value instanceof Constant c ? c : values.get(value); }
 
+    // 尝试求出整数指令的常量结果，保留未定义运算
     private Constant evaluate(Instruction instruction) {
         if (!instruction.getType().isInteger()) return null;
         var operands = instruction.getOperands();
@@ -68,6 +71,7 @@ final class MipsConstants {
         return result == null ? null : Constant.integer(instruction.getType(), result);
     }
 
+    // 按常量的整数位宽解释其有符号值
     static int signed(Constant value) {
         int shift = 32 - value.getType().bits();
         return value.getNumber() << shift >> shift;
