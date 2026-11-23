@@ -24,7 +24,7 @@
 | 2 语法分析 | `frontend/Parser.java`、`frontend/ast/` | `parser.txt`（token + 语法树先序） | ✅ 完成 |
 | 3 语义分析 | `frontend/Traverser.java`、`frontend/symbol/` | `symbol.txt`（符号表） | ✅ 完成 |
 | 4 中间代码生成 | `llvm/`、`frontend/SemanticInfo.java` | `llvm_ir.txt` | ✅ 完成（LLVM 12） |
-| 5 代码优化 | `llvm/pass/`、`mips/`、`mips/pass/` | 可选优化前 IR、优化后 IR、优化后 MIPS | ✅ 初步后端优化 |
+| 5 代码优化 | `llvm/pass/`、`mips/pass/` | 可选优化前 IR、优化后 IR、优化后 MIPS | ✅ 初步后端优化 |
 | 6 目标代码生成 | `mips/` | `mips.txt` | ✅ MARS 2026-BUAA |
 
 出错时错误信息写入 `error.txt`（`src/utils/Configure.java` 里配置），

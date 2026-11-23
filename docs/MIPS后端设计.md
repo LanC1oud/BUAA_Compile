@@ -5,10 +5,22 @@
 
 ## 模块划分
 
-`MipsGenerator` 遍历 `IrModule` 的全局对象、函数、基本块和指令，进行数据布局、栈帧分配和指令选择。
+`MipsGenerator` 遍历 `IrModule` 的全局对象、函数、基本块和指令，负责基础降低、调用约定与指令发射，仅通过调用接入可选优化。
 `MipsModule` 分开保存数据段和文本段；`MipsPrinter` 输出可由 MARS 汇编的文本。
-`MipsPass` 提供目标代码优化接口，与已有 `IrPass` 分开执行。
-`MipsFunctionPlan` 分析块内末次使用、跨块结果和可融合比较；`MipsLocalRegisters` 管理块内 `$t3～$t8` 及按需写回。
+`MipsFrame` 保存栈帧布局并提供基础分配方式；`MipsLayout` 统一存储大小、对齐和立即数范围。
+所有后端优化集中在 `mips/pass/`：
+
+| 类 | 职责 |
+| --- | --- |
+| `MipsGenerationOptimization` | 生成期间的优化入口：常量条件、地址折叠、算术指令选择、比较分支融合、寄存器缓存及无用结果处理 |
+| `MipsConstants` | 不修改 IR 的常量分析 |
+| `MipsFunctionPlan` | 块内末次使用、跨块结果、可重算地址和比较融合分析 |
+| `MipsLocalRegisters` | 块内 `$t3～$t8` 分配及按需写回 |
+| `MipsFrameOptimization` | 栈槽复用、无用槽剔除和叶子函数返回地址槽省略 |
+| `MipsPass` / `RemoveRedundantJumps` | 生成完成后的目标代码优化接口及冗余跳转删除 |
+
+生成期间的优化通过 `MipsEmission` 调用生成器的基础发射操作。优化器保管分析结果与寄存器状态，生成器在函数、基本块、指令、加载/保存和调用边界调用优化器。未接管的操作继续走基础降低路径。
+这类优化依赖 IR 的类型、使用关系及栈帧信息，因此保留在降低期间执行；生成后的文本优化继续使用 `MipsPass.run(MipsModule)`。两者都归入 `mips/pass/`，与已有 `IrPass` 分开执行。
 各轮改动、代码入口和实测结果统一记录在 [优化日志](优化日志.md)。
 
 `Controller` 在语义检查通过后生成 IR，再根据目标阶段输出 LLVM 或 MIPS。
