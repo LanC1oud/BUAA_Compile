@@ -12,6 +12,7 @@ import frontend.Parser;
 import frontend.ParserWatcher;
 import frontend.Traverser;
 import llvm.IrGenerator;
+import mips.MipsGenerator;
 import frontend.ast.CompileUnit;
 import frontend.symbol.SymbolTable;
 import frontend.token.TokenStream;
@@ -32,7 +33,7 @@ import java.util.Objects;
  * 编译器前端管线：{@code utils.Controller} 的"库版本"。
  *
  * <p>Controller 面向命令行评测——读静态配置、每个阶段结束就 {@code System.exit(0)}，
- * 这个类把词法、语法、语义、LLVM 四个阶段抽成可重复调用、返回结果对象、
+ * 这个类把词法、语法、语义、LLVM、MIPS 五个阶段抽成可重复调用、返回结果对象、
  * 不退出 JVM 的接口。
  *
  * <p><b>本类不是线程安全的。</b> 它要复用 {@code Controller.errors} /
@@ -224,6 +225,14 @@ public final class Pipeline {
                 .mapToLong(b -> b.getInstructions().size()).sum();
         record(Stage.LLVM, ir, errors, new StringBuilder(generated.log()),
                 new StageStats(Stage.LLVM, millisSince(start), 0, instructions, "指令"));
+        if (until == Stage.LLVM) return;
+        start = System.nanoTime();
+        Captured<mips.MipsModule> lowered = capture(() ->
+                new MipsGenerator(Configure.optimize, Configure.optimize ? Configure.mipsPasses : List.of()).generate(generated.value()));
+        String assembly = lowered.value().toString();
+        long mipsInstructions = lowered.value().getText().stream().filter(line -> line.startsWith("    ")).count();
+        record(Stage.MIPS, assembly, errors, new StringBuilder(lowered.log()),
+                new StageStats(Stage.MIPS, millisSince(start), 0, mipsInstructions, "指令"));
     }
 
     private static long millisSince(long startNanos) {

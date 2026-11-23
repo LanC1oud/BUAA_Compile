@@ -6,8 +6,8 @@
 - 语法分析 ✅
 - 语义分析 ✅
 - LLVM IR 生成 ✅
-- 代码优化
-- 目标代码生成
+- MIPS 目标代码生成 ✅
+- MIPS 优化
 
 ---
 
@@ -24,8 +24,8 @@
 | 2 语法分析 | `frontend/Parser.java`、`frontend/ast/` | `parser.txt`（token + 语法树先序） | ✅ 完成 |
 | 3 语义分析 | `frontend/Traverser.java`、`frontend/symbol/` | `symbol.txt`（符号表） | ✅ 完成 |
 | 4 中间代码生成 | `llvm/`、`frontend/SemanticInfo.java` | `llvm_ir.txt` | ✅ 完成（LLVM 12） |
-| 5 代码优化 | 待实现 | — | ⬜ 未开始 |
-| 6 目标代码生成 | 待实现 | `mips.txt` | ⬜ 未开始 |
+| 5 代码优化 | `llvm/pass/`、`mips/`、`mips/pass/` | 可选优化前 IR、优化后 IR、优化后 MIPS | ✅ 初步后端优化 |
+| 6 目标代码生成 | `mips/` | `mips.txt` | ✅ MARS 2026-BUAA |
 
 出错时错误信息写入 `error.txt`（`src/utils/Configure.java` 里配置），
 格式为 `行号 错误码`，如 `5 i`。
@@ -51,6 +51,9 @@
 
 - **`error.ErrorTable`** —— 错误收集表，实现 `BackTrace.Traceable`
 - **`frontend.symbol.SymbolTable`** —— 符号表，作用域栈 + 输出列表
+
+语义检查通过后继续执行 `AST → 结构化 LLVM IR → MIPS → mips.txt`。
+MIPS 阶段同时保留 `llvm_ir.txt`，便于检查中间结果。后端直接读取 IR 对象，不解析 IR 文本。
 
 ### 目录结构
 
@@ -100,16 +103,20 @@ testfile*.sysy                  测试用例
 ```bash
 # 1) 准备输入：把待编译源码放到项目根的 testfile.txt
 #    阶段开关改 src/utils/HomeworkConfig.java 里的 hw 字段
-#      public static Hw hw = Hw.Llvm;   // Lexer / Syntax / Semantic / Llvm
+#      public static Hw hw = Hw.Mips;   // Lexer / Syntax / Semantic / Llvm / Mips
 
 # 2) 编译
 javac -encoding UTF-8 -d out/production/BUAA_Compile $(find src -name '*.java')
 
 # 3) 运行
 java -cp out/production/BUAA_Compile Compiler
+# 默认开启初步 MIPS 优化；可单独输出 LLVM 或关闭优化
+java -cp out/production/BUAA_Compile Compiler --stage llvm
+java -cp out/production/BUAA_Compile Compiler --no-optimize
+java -cp out/production/BUAA_Compile Compiler --optimize --ir-before llvm_ir_before.txt
 ```
 
-产物落在项目根，按阶段不同：`lexer.txt` / `parser.txt` / `symbol.txt` / `llvm_ir.txt`；
+产物落在项目根，按阶段不同：`lexer.txt` / `parser.txt` / `symbol.txt` / `llvm_ir.txt` / `mips.txt`；
 有错时写 `error.txt`。
 
 IDEA 里直接运行 `src/Compiler.java` 的 `main` 即可。
@@ -135,20 +142,6 @@ run.bat --help
 ./run.sh --force       # 强制重编
 ./run.sh --help
 ```
-
----
-
-### 在界面运行 LLVM IR
-
-打开「LLVM IR 运行」，粘贴包含 `main` 的 IR，在「标准输入」填写程序要读取的文本，点击「运行 IR」。如需自动核对，勾选「对比预期输出」并填入期望文本。比对时兼容 Windows 和 Unix 换行，空格和末尾换行均计入。
-
-运行需要 PATH 中可用的 `clang` 和本机 C 编译、链接环境，也可以通过环境变量 `CLANG` 指定 clang 的绝对路径。界面会链接项目的 `runtime/libsysy.c`。粘贴的 IR 会作为本机程序执行，请使用可信代码。程序的标准输出、诊断和退出码分别展示，运行限时 5 秒。
-
----
-
-### SysY IDE（实验）
-
-第三个标签页提供带行号和语法高亮的 SysY 编辑器。点击「运行」后，在下方终端输入一行并按 Enter，程序的输出会随运行显示。「停止」可以结束正在编译、计算或等待输入的程序。初始示例输入 `41` 后会显示 `n + 1 = 42`。此页使用与 LLVM IR 运行页相同的 Clang 环境。
 
 ---
 

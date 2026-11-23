@@ -6,6 +6,7 @@
 # 构建、打包及本地工具链产物
 /build/
 /out/
+/tools/
 *.class
 
 # 编译器在项目根目录生成的评测输出；保留子目录中的同名测试答案
@@ -15,6 +16,8 @@
 /error.txt
 /llvm_ir.txt
 /mips.txt
+/llvm_ir_before.txt
+/instruction_statistics.json
 
 # 界面批量导出、本地样例与回滚备份
 /output/
@@ -39,5 +42,35 @@ __pycache__/
 .DS_Store
 Thumbs.db
 Desktop.ini
-/src/lllvmir.zip
+/src/llvmir.zip
 /testfiles/
+
+# MIPS 阶段可复现的测试、设计与回滚工具需要纳入版本控制。
+!/tests/
+/tests/*
+!/tests/run-mips-tests.py
+!/tests/mips_cases.py
+!/tests/mips_optimization_cases.py
+!/tests/mips_round2_cases.py
+!/tests/MipsAllocationRegression.java
+!/tests/MipsPipelineRegression.java
+!/tests/llvm_cases.py
+!/tests/official-llvm.sysy
+!/tests/support/
+/tests/support/*
+!/tests/support/MemoryPreferencesFactory.java
+!/tests/run-llvm-tests.py
+!/tests/LlvmPipelineRegression.java
+!/tools/
+/tools/*
+!/tools/restore-llvm.ps1
+!/tools/restore-mips.ps1
+!/tools/restore-snapshot.ps1
+!/tools/pack.ps1
+!/tools/setup-llvm12.py
+!/tools/build-runtime.py
+!/docs/
+/docs/*
+!/docs/MIPS后端设计.md
+!/docs/优化日志.md
+!/docs/验证结果/

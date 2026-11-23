@@ -4,7 +4,10 @@ public enum Stage {
     LEXER("词法分析 Lexer", "lexer.txt"),
     SYNTAX("语法分析 Syntax", "parser.txt"),
     SEMANTIC("语义分析 Semantic", "symbol.txt"),
-    LLVM("LLVM IR 生成", "llvm_ir.txt");
+    LLVM("LLVM IR 生成", "llvm_ir.txt"),
+    MIPS("MIPS 目标代码生成", "mips.txt");
+
+    public boolean isCodeGeneration() { return this == LLVM || this == MIPS; }
 
     private final String displayName;
     private final String defaultFileName;

@@ -63,7 +63,7 @@ public final class BatchPanel extends JPanel {
         super(new BorderLayout(6, 6));
 
         model = new DefaultTableModel(
-                new String[]{"样例", "词法", "语法", "语义", "错误数", "结果", "输出目录"}, 0) {
+                new String[]{"样例", "词法", "语法", "语义", "LLVM", "MIPS", "错误数", "结果", "输出目录"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -254,10 +254,10 @@ public final class BatchPanel extends JPanel {
     }
 
     private void addRow(SampleOutcome outcome) {
-        Object[] row = new Object[7];
+        Object[] row = new Object[9];
         row[0] = outcome.sample().display();
         List<compilerui.model.CompileResult> results = outcome.results();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < compilerui.model.Stage.values().length; i++) {
             if (outcome.failure() != null && results.isEmpty()) {
                 row[1 + i] = "—";
             } else if (i < results.size()) {
@@ -268,17 +268,17 @@ public final class BatchPanel extends JPanel {
             }
         }
         int finalErrors = outcome.finalErrorCount();
-        row[4] = finalErrors < 0 ? "—" : String.valueOf(finalErrors);
+        row[6] = finalErrors < 0 ? "—" : String.valueOf(finalErrors);
         if (outcome.failure() != null && results.isEmpty()) {
-            row[5] = "异常";
+            row[7] = "异常";
         } else if (outcome.passed()) {
-            row[5] = "通过";
+            row[7] = "通过";
         } else if (finalErrors < 0) {
-            row[5] = "解析中断";
+            row[7] = "解析中断";
         } else {
-            row[5] = "有错误";
+            row[7] = "有错误";
         }
-        row[6] = outcome.outputDir() == null ? "—" : outcome.outputDir().toString();
+        row[8] = outcome.outputDir() == null ? "—" : outcome.outputDir().toString();
         model.addRow(row);
     }
 
@@ -298,7 +298,7 @@ public final class BatchPanel extends JPanel {
                 return component;
             }
             String text = String.valueOf(value);
-            if (column == 0 || column == 6) {
+            if (column == 0 || column == 8) {
                 component.setForeground(Color.BLACK);
             } else if ("ok".equals(text) || "通过".equals(text)) {
                 component.setForeground(new Color(0x00, 0x88, 0x00));

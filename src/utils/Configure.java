@@ -5,9 +5,11 @@ public class Configure {
     public static String source = "testfile.txt";
     public static String target = HomeworkConfig.getTarget();
     public static String error = "error.txt";
-    // Future optimizations are opt-in; the default pipeline is already executable.
-    public static boolean optimize = false;
+    // Initial MIPS optimizations are enabled; --no-optimize keeps the baseline path available.
+    public static boolean optimize = true;
     public static java.util.List<llvm.pass.IrPass> irPasses = java.util.List.of();
+    public static java.util.List<mips.pass.MipsPass> mipsPasses =
+            java.util.List.of(new mips.pass.RemoveRedundantJumps());
     public static String irBeforeOptimization = null;
     
     

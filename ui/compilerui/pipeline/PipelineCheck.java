@@ -70,7 +70,7 @@ public final class PipelineCheck {
 
             CompileResult result = pipeline.resultOf(stage);
             if (result == null) {
-                if (stage == Stage.LLVM && !pipeline.rawErrors().isEmpty()) {
+                if (stage.isCodeGeneration() && !pipeline.rawErrors().isEmpty()) {
                     System.out.println("  [ OK ] 前端错误阻止 IR 生成");
                     continue;
                 }
@@ -124,7 +124,7 @@ public final class PipelineCheck {
             second.compile(source.toString(), stage);
             CompileResult a = first.resultOf(stage);
             CompileResult b = second.resultOf(stage);
-            if (stage == Stage.LLVM && a == null && b == null && first.rawErrors().equals(second.rawErrors())
+            if (stage.isCodeGeneration() && a == null && b == null && first.rawErrors().equals(second.rawErrors())
                     && !first.rawErrors().isEmpty()) continue;
             String crashA = first.crashMessage();
             String crashB = second.crashMessage();

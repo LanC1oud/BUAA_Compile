@@ -173,7 +173,7 @@ public final class BatchRunner {
      *
      * @param samples   待编译样例
      * @param outputDir 输出文件夹
-     * @param settings  编译设置（阶段固定跑到语义）
+     * @param settings  编译设置（编译至所选阶段，默认 MIPS）
      * @param listener  进度回调，可为 null
      */
     public static List<SampleOutcome> run(List<Sample> samples,
@@ -197,8 +197,8 @@ public final class BatchRunner {
         Pipeline pipeline = new Pipeline();
         pipeline.setSettings(settings);
         try {
-            // 三个阶段一次跑完，产物后面按阶段分别落盘。
-            pipeline.compileContent(sample.source(), sample.path().toString(), Stage.LLVM);
+            // 按所选目标一次跑完，随后分别保存各阶段产物。
+            pipeline.compileContent(sample.source(), sample.path().toString(), settings.stage());
         } catch (IOException e) {
             return new SampleOutcome(sample, List.of(), null,
                     e.getClass().getSimpleName() + ": " + e.getMessage());
@@ -219,7 +219,7 @@ public final class BatchRunner {
         Path dir = outputDir.resolve(resultDirName(sample));
         try {
             Files.createDirectories(dir);
-            Files.deleteIfExists(dir.resolve("llvm_ir.txt"));
+            for (Stage stage : Stage.values()) Files.deleteIfExists(dir.resolve(stage.defaultFileName()));
             Files.deleteIfExists(dir.resolve("error.txt"));
             for (CompileResult result : results) {
                 writeProduct(dir, result);
@@ -281,7 +281,7 @@ public final class BatchRunner {
     public static String resultDirName(Sample sample) {
         // 带上 group 消歧：不同子目录下可能有同名样例。
         String base = sample.group().isEmpty() ? sample.name() : sample.group() + "_" + sample.name();
-        return RESULT_DIR_PREFIX + "\"" + sanitize(base) + "\"";
+        return RESULT_DIR_PREFIX + sanitize(base);
     }
 
     /** 把路径分隔符等换成下划线，避免生成非法目录名。 */

@@ -121,11 +121,7 @@ public final class CompilerUi extends JFrame {
         };
         errorTable = new JTable(errorModel);
 
-        JTabbedPane workspaces = new JTabbedPane();
-        workspaces.addTab("SysY 编译", buildRoot());
-        workspaces.addTab("LLVM IR 运行", new IrRunPanel());
-        workspaces.addTab("SysY IDE（实验）", new SysyIdePanel());
-        setContentPane(workspaces);
+        setContentPane(buildRoot());
         applyFont(getContentPane());
         loadPreferences();
         pack();
@@ -176,7 +172,7 @@ public final class CompilerUi extends JFrame {
             stageButtons.put(stage, radio);
             row.add(radio);
         }
-        stageButtons.get(Stage.LLVM).setSelected(true);
+        stageButtons.get(Stage.MIPS).setSelected(true);
 
         row.add(javax.swing.Box.createHorizontalStrut(14));
         JButton open = new JButton("打开文件…");
@@ -321,7 +317,7 @@ public final class CompilerUi extends JFrame {
                 return entry.getKey();
             }
         }
-        return Stage.LLVM;
+        return Stage.MIPS;
     }
 
     /** 换阶段时同步默认文件名。 */
@@ -423,7 +419,7 @@ public final class CompilerUi extends JFrame {
                     CompileResult last = collected.get(until);
                     if (last == null) {
                         showView(errorPanel);
-                        setStatus("前端报错，LLVM IR 未生成（" + lastDisplayErrors.size() + " 处错误）");
+                        setStatus("前端报错，" + until.displayName() + " 未生成（" + lastDisplayErrors.size() + " 处错误）");
                     } else if (last.noError()) {
                         setStatus("「" + until.displayName() + "」通过，可以导出了。");
                     } else {
@@ -478,8 +474,8 @@ public final class CompilerUi extends JFrame {
     private void showStage(Stage stage) {
         CompileResult result = lastResults.get(stage);
         if (result == null) {
-            payloadArea.setText(stage == Stage.LLVM && !pipeline.rawErrors().isEmpty()
-                    ? "前端检查未通过，未生成 LLVM IR。请查看「错误」页。"
+            payloadArea.setText(stage.isCodeGeneration() && !pipeline.rawErrors().isEmpty()
+                    ? "前端检查未通过，未生成目标代码。请查看「错误」页。"
                     : "（尚未运行到「" + stage.displayName() + "」阶段，点击「▶ 运行」）");
             logArea.setText("");
             astPanel.setAstText(null);
@@ -562,9 +558,11 @@ public final class CompilerUi extends JFrame {
         Path target = dir.resolve(fileName);
         try {
             Files.createDirectories(dir);
-            boolean irFailed = stage == Stage.LLVM && (chosen.stage() != Stage.LLVM || !chosen.noError());
+            boolean irFailed = stage.isCodeGeneration() && (chosen.stage() != stage || !chosen.noError());
             if (irFailed) {
                 Files.deleteIfExists(dir.resolve("llvm_ir.txt"));
+                Files.deleteIfExists(dir.resolve("mips.txt"));
+                Files.deleteIfExists(target);
                 target = dir.resolve("error.txt");
             }
             String exportText = irFailed ? pipeline.rawErrors() : chosen.outputText();

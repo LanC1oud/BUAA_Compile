@@ -15,6 +15,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import llvm.IrGenerator;
+import llvm.IrModule;
+import mips.MipsGenerator;
 
 public class Controller {
     public static final ErrorTable errors = new ErrorTable();
@@ -25,7 +27,12 @@ public class Controller {
         symbols.clear();
         Files.deleteIfExists(Path.of(Configure.target));
         Files.deleteIfExists(Path.of(Configure.error));
-        if (HomeworkConfig.hw == HomeworkConfig.Hw.Llvm) Files.deleteIfExists(Path.of("llvm_ir.txt"));
+        if (HomeworkConfig.hw == HomeworkConfig.Hw.Llvm || HomeworkConfig.hw == HomeworkConfig.Hw.Mips) {
+            Files.deleteIfExists(Path.of("llvm_ir.txt"));
+            Files.deleteIfExists(Path.of("mips.txt"));
+        }
+        if (Configure.irBeforeOptimization != null)
+            Files.deleteIfExists(Path.of(Configure.irBeforeOptimization));
         
         // stage 1: Lexer
         String source = Configure.source;
@@ -93,12 +100,19 @@ public class Controller {
         // stage 4: LLVM IR
         IrGenerator generator = new IrGenerator(traverser.getSemanticInfo(), Configure.optimize ?
                 Configure.irPasses : java.util.List.of());
-        String ir = generator.generate(ast).toString();
+        IrModule module = generator.generate(ast);
+        String ir = module.toString();
         if (Configure.irBeforeOptimization != null) {
             Files.writeString(Path.of(Configure.irBeforeOptimization),
                     generator.getUnoptimizedIr(), StandardCharsets.UTF_8);
         }
-        Files.writeString(Path.of(Configure.target), ir, StandardCharsets.UTF_8);
+        // stage 5: MIPS
+        if (HomeworkConfig.hw == HomeworkConfig.Hw.Mips) {
+            String assembly = new MipsGenerator(Configure.optimize, Configure.optimize ? Configure.mipsPasses : java.util.List.of())
+                    .generate(module).toString();
+            Files.writeString(Path.of("llvm_ir.txt"), ir, StandardCharsets.UTF_8);
+            Files.writeString(Path.of(Configure.target), assembly, StandardCharsets.UTF_8);
+        } else Files.writeString(Path.of(Configure.target), ir, StandardCharsets.UTF_8);
     }
     
     private static void exit() {

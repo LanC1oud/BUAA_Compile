@@ -36,7 +36,6 @@ public final class CodeEditor extends JScrollPane {
     public CodeEditor() {
         super();
         pane.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
-        CodeIndent.install(pane);
         setViewportView(pane);
         setRowHeaderView(lineNumbers);
         lineNumbers.setBackground(new Color(0xF5, 0xF5, 0xF5));
