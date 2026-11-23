@@ -163,17 +163,19 @@ public final class StageStatsPanel extends JPanel {
         }
 
         int finalErrors = errorCounts.getOrDefault(until, previous == null ? 0 : previous);
-        // 分两行写：面板宽度有限，挤一行会被裁掉。
+        // 分行显示：单次编译右侧面板较窄，避免 MIPS 指标被裁掉。
         summary.setText(String.format(
-                "<html>跑到 <b>%s</b>，总耗时 <b>%d ms</b>"
-                        + "（词法 %d / 语法 %d / 语义 %d / IR %d）<br>"
+                "<html>跑到 <b>%s</b>，总耗时 <b>%d ms</b><br>"
+                        + "耗时(ms)：词法 %d / 语法 %d / 语义 %d / IR %d / MIPS %d<br>"
                         + "规模：token <b>%d</b>　AST 节点 <b>%d</b>　符号 <b>%d</b>"
-                        + "　IR 指令 <b>%d</b>　最终错误 <b>%d</b></html>",
+                        + "<br>IR 指令 <b>%d</b>　MIPS 指令 <b>%d</b>　最终错误 <b>%d</b></html>",
                 until.displayName(), totalMillis,
                 millisOf(stats.get(Stage.LEXER)), millisOf(stats.get(Stage.SYNTAX)),
                 millisOf(stats.get(Stage.SEMANTIC)), millisOf(stats.get(Stage.LLVM)),
+                millisOf(stats.get(Stage.MIPS)),
                 metricOf(stats.get(Stage.LEXER)), metricOf(stats.get(Stage.SYNTAX)),
-                metricOf(stats.get(Stage.SEMANTIC)), metricOf(stats.get(Stage.LLVM)), finalErrors));
+                metricOf(stats.get(Stage.SEMANTIC)), metricOf(stats.get(Stage.LLVM)),
+                metricOf(stats.get(Stage.MIPS)), finalErrors));
     }
 
     public void reset() {

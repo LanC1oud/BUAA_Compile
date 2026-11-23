@@ -1,0 +1,72 @@
+package mips.pass;
+
+import llvm.instruction.Instruction;
+import llvm.type.IrType;
+import llvm.value.*;
+import mips.MipsFrame;
+import java.util.*;
+import static mips.MipsLayout.*;
+
+/** 剔除可重算/无用值，复用块内回退槽，并省去叶子函数的返回地址槽。 */
+final class MipsFrameOptimization {
+    private MipsFrameOptimization() { }
+
+    static MipsFrame allocate(Function function, MipsFunctionPlan plan) {
+        Map<Value, Integer> objects = new IdentityHashMap<>();
+        Map<Value, Integer> slots = new IdentityHashMap<>();
+        int outgoing = 0;
+        boolean callsFunction = false;
+        for (BasicBlock block : function.getBlocks())
+            for (Instruction i : block.getInstructions())
+                if (i.getOpcode() == Instruction.Opcode.CALL) {
+                    outgoing = Math.max(outgoing, Math.multiplyExact(Math.max(0, i.getOperands().size() - 5), 4));
+                    if (!((Function) i.getOperands().get(0)).isExternal()) callsFunction = true;
+                }
+        int cursor = outgoing;
+        for (Argument argument : function.getArguments()) {
+            if (argument.getUses().isEmpty()) continue;
+            slots.put(argument, cursor);
+            cursor = Math.addExact(cursor, 4);
+        }
+        for (BasicBlock block : function.getBlocks()) {
+            for (Instruction i : block.getInstructions()) {
+                if (i.getOpcode() == Instruction.Opcode.ALLOCA && !i.getUses().isEmpty()) {
+                    IrType object = i.getType().element();
+                    cursor = align(cursor, alignment(object));
+                    objects.put(i, cursor);
+                    cursor = Math.addExact(cursor, sizeOf(object));
+                }
+            }
+        }
+        cursor = align(cursor, 4);
+        for (BasicBlock block : function.getBlocks()) {
+            for (Instruction i : block.getInstructions()) {
+                if (plan.needsSlot(i) && plan.crossesBlock(i)) {
+                    slots.put(i, cursor);
+                    cursor = Math.addExact(cursor, 4);
+                }
+            }
+        }
+        int localBase = cursor, peak = 0;
+        for (BasicBlock block : function.getBlocks()) {
+            PriorityQueue<Interval> active = new PriorityQueue<>(Comparator.comparingInt(Interval::end));
+            PriorityQueue<Integer> free = new PriorityQueue<>();
+            int count = 0;
+            List<Instruction> instructions = block.getInstructions();
+            for (int n = 0; n < instructions.size(); n++) {
+                Instruction i = instructions.get(n);
+                if (!plan.needsSlot(i) || plan.crossesBlock(i)) continue;
+                while (!active.isEmpty() && active.peek().end() <= n) free.add(active.remove().slot());
+                int slot = free.isEmpty() ? count++ : free.remove();
+                slots.put(i, Math.addExact(localBase, Math.multiplyExact(slot, 4)));
+                active.add(new Interval(plan.lastUse(i, block), slot));
+            }
+            peak = Math.max(peak, count);
+        }
+        int returnAddress = Math.addExact(localBase, Math.multiplyExact(peak, 4));
+        int size = align(Math.addExact(returnAddress, callsFunction ? 4 : 0), 8);
+        return new MipsFrame(objects, slots, size, returnAddress, callsFunction);
+    }
+
+    private record Interval(int end, int slot) { }
+}

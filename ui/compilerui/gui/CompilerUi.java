@@ -5,6 +5,7 @@ import compilerui.model.CompilerSettings;
 import compilerui.model.DisplayError;
 import compilerui.model.Stage;
 import compilerui.pipeline.Pipeline;
+import compilerui.pipeline.ResultExporter;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -79,6 +80,8 @@ public final class CompilerUi extends JFrame {
     /** 错误视图，供"编译报错后自动切过去"使用。 */
     private JComponent errorPanel;
     private final TextPanel payloadArea = new TextPanel();
+    private final TextPanel llvmArea = new TextPanel();
+    private final TextPanel mipsArea = new TextPanel();
     private final TextPanel logArea = new TextPanel();
     private final AstTreePanel astPanel = new AstTreePanel();
     private final SyntaxPanel syntaxPanel = new SyntaxPanel();
@@ -91,8 +94,9 @@ public final class CompilerUi extends JFrame {
     private final JTextField dirField = new JTextField();
     private final JTextField fileNameField = new JTextField();
     private final JLabel statusLabel = new JLabel("就绪");
-    private final JButton runButton = new JButton("▶ 运行");
+    private final JButton runButton = new JButton("▶ 编译");
     private final JButton exportButton = new JButton("导出结果");
+    private final JCheckBox optimizeBox = new JCheckBox("启用优化", true);
     private final JCheckBox trailingNewlineBox = new JCheckBox("末尾换行", false);
     private final JCheckBox debugTokens = new JCheckBox("Token");
     private final JCheckBox debugAst = new JCheckBox("Token+AST", true);
@@ -124,6 +128,13 @@ public final class CompilerUi extends JFrame {
         setContentPane(buildRoot());
         applyFont(getContentPane());
         loadPreferences();
+        refreshCodeViews();
+        for (int modifier : new int[]{java.awt.event.InputEvent.CTRL_DOWN_MASK,
+                java.awt.event.InputEvent.META_DOWN_MASK}) {
+            getRootPane().registerKeyboardAction(e -> runCompile(),
+                    javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, modifier),
+                    JComponent.WHEN_IN_FOCUSED_WINDOW);
+        }
         pack();
         setSize(1240, 760);
         setLocationRelativeTo(null);
@@ -145,7 +156,7 @@ public final class CompilerUi extends JFrame {
 
         JPanel south = new JPanel(new BorderLayout(8, 0));
         south.add(statusLabel, BorderLayout.WEST);
-        JLabel hint = new JLabel("提示：Cmd/Ctrl+Enter 运行；点错误行即跳到对应源码");
+        JLabel hint = new JLabel("提示：Cmd/Ctrl+Enter 编译；点错误行即跳到对应源码");
         hint.setForeground(new Color(0x70, 0x70, 0x70));
         south.add(hint, BorderLayout.EAST);
         root.add(south, BorderLayout.SOUTH);
@@ -157,6 +168,17 @@ public final class CompilerUi extends JFrame {
         top.setLayout(new javax.swing.BoxLayout(top, javax.swing.BoxLayout.Y_AXIS));
         top.add(buildStageRow());
         top.add(buildConfigRow());
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        optimizeBox.setToolTipText("控制 IR 与 MIPS 优化；关闭后便于逐条对照基础翻译");
+        optimizeBox.addActionListener(e -> savePreferences());
+        actions.add(optimizeBox);
+        runButton.addActionListener(e -> runCompile());
+        exportButton.addActionListener(e -> exportResult());
+        exportButton.setEnabled(false);
+        actions.add(runButton);
+        actions.add(exportButton);
+        actions.add(new JLabel("MIPS 翻译后可查看 LLVM IR 和汇编，导出时一并保存"));
+        top.add(actions);
         return top;
     }
 
@@ -184,7 +206,7 @@ public final class CompilerUi extends JFrame {
         return row;
     }
 
-    /** 行 2：导出参数 + 调试开关 + 动作。 */
+    /** 行 2：导出参数与调试开关。 */
     private JComponent buildConfigRow() {
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
         row.setBorder(titled("导出与调试"));
@@ -209,12 +231,6 @@ public final class CompilerUi extends JFrame {
         debug.add(debugErrors);
         row.add(debug);
 
-        row.add(javax.swing.Box.createHorizontalStrut(10));
-        runButton.addActionListener(e -> runCompile());
-        exportButton.addActionListener(e -> exportResult());
-        exportButton.setEnabled(false);
-        row.add(runButton);
-        row.add(exportButton);
         return row;
     }
 
@@ -225,7 +241,10 @@ public final class CompilerUi extends JFrame {
 
         // 单次编译的视图平铺在一层里（不再套一层「输出」）。
         errorPanel = buildErrorTab();
+        viewTabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         viewTabs.addTab("编译结果", payloadArea);
+        viewTabs.addTab("LLVM IR", llvmArea);
+        viewTabs.addTab("MIPS 汇编", mipsArea);
         viewTabs.addTab("近似 AST", astPanel);
         viewTabs.addTab("错误", errorPanel);
         viewTabs.addTab("阶段对比", statsPanel);
@@ -325,6 +344,8 @@ public final class CompilerUi extends JFrame {
         Stage stage = selectedStage();
         settings = settings.withStage(stage);
         fileNameField.setText(settings.fileName());
+        showStage(stage);
+        showView(stage == Stage.MIPS ? mipsArea : stage == Stage.LLVM ? llvmArea : payloadArea);
         setStatus("目标阶段：" + stage.displayName());
     }
 
@@ -334,6 +355,7 @@ public final class CompilerUi extends JFrame {
                 .withOutputDir(dirField.getText().trim())
                 .withFileName(fileName.isEmpty() ? selectedStage().defaultFileName() : fileName)
                 .withTrailingNewline(trailingNewlineBox.isSelected())
+                .withOptimize(optimizeBox.isSelected())
                 .withDebug(debugTokens.isSelected(), debugSymbols.isSelected(),
                         debugAst.isSelected(), debugErrors.isSelected());
     }
@@ -377,6 +399,7 @@ public final class CompilerUi extends JFrame {
         }
         Stage until = selectedStage();
         pipeline.setSettings(currentSettings());
+        savePreferences();
         setRunning(true);
         setStatus("正在编译到「" + until.displayName() + "」…");
 
@@ -404,6 +427,7 @@ public final class CompilerUi extends JFrame {
                 try {
                     Map<Stage, CompileResult> collected = get();
                     lastResults = collected;
+                    refreshCodeViews();
                     exportButton.setEnabled(!collected.isEmpty());
                     showStage(until);
                     populateErrors(pipeline.displayErrors());
@@ -421,6 +445,7 @@ public final class CompilerUi extends JFrame {
                         showView(errorPanel);
                         setStatus("前端报错，" + until.displayName() + " 未生成（" + lastDisplayErrors.size() + " 处错误）");
                     } else if (last.noError()) {
+                        showView(until == Stage.MIPS ? mipsArea : until == Stage.LLVM ? llvmArea : payloadArea);
                         setStatus("「" + until.displayName() + "」通过，可以导出了。");
                     } else {
                         showView(errorPanel);
@@ -431,6 +456,9 @@ public final class CompilerUi extends JFrame {
                     Thread.currentThread().interrupt();
                     setStatus("已中断");
                 } catch (ExecutionException ex) {
+                    lastResults = new EnumMap<>(Stage.class);
+                    refreshCodeViews();
+                    exportButton.setEnabled(false);
                     errorModel.setRowCount(0);
                     lastDisplayErrors = List.of();
                     statsPanel.reset();
@@ -471,12 +499,23 @@ public final class CompilerUi extends JFrame {
         showView(payloadArea);
     }
 
+    private void refreshCodeViews() {
+        llvmArea.setText(codeText(Stage.LLVM));
+        mipsArea.setText(codeText(Stage.MIPS));
+    }
+
+    private String codeText(Stage stage) {
+        CompileResult result = lastResults.get(stage);
+        if (result != null && result.noError()) return orEmpty(result.payload());
+        return "尚未生成 " + stage.displayName() + "。请选择对应目标阶段后编译；前端有错误时不会生成目标代码。";
+    }
+
     private void showStage(Stage stage) {
         CompileResult result = lastResults.get(stage);
         if (result == null) {
             payloadArea.setText(stage.isCodeGeneration() && !pipeline.rawErrors().isEmpty()
                     ? "前端检查未通过，未生成目标代码。请查看「错误」页。"
-                    : "（尚未运行到「" + stage.displayName() + "」阶段，点击「▶ 运行」）");
+                    : "（尚未运行到「" + stage.displayName() + "」阶段，点击「▶ 编译」）");
             logArea.setText("");
             astPanel.setAstText(null);
             return;
@@ -542,37 +581,12 @@ public final class CompilerUi extends JFrame {
     }
 
     private void exportResult() {
-        Stage stage = selectedStage();
-        CompileResult chosen = lastResults.get(stage);
-        if (chosen == null && !lastResults.isEmpty()) {
-            chosen = lastResults.get(
-                    lastResults.keySet().stream().reduce((a, b) -> b).orElse(stage));
-        }
-        if (chosen == null) {
-            errorDialog("还没有结果", new IOException("请先点击「▶ 运行」生成编译结果。"));
-            return;
-        }
-        Path dir = resolveOutputDir(dirField.getText());
-        String fileName = fileNameField.getText().isBlank()
-                ? chosen.stage().defaultFileName() : fileNameField.getText().trim();
-        Path target = dir.resolve(fileName);
         try {
-            Files.createDirectories(dir);
-            boolean irFailed = stage.isCodeGeneration() && (chosen.stage() != stage || !chosen.noError());
-            if (irFailed) {
-                Files.deleteIfExists(dir.resolve("llvm_ir.txt"));
-                Files.deleteIfExists(dir.resolve("mips.txt"));
-                Files.deleteIfExists(target);
-                target = dir.resolve("error.txt");
-            }
-            String exportText = irFailed ? pipeline.rawErrors() : chosen.outputText();
-            if (irFailed && exportText.isEmpty()) exportText = "# IR generation aborted: " + pipeline.crashMessage();
-            // 这里写的就是产物原文：有错时与 error.txt 同格式，没有被界面改写。
-            Files.writeString(target,
-                    exportText + (trailingNewlineBox.isSelected() ? "\n" : ""),
-                    StandardCharsets.UTF_8);
-            setStatus("已导出 " + chosen.stage().displayName() + " → " + target
-                    + (chosen.noError() ? "" : "（内容为原始错误格式）"));
+            ResultExporter.Export result = ResultExporter.export(lastResults, selectedStage(),
+                    resolveOutputDir(dirField.getText()), fileNameField.getText(),
+                    trailingNewlineBox.isSelected(), pipeline.rawErrors(), pipeline.crashMessage());
+            setStatus("已导出 → " + result.target()
+                    + (result.errors() ? "（错误信息）" : result.includesIr() ? "，同时保存 llvm_ir.txt" : ""));
             savePreferences();
         } catch (IOException ex) {
             errorDialog("导出失败", ex);
@@ -598,7 +612,8 @@ public final class CompilerUi extends JFrame {
                         Boolean.parseBoolean(properties.getProperty("displayTokens", "false")),
                         Boolean.parseBoolean(properties.getProperty("displaySymbols", "false")),
                         Boolean.parseBoolean(properties.getProperty("displayTokensWithAst", "true")),
-                        Boolean.parseBoolean(properties.getProperty("displayErrors", "true")));
+                        Boolean.parseBoolean(properties.getProperty("displayErrors", "true")),
+                        Boolean.parseBoolean(properties.getProperty("optimize", "true")));
             } catch (IOException ignored) {
                 // 配置坏了就用默认值
             }
@@ -614,6 +629,7 @@ public final class CompilerUi extends JFrame {
         }
         dirField.setText(settings.outputDir());
         fileNameField.setText(settings.fileName());
+        optimizeBox.setSelected(settings.optimize());
         trailingNewlineBox.setSelected(settings.trailingNewline());
         debugTokens.setSelected(settings.displayTokens());
         debugAst.setSelected(settings.displayTokensWithAst());
@@ -642,6 +658,7 @@ public final class CompilerUi extends JFrame {
         properties.setProperty("displayTokens", Boolean.toString(compile.displayTokens()));
         properties.setProperty("displaySymbols", Boolean.toString(compile.displaySymbols()));
         properties.setProperty("displayTokensWithAst", Boolean.toString(compile.displayTokensWithAst()));
+        properties.setProperty("optimize", Boolean.toString(compile.optimize()));
         properties.setProperty("displayErrors", Boolean.toString(compile.displayErrors()));
         try {
             Files.createDirectories(WORK_DIR);
@@ -660,6 +677,8 @@ public final class CompilerUi extends JFrame {
     private void setRunning(boolean value) {
         running = value;
         runButton.setEnabled(!value);
+        optimizeBox.setEnabled(!value);
+        for (JRadioButton button : stageButtons.values()) button.setEnabled(!value);
         exportButton.setEnabled(!value && !lastResults.isEmpty());
         // 管线共用全局静态状态，批量与单次编译不能同时跑。
         batchPanel.setEnabled(!value);

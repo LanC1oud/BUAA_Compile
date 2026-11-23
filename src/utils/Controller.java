@@ -106,6 +106,7 @@ public class Controller {
             Files.writeString(Path.of(Configure.irBeforeOptimization),
                     generator.getUnoptimizedIr(), StandardCharsets.UTF_8);
         }
+
         // stage 5: MIPS
         if (HomeworkConfig.hw == HomeworkConfig.Hw.Mips) {
             String assembly = new MipsGenerator(Configure.optimize, Configure.optimize ? Configure.mipsPasses : java.util.List.of())

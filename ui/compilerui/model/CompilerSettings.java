@@ -16,6 +16,7 @@ import utils.Configure;
  * @param displaySymbols       把符号表打到日志
  * @param displayTokensWithAst 把 token + AST 一起打到日志（ParserWatcher 的输出开关）
  * @param displayErrors        把错误表打到日志
+ * @param optimize             启用 IR 与 MIPS 优化
  */
 public record CompilerSettings(Stage stage,
                                String outputDir,
@@ -24,7 +25,16 @@ public record CompilerSettings(Stage stage,
                                boolean displayTokens,
                                boolean displaySymbols,
                                boolean displayTokensWithAst,
-                               boolean displayErrors) {
+                               boolean displayErrors,
+                               boolean optimize) {
+
+    /** 兼容原有调用方，默认开启优化。 */
+    public CompilerSettings(Stage stage, String outputDir, String fileName, boolean trailingNewline,
+                            boolean displayTokens, boolean displaySymbols,
+                            boolean displayTokensWithAst, boolean displayErrors) {
+        this(stage, outputDir, fileName, trailingNewline, displayTokens, displaySymbols,
+                displayTokensWithAst, displayErrors, true);
+    }
 
     public static CompilerSettings defaults() {
         // displayTokensWithAst 默认打开：语法阶段的正式产物就是「token + AST」文本
@@ -54,26 +64,31 @@ public record CompilerSettings(Stage stage,
     /** 换阶段时同步默认文件名。 */
     public CompilerSettings withStage(Stage newStage) {
         return new CompilerSettings(newStage, outputDir, newStage.defaultFileName(),
-                trailingNewline, displayTokens, displaySymbols, displayTokensWithAst, displayErrors);
+                trailingNewline, displayTokens, displaySymbols, displayTokensWithAst, displayErrors, optimize);
     }
 
     public CompilerSettings withFileName(String newFileName) {
         return new CompilerSettings(stage, outputDir, newFileName, trailingNewline,
-                displayTokens, displaySymbols, displayTokensWithAst, displayErrors);
+                displayTokens, displaySymbols, displayTokensWithAst, displayErrors, optimize);
     }
 
     public CompilerSettings withOutputDir(String newOutputDir) {
         return new CompilerSettings(stage, newOutputDir, fileName, trailingNewline,
-                displayTokens, displaySymbols, displayTokensWithAst, displayErrors);
+                displayTokens, displaySymbols, displayTokensWithAst, displayErrors, optimize);
     }
 
     public CompilerSettings withTrailingNewline(boolean value) {
         return new CompilerSettings(stage, outputDir, fileName, value,
-                displayTokens, displaySymbols, displayTokensWithAst, displayErrors);
+                displayTokens, displaySymbols, displayTokensWithAst, displayErrors, optimize);
+    }
+
+    public CompilerSettings withOptimize(boolean value) {
+        return new CompilerSettings(stage, outputDir, fileName, trailingNewline,
+                displayTokens, displaySymbols, displayTokensWithAst, displayErrors, value);
     }
 
     public CompilerSettings withDebug(boolean tokens, boolean symbols, boolean tokensWithAst, boolean errors) {
         return new CompilerSettings(stage, outputDir, fileName, trailingNewline,
-                tokens, symbols, tokensWithAst, errors);
+                tokens, symbols, tokensWithAst, errors, optimize);
     }
 }

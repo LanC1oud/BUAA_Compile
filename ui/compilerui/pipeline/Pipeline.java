@@ -219,7 +219,7 @@ public final class Pipeline {
         if (until == Stage.SEMANTIC || !errors.noError()) return;
         start = System.nanoTime();
         Captured<llvm.IrModule> generated = capture(() ->
-                new IrGenerator(traversed.value().getSemanticInfo(), Configure.optimize ? Configure.irPasses : List.of()).generate(ast));
+                new IrGenerator(traversed.value().getSemanticInfo(), settings.optimize() ? Configure.irPasses : List.of()).generate(ast));
         String ir = generated.value().toString();
         long instructions = generated.value().getFunctions().stream().flatMap(f -> f.getBlocks().stream())
                 .mapToLong(b -> b.getInstructions().size()).sum();
@@ -228,7 +228,7 @@ public final class Pipeline {
         if (until == Stage.LLVM) return;
         start = System.nanoTime();
         Captured<mips.MipsModule> lowered = capture(() ->
-                new MipsGenerator(Configure.optimize, Configure.optimize ? Configure.mipsPasses : List.of()).generate(generated.value()));
+                new MipsGenerator(settings.optimize(), settings.optimize() ? Configure.mipsPasses : List.of()).generate(generated.value()));
         String assembly = lowered.value().toString();
         long mipsInstructions = lowered.value().getText().stream().filter(line -> line.startsWith("    ")).count();
         record(Stage.MIPS, assembly, errors, new StringBuilder(lowered.log()),

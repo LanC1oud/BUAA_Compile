@@ -46,6 +46,7 @@ public final class PipelineCheck {
         checkStages(source, outDir);
         checkReproducible(source);
         checkErrorDisplay(source);
+        checkMipsUi(outDir.resolve("mips-ui"));
 
         if (!sourceBefore.equals(Configure.source)) {
             fail("Configure.source 未还原: " + Configure.source);
@@ -198,6 +199,73 @@ public final class PipelineCheck {
         }
         System.out.println("  [ OK ] " + display.size()
                 + " 条错误：界面格式正确，且 error.txt 原始格式未被改动");
+    }
+
+    /** 验证 UI 优化设置、单次/批量 MIPS 产物及导出清理。 */
+    private static void checkMipsUi(Path directory) throws Exception {
+        System.out.println("\n[4] MIPS 翻译、优化开关与导出");
+        boolean globalOptimize = Configure.optimize;
+        String source = "int main(){int x=get_int();printf(\"%d\",x*8+3);return 0;}";
+        Pipeline pipeline = new Pipeline();
+        var baselineSettings = CompilerSettings.defaults().withOptimize(false)
+                .withStage(Stage.MIPS).withOutputDir(directory.toString()).withFileName("program.s")
+                .withTrailingNewline(false).withDebug(false, false, true, false);
+        if (baselineSettings.optimize()) fail("复制设置时丢失了优化开关");
+        pipeline.setSettings(baselineSettings);
+        pipeline.compileContent(source, "mips-ui", Stage.MIPS);
+        var baseline = pipeline.resultOf(Stage.MIPS);
+        if (baseline == null) throw new AssertionError("MIPS 生成失败：" + pipeline.crashMessage());
+        var results = new java.util.EnumMap<Stage, CompileResult>(Stage.class);
+        results.put(Stage.MIPS, baseline);
+        results.put(Stage.LLVM, pipeline.resultOf(Stage.LLVM));
+        var export = ResultExporter.export(results, Stage.MIPS, directory, "program.s", false, "", null);
+        if (!export.includesIr() || !Files.readString(export.target()).equals(baseline.payload())
+                || !Files.readString(directory.resolve("llvm_ir.txt")).equals(results.get(Stage.LLVM).payload()))
+            fail("MIPS 与对应 IR 导出不一致");
+        try {
+            ResultExporter.export(results, Stage.MIPS, directory, "llvm_ir.txt", false, "", null);
+            fail("允许 MIPS 覆盖对应 IR");
+        } catch (java.io.IOException expected) { }
+        pipeline.setSettings(baselineSettings.withOptimize(true));
+        pipeline.compileContent(source, "optimized", Stage.MIPS);
+        var optimized = pipeline.resultOf(Stage.MIPS);
+        if (optimized == null || optimized.payload().equals(baseline.payload()))
+            fail("UI 优化开关没有切换生成路径");
+        if (Configure.optimize != globalOptimize) fail("UI 编译修改了全局优化设置");
+        var sample = new BatchRunner.Sample(Path.of("mips-ui.sy"), "mips-ui", source, "");
+        var batch = BatchRunner.run(List.of(sample), directory.resolve("batch"), baselineSettings, null).get(0);
+        if (!batch.passed() || !Files.readString(batch.outputDir().resolve("mips.txt")).equals(baseline.payload()))
+            fail("批量编译未使用相同的 MIPS 优化设置");
+        pipeline.compileContent("int main(){missing=1;return 0;}", "invalid", Stage.MIPS);
+        results.clear();
+        for (Stage stage : Stage.values()) {
+            var result = pipeline.resultOf(stage);
+            if (result != null) results.put(stage, result);
+        }
+        Files.writeString(directory.resolve("mips.txt"), "stale");
+        var errors = ResultExporter.export(results, Stage.MIPS, directory, "program.s", false,
+                pipeline.rawErrors(), pipeline.crashMessage());
+        if (!errors.errors() || Files.exists(directory.resolve("program.s"))
+                || Files.exists(directory.resolve("mips.txt")) || Files.exists(directory.resolve("llvm_ir.txt"))
+                || !Files.readString(errors.target()).equals(pipeline.rawErrors()))
+            fail("失败后导出保留旧目标代码，或改变了错误格式");
+        pipeline.compileContent(source, "llvm-only", Stage.LLVM);
+        if (pipeline.resultOf(Stage.MIPS) != null) fail("LLVM 编译残留旧 MIPS");
+        results.clear();
+        results.put(Stage.LLVM, pipeline.resultOf(Stage.LLVM));
+        Files.writeString(directory.resolve("mips.txt"), "keep");
+        try {
+            ResultExporter.export(results, Stage.MIPS, directory, "", false, "", null);
+            fail("未编译 MIPS 时允许导出");
+        } catch (java.io.IOException expected) { }
+        if (!Files.readString(directory.resolve("mips.txt")).equals("keep")) fail("未运行阶段导出误删文件");
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            var panel = new compilerui.gui.StageStatsPanel();
+            results.put(Stage.MIPS, optimized);
+            panel.update(results, Stage.MIPS);
+            panel.reset();
+        });
+        System.out.println("  [ OK ] 单次/批量优化、MIPS+IR 导出、失败清理、阶段统计");
     }
 
     private static void fail(String message) {
