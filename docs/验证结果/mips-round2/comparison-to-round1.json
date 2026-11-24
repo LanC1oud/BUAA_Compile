@@ -1,0 +1,817 @@
+{
+  "baseline": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\backups\\mips-stage-20261123-111036-round1",
+  "shared_cases": 62,
+  "totals": {
+    "round1": {
+      "weighted_cycles": 143912.5,
+      "instructions": 101154,
+      "memory": 40605
+    },
+    "round2": {
+      "weighted_cycles": 106814.5,
+      "instructions": 88615,
+      "memory": 16046
+    }
+  },
+  "reduction_percent": {
+    "weighted_cycles": 25.778163814818033,
+    "instructions": 12.395950728592043,
+    "memory": 60.48269917497845
+  },
+  "unoptimized_statistics_unchanged": true,
+  "per_case": [
+    {
+      "name": "minimal",
+      "round1": 11.0,
+      "round2": 9.0
+    },
+    {
+      "name": "exit-status",
+      "round1": 11.0,
+      "round2": 9.0
+    },
+    {
+      "name": "arithmetic",
+      "round1": 44.0,
+      "round2": 41.0
+    },
+    {
+      "name": "int-boundaries",
+      "round1": 62.0,
+      "round2": 59.0
+    },
+    {
+      "name": "casts-wrap",
+      "round1": 123.0,
+      "round2": 114.0
+    },
+    {
+      "name": "char-steps",
+      "round1": 55.0,
+      "round2": 49.0
+    },
+    {
+      "name": "runtime-char",
+      "round1": 64.0,
+      "round2": 56.0
+    },
+    {
+      "name": "mutable-global",
+      "round1": 45.0,
+      "round2": 42.0
+    },
+    {
+      "name": "shadow",
+      "round1": 71.0,
+      "round2": 67.0
+    },
+    {
+      "name": "recursion",
+      "round1": 389.5,
+      "round2": 289.5
+    },
+    {
+      "name": "param-copy",
+      "round1": 111.0,
+      "round2": 106.0
+    },
+    {
+      "name": "array-params",
+      "round1": 145.0,
+      "round2": 136.0
+    },
+    {
+      "name": "const-arrays",
+      "round1": 127.0,
+      "round2": 120.0
+    },
+    {
+      "name": "string-lengths",
+      "round1": 112.0,
+      "round2": 111.0
+    },
+    {
+      "name": "char-array-forward",
+      "round1": 61.0,
+      "round2": 59.0
+    },
+    {
+      "name": "printf-eval",
+      "round1": 48.0,
+      "round2": 45.0
+    },
+    {
+      "name": "printf-order",
+      "round1": 68.0,
+      "round2": 63.0
+    },
+    {
+      "name": "escapes",
+      "round1": 42.0,
+      "round2": 41.0
+    },
+    {
+      "name": "six-runtime",
+      "round1": 59.0,
+      "round2": 56.0
+    },
+    {
+      "name": "string-zero-one",
+      "round1": 65.0,
+      "round2": 64.0
+    },
+    {
+      "name": "string-truncate",
+      "round1": 18.0,
+      "round2": 18.0
+    },
+    {
+      "name": "string-crlf",
+      "round1": 18.0,
+      "round2": 18.0
+    },
+    {
+      "name": "comparisons",
+      "round1": 32.0,
+      "round2": 30.0
+    },
+    {
+      "name": "char-comparison-chain",
+      "round1": 17.0,
+      "round2": 15.0
+    },
+    {
+      "name": "short-circuit",
+      "round1": 66.0,
+      "round2": 56.0
+    },
+    {
+      "name": "while-short-circuit",
+      "round1": 285.0,
+      "round2": 194.0
+    },
+    {
+      "name": "loop-init",
+      "round1": 314.5,
+      "round2": 221.5
+    },
+    {
+      "name": "while-empty-nested",
+      "round1": 1186.0,
+      "round2": 583.0
+    },
+    {
+      "name": "return-tail",
+      "round1": 142.0,
+      "round2": 122.0
+    },
+    {
+      "name": "switch-once",
+      "round1": 81.0,
+      "round2": 67.0
+    },
+    {
+      "name": "switch-default-middle",
+      "round1": 235.5,
+      "round2": 146.5
+    },
+    {
+      "name": "switch-default-first",
+      "round1": 26.0,
+      "round2": 24.0
+    },
+    {
+      "name": "switch-char",
+      "round1": 26.0,
+      "round2": 24.0
+    },
+    {
+      "name": "nested-control",
+      "round1": 318.5,
+      "round2": 199.5
+    },
+    {
+      "name": "static-scalar",
+      "round1": 88.0,
+      "round2": 83.0
+    },
+    {
+      "name": "static-array-char",
+      "round1": 204.0,
+      "round2": 171.0
+    },
+    {
+      "name": "static-shadow",
+      "round1": 127.0,
+      "round2": 113.0
+    },
+    {
+      "name": "static-recursive",
+      "round1": 291.0,
+      "round2": 221.0
+    },
+    {
+      "name": "many-args",
+      "round1": 177.0,
+      "round2": 155.0
+    },
+    {
+      "name": "mixed-args",
+      "round1": 194.0,
+      "round2": 176.0
+    },
+    {
+      "name": "recursive-stack-args",
+      "round1": 902.5,
+      "round2": 701.5
+    },
+    {
+      "name": "nested-calls",
+      "round1": 325.0,
+      "round2": 296.0
+    },
+    {
+      "name": "large-stack",
+      "round1": 127.0,
+      "round2": 114.0
+    },
+    {
+      "name": "global-alignment",
+      "round1": 93.0,
+      "round2": 89.0
+    },
+    {
+      "name": "global-last-element",
+      "round1": 89.0,
+      "round2": 80.0
+    },
+    {
+      "name": "string-consecutive",
+      "round1": 46.0,
+      "round2": 43.0
+    },
+    {
+      "name": "string-capacity-consumes",
+      "round1": 79.0,
+      "round2": 77.0
+    },
+    {
+      "name": "string-empty-eof",
+      "round1": 46.0,
+      "round2": 43.0
+    },
+    {
+      "name": "int-overflow",
+      "round1": 69.0,
+      "round2": 64.0
+    },
+    {
+      "name": "high-byte-data",
+      "round1": 117.0,
+      "round2": 107.0
+    },
+    {
+      "name": "array-sort",
+      "round1": 4538.5,
+      "round2": 2827.5
+    },
+    {
+      "name": "far-branch-false",
+      "round1": 36.0,
+      "round2": 28.0
+    },
+    {
+      "name": "far-branch-true",
+      "round1": 28637.0,
+      "round2": 23429.0
+    },
+    {
+      "name": "opt-signed-div-rem",
+      "round1": 26887.0,
+      "round2": 23513.0
+    },
+    {
+      "name": "opt-char-div-rem",
+      "round1": 2085.0,
+      "round2": 1805.0
+    },
+    {
+      "name": "opt-loop-sum",
+      "round1": 68546.0,
+      "round2": 45531.0
+    },
+    {
+      "name": "opt-alias-call",
+      "round1": 96.0,
+      "round2": 88.0
+    },
+    {
+      "name": "opt-large-immediates",
+      "round1": 66.0,
+      "round2": 59.0
+    },
+    {
+      "name": "opt-multiply-powers",
+      "round1": 282.0,
+      "round2": 264.0
+    },
+    {
+      "name": "opt-calls-and-cache",
+      "round1": 123.0,
+      "round2": 113.0
+    },
+    {
+      "name": "opt-byte-alias",
+      "round1": 95.0,
+      "round2": 89.0
+    },
+    {
+      "name": "official-comprehensive",
+      "round1": 5067.5,
+      "round2": 3279.5
+    }
+  ],
+  "full_suite": {
+    "plain_cycles": 301520.5,
+    "optimized_cycles": 135428.0,
+    "reduction_percent": 55.08497763833636,
+    "cases": [
+      {
+        "name": "minimal",
+        "plain_cycles": 16.5,
+        "optimized_cycles": 9.0,
+        "plain_instructions": 13,
+        "optimized_instructions": 8
+      },
+      {
+        "name": "exit-status",
+        "plain_cycles": 16.5,
+        "optimized_cycles": 9.0,
+        "plain_instructions": 13,
+        "optimized_instructions": 8
+      },
+      {
+        "name": "arithmetic",
+        "plain_cycles": 199.5,
+        "optimized_cycles": 41.0,
+        "plain_instructions": 100,
+        "optimized_instructions": 40
+      },
+      {
+        "name": "int-boundaries",
+        "plain_cycles": 113.5,
+        "optimized_cycles": 59.0,
+        "plain_instructions": 71,
+        "optimized_instructions": 50
+      },
+      {
+        "name": "casts-wrap",
+        "plain_cycles": 298.5,
+        "optimized_cycles": 114.0,
+        "plain_instructions": 175,
+        "optimized_instructions": 100
+      },
+      {
+        "name": "char-steps",
+        "plain_cycles": 161.5,
+        "optimized_cycles": 49.0,
+        "plain_instructions": 101,
+        "optimized_instructions": 46
+      },
+      {
+        "name": "runtime-char",
+        "plain_cycles": 118.5,
+        "optimized_cycles": 56.0,
+        "plain_instructions": 71,
+        "optimized_instructions": 50
+      },
+      {
+        "name": "mutable-global",
+        "plain_cycles": 56.0,
+        "optimized_cycles": 42.0,
+        "plain_instructions": 40,
+        "optimized_instructions": 35
+      },
+      {
+        "name": "shadow",
+        "plain_cycles": 99.0,
+        "optimized_cycles": 67.0,
+        "plain_instructions": 69,
+        "optimized_instructions": 52
+      },
+      {
+        "name": "recursion",
+        "plain_cycles": 476.5,
+        "optimized_cycles": 289.5,
+        "plain_instructions": 302,
+        "optimized_instructions": 208
+      },
+      {
+        "name": "param-copy",
+        "plain_cycles": 167.0,
+        "optimized_cycles": 106.0,
+        "plain_instructions": 117,
+        "optimized_instructions": 82
+      },
+      {
+        "name": "array-params",
+        "plain_cycles": 316.0,
+        "optimized_cycles": 136.0,
+        "plain_instructions": 227,
+        "optimized_instructions": 107
+      },
+      {
+        "name": "const-arrays",
+        "plain_cycles": 319.5,
+        "optimized_cycles": 120.0,
+        "plain_instructions": 232,
+        "optimized_instructions": 99
+      },
+      {
+        "name": "string-lengths",
+        "plain_cycles": 352.5,
+        "optimized_cycles": 111.0,
+        "plain_instructions": 253,
+        "optimized_instructions": 86
+      },
+      {
+        "name": "char-array-forward",
+        "plain_cycles": 139.5,
+        "optimized_cycles": 59.0,
+        "plain_instructions": 99,
+        "optimized_instructions": 44
+      },
+      {
+        "name": "printf-eval",
+        "plain_cycles": 75.0,
+        "optimized_cycles": 45.0,
+        "plain_instructions": 58,
+        "optimized_instructions": 39
+      },
+      {
+        "name": "printf-order",
+        "plain_cycles": 110.5,
+        "optimized_cycles": 63.0,
+        "plain_instructions": 84,
+        "optimized_instructions": 54
+      },
+      {
+        "name": "escapes",
+        "plain_cycles": 185.5,
+        "optimized_cycles": 41.0,
+        "plain_instructions": 134,
+        "optimized_instructions": 32
+      },
+      {
+        "name": "six-runtime",
+        "plain_cycles": 109.5,
+        "optimized_cycles": 56.0,
+        "plain_instructions": 82,
+        "optimized_instructions": 49
+      },
+      {
+        "name": "string-zero-one",
+        "plain_cycles": 198.5,
+        "optimized_cycles": 64.0,
+        "plain_instructions": 154,
+        "optimized_instructions": 52
+      },
+      {
+        "name": "string-truncate",
+        "plain_cycles": 41.5,
+        "optimized_cycles": 18.0,
+        "plain_instructions": 34,
+        "optimized_instructions": 17
+      },
+      {
+        "name": "string-crlf",
+        "plain_cycles": 49.5,
+        "optimized_cycles": 18.0,
+        "plain_instructions": 38,
+        "optimized_instructions": 17
+      },
+      {
+        "name": "comparisons",
+        "plain_cycles": 278.0,
+        "optimized_cycles": 30.0,
+        "plain_instructions": 202,
+        "optimized_instructions": 29
+      },
+      {
+        "name": "char-comparison-chain",
+        "plain_cycles": 130.5,
+        "optimized_cycles": 15.0,
+        "plain_instructions": 92,
+        "optimized_instructions": 14
+      },
+      {
+        "name": "short-circuit",
+        "plain_cycles": 126.0,
+        "optimized_cycles": 56.0,
+        "plain_instructions": 92,
+        "optimized_instructions": 46
+      },
+      {
+        "name": "while-short-circuit",
+        "plain_cycles": 369.0,
+        "optimized_cycles": 194.0,
+        "plain_instructions": 251,
+        "optimized_instructions": 158
+      },
+      {
+        "name": "loop-init",
+        "plain_cycles": 650.5,
+        "optimized_cycles": 221.5,
+        "plain_instructions": 435,
+        "optimized_instructions": 169
+      },
+      {
+        "name": "while-empty-nested",
+        "plain_cycles": 1538.5,
+        "optimized_cycles": 583.0,
+        "plain_instructions": 1018,
+        "optimized_instructions": 450
+      },
+      {
+        "name": "return-tail",
+        "plain_cycles": 190.5,
+        "optimized_cycles": 122.0,
+        "plain_instructions": 135,
+        "optimized_instructions": 94
+      },
+      {
+        "name": "switch-once",
+        "plain_cycles": 96.5,
+        "optimized_cycles": 67.0,
+        "plain_instructions": 70,
+        "optimized_instructions": 55
+      },
+      {
+        "name": "switch-default-middle",
+        "plain_cycles": 295.0,
+        "optimized_cycles": 146.5,
+        "plain_instructions": 202,
+        "optimized_instructions": 114
+      },
+      {
+        "name": "switch-default-first",
+        "plain_cycles": 66.0,
+        "optimized_cycles": 24.0,
+        "plain_instructions": 51,
+        "optimized_instructions": 20
+      },
+      {
+        "name": "switch-char",
+        "plain_cycles": 57.0,
+        "optimized_cycles": 24.0,
+        "plain_instructions": 44,
+        "optimized_instructions": 20
+      },
+      {
+        "name": "nested-control",
+        "plain_cycles": 413.5,
+        "optimized_cycles": 199.5,
+        "plain_instructions": 281,
+        "optimized_instructions": 154
+      },
+      {
+        "name": "static-scalar",
+        "plain_cycles": 120.5,
+        "optimized_cycles": 83.0,
+        "plain_instructions": 84,
+        "optimized_instructions": 68
+      },
+      {
+        "name": "static-array-char",
+        "plain_cycles": 344.5,
+        "optimized_cycles": 171.0,
+        "plain_instructions": 236,
+        "optimized_instructions": 148
+      },
+      {
+        "name": "static-shadow",
+        "plain_cycles": 159.5,
+        "optimized_cycles": 113.0,
+        "plain_instructions": 109,
+        "optimized_instructions": 96
+      },
+      {
+        "name": "static-recursive",
+        "plain_cycles": 363.5,
+        "optimized_cycles": 221.0,
+        "plain_instructions": 241,
+        "optimized_instructions": 172
+      },
+      {
+        "name": "many-args",
+        "plain_cycles": 215.0,
+        "optimized_cycles": 155.0,
+        "plain_instructions": 132,
+        "optimized_instructions": 109
+      },
+      {
+        "name": "mixed-args",
+        "plain_cycles": 385.0,
+        "optimized_cycles": 176.0,
+        "plain_instructions": 263,
+        "optimized_instructions": 131
+      },
+      {
+        "name": "recursive-stack-args",
+        "plain_cycles": 1127.5,
+        "optimized_cycles": 701.5,
+        "plain_instructions": 701,
+        "optimized_instructions": 496
+      },
+      {
+        "name": "nested-calls",
+        "plain_cycles": 437.0,
+        "optimized_cycles": 296.0,
+        "plain_instructions": 275,
+        "optimized_instructions": 214
+      },
+      {
+        "name": "large-stack",
+        "plain_cycles": 399.5,
+        "optimized_cycles": 114.0,
+        "plain_instructions": 323,
+        "optimized_instructions": 98
+      },
+      {
+        "name": "global-alignment",
+        "plain_cycles": 170.5,
+        "optimized_cycles": 89.0,
+        "plain_instructions": 127,
+        "optimized_instructions": 76
+      },
+      {
+        "name": "global-last-element",
+        "plain_cycles": 160.5,
+        "optimized_cycles": 80.0,
+        "plain_instructions": 118,
+        "optimized_instructions": 70
+      },
+      {
+        "name": "string-consecutive",
+        "plain_cycles": 125.5,
+        "optimized_cycles": 43.0,
+        "plain_instructions": 98,
+        "optimized_instructions": 42
+      },
+      {
+        "name": "string-capacity-consumes",
+        "plain_cycles": 248.5,
+        "optimized_cycles": 77.0,
+        "plain_instructions": 192,
+        "optimized_instructions": 65
+      },
+      {
+        "name": "string-empty-eof",
+        "plain_cycles": 133.5,
+        "optimized_cycles": 43.0,
+        "plain_instructions": 102,
+        "optimized_instructions": 42
+      },
+      {
+        "name": "int-overflow",
+        "plain_cycles": 114.5,
+        "optimized_cycles": 64.0,
+        "plain_instructions": 82,
+        "optimized_instructions": 54
+      },
+      {
+        "name": "high-byte-data",
+        "plain_cycles": 198.5,
+        "optimized_cycles": 107.0,
+        "plain_instructions": 142,
+        "optimized_instructions": 93
+      },
+      {
+        "name": "array-sort",
+        "plain_cycles": 6294.5,
+        "optimized_cycles": 2827.5,
+        "plain_instructions": 3933,
+        "optimized_instructions": 2132
+      },
+      {
+        "name": "far-branch-false",
+        "plain_cycles": 46.5,
+        "optimized_cycles": 28.0,
+        "plain_instructions": 34,
+        "optimized_instructions": 24
+      },
+      {
+        "name": "far-branch-true",
+        "plain_cycles": 41649.0,
+        "optimized_cycles": 23429.0,
+        "plain_instructions": 26036,
+        "optimized_instructions": 18225
+      },
+      {
+        "name": "opt-signed-div-rem",
+        "plain_cycles": 59870.0,
+        "optimized_cycles": 23513.0,
+        "plain_instructions": 30297,
+        "optimized_instructions": 20967
+      },
+      {
+        "name": "opt-char-div-rem",
+        "plain_cycles": 5161.5,
+        "optimized_cycles": 1805.0,
+        "plain_instructions": 2673,
+        "optimized_instructions": 1602
+      },
+      {
+        "name": "opt-loop-sum",
+        "plain_cycles": 108564.0,
+        "optimized_cycles": 45531.0,
+        "plain_instructions": 58045,
+        "optimized_instructions": 38025
+      },
+      {
+        "name": "opt-alias-call",
+        "plain_cycles": 181.0,
+        "optimized_cycles": 88.0,
+        "plain_instructions": 130,
+        "optimized_instructions": 68
+      },
+      {
+        "name": "opt-large-immediates",
+        "plain_cycles": 90.0,
+        "optimized_cycles": 59.0,
+        "plain_instructions": 63,
+        "optimized_instructions": 51
+      },
+      {
+        "name": "opt-multiply-powers",
+        "plain_cycles": 528.5,
+        "optimized_cycles": 264.0,
+        "plain_instructions": 364,
+        "optimized_instructions": 217
+      },
+      {
+        "name": "opt-calls-and-cache",
+        "plain_cycles": 185.5,
+        "optimized_cycles": 113.0,
+        "plain_instructions": 125,
+        "optimized_instructions": 90
+      },
+      {
+        "name": "opt-byte-alias",
+        "plain_cycles": 230.0,
+        "optimized_cycles": 89.0,
+        "plain_instructions": 162,
+        "optimized_instructions": 70
+      },
+      {
+        "name": "round2-register-pressure",
+        "plain_cycles": 456.5,
+        "optimized_cycles": 260.0,
+        "plain_instructions": 328,
+        "optimized_instructions": 218
+      },
+      {
+        "name": "round2-pressure-across-call",
+        "plain_cycles": 522.0,
+        "optimized_cycles": 307.0,
+        "plain_instructions": 373,
+        "optimized_instructions": 253
+      },
+      {
+        "name": "round2-dynamic-branches",
+        "plain_cycles": 3299.5,
+        "optimized_cycles": 1195.5,
+        "plain_instructions": 2303,
+        "optimized_instructions": 971
+      },
+      {
+        "name": "round2-slot-loop",
+        "plain_cycles": 53614.0,
+        "optimized_cycles": 26281.0,
+        "plain_instructions": 30045,
+        "optimized_instructions": 21025
+      },
+      {
+        "name": "round2-many-parameters",
+        "plain_cycles": 467.0,
+        "optimized_cycles": 319.0,
+        "plain_instructions": 279,
+        "optimized_instructions": 232
+      },
+      {
+        "name": "round2-char-pressure",
+        "plain_cycles": 403.0,
+        "optimized_cycles": 251.0,
+        "plain_instructions": 261,
+        "optimized_instructions": 194
+      },
+      {
+        "name": "official-comprehensive",
+        "plain_cycles": 7423.0,
+        "optimized_cycles": 3279.5,
+        "plain_instructions": 4952,
+        "optimized_instructions": 2572
+      }
+    ]
+  }
+}

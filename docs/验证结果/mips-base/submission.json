@@ -1,0 +1,8 @@
+{
+  "java_release": 17,
+  "submission_sample": "passed",
+  "root_mips_vs_llvm12": "passed",
+  "input_file_unchanged": true,
+  "zip_structure": "passed",
+  "zip_sha256": "b07b7e140b7a8641702832b6e9857e13de8659d16368559693db21930fdfffa4"
+}

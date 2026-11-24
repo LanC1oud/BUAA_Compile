@@ -1,0 +1,18 @@
+void helper() {
+    if (1 & 1);
+    return
+}
+int value() { return 1; }
+int main() {
+    missing = 1;
+    int x;
+    int x;
+    x = 'a';
+    value(1);
+    printf("%d");
+    printf("%d", 'a');
+    break;
+    const int c = 1;
+    c = 2;
+    return 0;
+}

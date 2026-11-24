@@ -1,0 +1,464 @@
+{
+  "backup_default": {
+    "finalCycles": 67948.0,
+    "totalInstructionCount": 43520,
+    "memory": 23023,
+    "divide": 10
+  },
+  "backup_optimized": {
+    "finalCycles": 67723.0,
+    "totalInstructionCount": 43370,
+    "memory": 23023,
+    "divide": 10
+  },
+  "current_optimized": {
+    "finalCycles": 45732.5,
+    "totalInstructionCount": 30220,
+    "memory": 14990,
+    "divide": 0
+  },
+  "shared_cases": 54,
+  "cycles_reduction_vs_backup_default_percent": 32.69485488903279,
+  "cycles_reduction_vs_backup_optimized_percent": 32.47124315225256,
+  "full_suite": {
+    "plain_cycles": 242758.5,
+    "optimized_cycles": 143912.5,
+    "reduction_percent": 40.71783274324071,
+    "cases": [
+      {
+        "name": "minimal",
+        "plain_cycles": 16.5,
+        "optimized_cycles": 11.0,
+        "plain_instructions": 13,
+        "optimized_instructions": 10
+      },
+      {
+        "name": "exit-status",
+        "plain_cycles": 16.5,
+        "optimized_cycles": 11.0,
+        "plain_instructions": 13,
+        "optimized_instructions": 10
+      },
+      {
+        "name": "arithmetic",
+        "plain_cycles": 199.5,
+        "optimized_cycles": 44.0,
+        "plain_instructions": 100,
+        "optimized_instructions": 40
+      },
+      {
+        "name": "int-boundaries",
+        "plain_cycles": 113.5,
+        "optimized_cycles": 62.0,
+        "plain_instructions": 71,
+        "optimized_instructions": 48
+      },
+      {
+        "name": "casts-wrap",
+        "plain_cycles": 298.5,
+        "optimized_cycles": 123.0,
+        "plain_instructions": 175,
+        "optimized_instructions": 96
+      },
+      {
+        "name": "char-steps",
+        "plain_cycles": 161.5,
+        "optimized_cycles": 55.0,
+        "plain_instructions": 101,
+        "optimized_instructions": 46
+      },
+      {
+        "name": "runtime-char",
+        "plain_cycles": 118.5,
+        "optimized_cycles": 64.0,
+        "plain_instructions": 71,
+        "optimized_instructions": 49
+      },
+      {
+        "name": "mutable-global",
+        "plain_cycles": 56.0,
+        "optimized_cycles": 45.0,
+        "plain_instructions": 40,
+        "optimized_instructions": 35
+      },
+      {
+        "name": "shadow",
+        "plain_cycles": 99.0,
+        "optimized_cycles": 71.0,
+        "plain_instructions": 69,
+        "optimized_instructions": 51
+      },
+      {
+        "name": "recursion",
+        "plain_cycles": 476.5,
+        "optimized_cycles": 389.5,
+        "plain_instructions": 302,
+        "optimized_instructions": 263
+      },
+      {
+        "name": "param-copy",
+        "plain_cycles": 167.0,
+        "optimized_cycles": 111.0,
+        "plain_instructions": 117,
+        "optimized_instructions": 81
+      },
+      {
+        "name": "array-params",
+        "plain_cycles": 316.0,
+        "optimized_cycles": 145.0,
+        "plain_instructions": 227,
+        "optimized_instructions": 104
+      },
+      {
+        "name": "const-arrays",
+        "plain_cycles": 319.5,
+        "optimized_cycles": 127.0,
+        "plain_instructions": 232,
+        "optimized_instructions": 94
+      },
+      {
+        "name": "string-lengths",
+        "plain_cycles": 352.5,
+        "optimized_cycles": 112.0,
+        "plain_instructions": 253,
+        "optimized_instructions": 81
+      },
+      {
+        "name": "char-array-forward",
+        "plain_cycles": 139.5,
+        "optimized_cycles": 61.0,
+        "plain_instructions": 99,
+        "optimized_instructions": 44
+      },
+      {
+        "name": "printf-eval",
+        "plain_cycles": 75.0,
+        "optimized_cycles": 48.0,
+        "plain_instructions": 58,
+        "optimized_instructions": 40
+      },
+      {
+        "name": "printf-order",
+        "plain_cycles": 110.5,
+        "optimized_cycles": 68.0,
+        "plain_instructions": 84,
+        "optimized_instructions": 56
+      },
+      {
+        "name": "escapes",
+        "plain_cycles": 185.5,
+        "optimized_cycles": 42.0,
+        "plain_instructions": 134,
+        "optimized_instructions": 32
+      },
+      {
+        "name": "six-runtime",
+        "plain_cycles": 109.5,
+        "optimized_cycles": 59.0,
+        "plain_instructions": 82,
+        "optimized_instructions": 48
+      },
+      {
+        "name": "string-zero-one",
+        "plain_cycles": 198.5,
+        "optimized_cycles": 65.0,
+        "plain_instructions": 154,
+        "optimized_instructions": 51
+      },
+      {
+        "name": "string-truncate",
+        "plain_cycles": 41.5,
+        "optimized_cycles": 18.0,
+        "plain_instructions": 34,
+        "optimized_instructions": 17
+      },
+      {
+        "name": "string-crlf",
+        "plain_cycles": 49.5,
+        "optimized_cycles": 18.0,
+        "plain_instructions": 38,
+        "optimized_instructions": 17
+      },
+      {
+        "name": "comparisons",
+        "plain_cycles": 278.0,
+        "optimized_cycles": 32.0,
+        "plain_instructions": 202,
+        "optimized_instructions": 31
+      },
+      {
+        "name": "char-comparison-chain",
+        "plain_cycles": 130.5,
+        "optimized_cycles": 17.0,
+        "plain_instructions": 92,
+        "optimized_instructions": 16
+      },
+      {
+        "name": "short-circuit",
+        "plain_cycles": 126.0,
+        "optimized_cycles": 66.0,
+        "plain_instructions": 92,
+        "optimized_instructions": 51
+      },
+      {
+        "name": "while-short-circuit",
+        "plain_cycles": 369.0,
+        "optimized_cycles": 285.0,
+        "plain_instructions": 251,
+        "optimized_instructions": 212
+      },
+      {
+        "name": "loop-init",
+        "plain_cycles": 650.5,
+        "optimized_cycles": 314.5,
+        "plain_instructions": 435,
+        "optimized_instructions": 209
+      },
+      {
+        "name": "while-empty-nested",
+        "plain_cycles": 1538.5,
+        "optimized_cycles": 1186.0,
+        "plain_instructions": 1018,
+        "optimized_instructions": 862
+      },
+      {
+        "name": "return-tail",
+        "plain_cycles": 190.5,
+        "optimized_cycles": 142.0,
+        "plain_instructions": 135,
+        "optimized_instructions": 106
+      },
+      {
+        "name": "switch-once",
+        "plain_cycles": 96.5,
+        "optimized_cycles": 81.0,
+        "plain_instructions": 70,
+        "optimized_instructions": 64
+      },
+      {
+        "name": "switch-default-middle",
+        "plain_cycles": 295.0,
+        "optimized_cycles": 235.5,
+        "plain_instructions": 202,
+        "optimized_instructions": 176
+      },
+      {
+        "name": "switch-default-first",
+        "plain_cycles": 66.0,
+        "optimized_cycles": 26.0,
+        "plain_instructions": 51,
+        "optimized_instructions": 22
+      },
+      {
+        "name": "switch-char",
+        "plain_cycles": 57.0,
+        "optimized_cycles": 26.0,
+        "plain_instructions": 44,
+        "optimized_instructions": 22
+      },
+      {
+        "name": "nested-control",
+        "plain_cycles": 413.5,
+        "optimized_cycles": 318.5,
+        "plain_instructions": 281,
+        "optimized_instructions": 235
+      },
+      {
+        "name": "static-scalar",
+        "plain_cycles": 120.5,
+        "optimized_cycles": 88.0,
+        "plain_instructions": 84,
+        "optimized_instructions": 66
+      },
+      {
+        "name": "static-array-char",
+        "plain_cycles": 344.5,
+        "optimized_cycles": 204.0,
+        "plain_instructions": 236,
+        "optimized_instructions": 146
+      },
+      {
+        "name": "static-shadow",
+        "plain_cycles": 159.5,
+        "optimized_cycles": 127.0,
+        "plain_instructions": 109,
+        "optimized_instructions": 96
+      },
+      {
+        "name": "static-recursive",
+        "plain_cycles": 363.5,
+        "optimized_cycles": 291.0,
+        "plain_instructions": 241,
+        "optimized_instructions": 208
+      },
+      {
+        "name": "many-args",
+        "plain_cycles": 215.0,
+        "optimized_cycles": 177.0,
+        "plain_instructions": 132,
+        "optimized_instructions": 109
+      },
+      {
+        "name": "mixed-args",
+        "plain_cycles": 385.0,
+        "optimized_cycles": 194.0,
+        "plain_instructions": 263,
+        "optimized_instructions": 130
+      },
+      {
+        "name": "recursive-stack-args",
+        "plain_cycles": 1127.5,
+        "optimized_cycles": 902.5,
+        "plain_instructions": 701,
+        "optimized_instructions": 562
+      },
+      {
+        "name": "nested-calls",
+        "plain_cycles": 437.0,
+        "optimized_cycles": 325.0,
+        "plain_instructions": 275,
+        "optimized_instructions": 210
+      },
+      {
+        "name": "large-stack",
+        "plain_cycles": 399.5,
+        "optimized_cycles": 127.0,
+        "plain_instructions": 323,
+        "optimized_instructions": 107
+      },
+      {
+        "name": "global-alignment",
+        "plain_cycles": 170.5,
+        "optimized_cycles": 93.0,
+        "plain_instructions": 127,
+        "optimized_instructions": 72
+      },
+      {
+        "name": "global-last-element",
+        "plain_cycles": 160.5,
+        "optimized_cycles": 89.0,
+        "plain_instructions": 118,
+        "optimized_instructions": 68
+      },
+      {
+        "name": "string-consecutive",
+        "plain_cycles": 125.5,
+        "optimized_cycles": 46.0,
+        "plain_instructions": 98,
+        "optimized_instructions": 42
+      },
+      {
+        "name": "string-capacity-consumes",
+        "plain_cycles": 248.5,
+        "optimized_cycles": 79.0,
+        "plain_instructions": 192,
+        "optimized_instructions": 64
+      },
+      {
+        "name": "string-empty-eof",
+        "plain_cycles": 133.5,
+        "optimized_cycles": 46.0,
+        "plain_instructions": 102,
+        "optimized_instructions": 42
+      },
+      {
+        "name": "int-overflow",
+        "plain_cycles": 114.5,
+        "optimized_cycles": 69.0,
+        "plain_instructions": 82,
+        "optimized_instructions": 52
+      },
+      {
+        "name": "high-byte-data",
+        "plain_cycles": 198.5,
+        "optimized_cycles": 117.0,
+        "plain_instructions": 142,
+        "optimized_instructions": 89
+      },
+      {
+        "name": "array-sort",
+        "plain_cycles": 6294.5,
+        "optimized_cycles": 4538.5,
+        "plain_instructions": 3933,
+        "optimized_instructions": 2952
+      },
+      {
+        "name": "far-branch-false",
+        "plain_cycles": 46.5,
+        "optimized_cycles": 36.0,
+        "plain_instructions": 34,
+        "optimized_instructions": 29
+      },
+      {
+        "name": "far-branch-true",
+        "plain_cycles": 41649.0,
+        "optimized_cycles": 28637.0,
+        "plain_instructions": 26036,
+        "optimized_instructions": 18230
+      },
+      {
+        "name": "opt-signed-div-rem",
+        "plain_cycles": 59870.0,
+        "optimized_cycles": 26887.0,
+        "plain_instructions": 30297,
+        "optimized_instructions": 20857
+      },
+      {
+        "name": "opt-char-div-rem",
+        "plain_cycles": 5161.5,
+        "optimized_cycles": 2085.0,
+        "plain_instructions": 2673,
+        "optimized_instructions": 1562
+      },
+      {
+        "name": "opt-loop-sum",
+        "plain_cycles": 108564.0,
+        "optimized_cycles": 68546.0,
+        "plain_instructions": 58045,
+        "optimized_instructions": 48035
+      },
+      {
+        "name": "opt-alias-call",
+        "plain_cycles": 181.0,
+        "optimized_cycles": 96.0,
+        "plain_instructions": 130,
+        "optimized_instructions": 66
+      },
+      {
+        "name": "opt-large-immediates",
+        "plain_cycles": 90.0,
+        "optimized_cycles": 66.0,
+        "plain_instructions": 63,
+        "optimized_instructions": 51
+      },
+      {
+        "name": "opt-multiply-powers",
+        "plain_cycles": 528.5,
+        "optimized_cycles": 282.0,
+        "plain_instructions": 364,
+        "optimized_instructions": 207
+      },
+      {
+        "name": "opt-calls-and-cache",
+        "plain_cycles": 185.5,
+        "optimized_cycles": 123.0,
+        "plain_instructions": 125,
+        "optimized_instructions": 88
+      },
+      {
+        "name": "opt-byte-alias",
+        "plain_cycles": 230.0,
+        "optimized_cycles": 95.0,
+        "plain_instructions": 162,
+        "optimized_instructions": 68
+      },
+      {
+        "name": "official-comprehensive",
+        "plain_cycles": 7423.0,
+        "optimized_cycles": 5067.5,
+        "plain_instructions": 4952,
+        "optimized_instructions": 3627
+      }
+    ]
+  }
+}

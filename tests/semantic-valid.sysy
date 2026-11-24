@@ -1,0 +1,28 @@
+const char text[2] = "abc";
+const char wrapped = -(char)1;
+int values[(int)wrapped] = {1, 2};
+
+char identity(char ch) {
+    static char saved = 'a';
+    {
+        int ch = 1;
+        put_int(ch);
+    }
+    return ch;
+}
+
+int main() {
+    char buffer[8];
+    get_string(buffer, 8);
+    if (!'a' + 1) {
+        printf("%c%s", identity('a'), buffer);
+    }
+    while (1) {
+        switch ('a') {
+            case 'a': break;
+            default: continue;
+        }
+        break;
+    }
+    return 0;
+}

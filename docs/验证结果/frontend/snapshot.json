@@ -1,0 +1,26 @@
+{
+  "snapshot": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\backups\\before-llvm-20261101-234349\\workspace.zip",
+  "frontend_identical": 92,
+  "valid_llvm_verified": 26,
+  "error_cases": 66,
+  "error_codes": [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n"
+  ],
+  "legacy_expectations_already_different_in_snapshot": [
+    "e/f/g \u88f8 return \u4e0e\u672b\u5c3e\u5f62\u6001\u6df7\u5408\uff08\u7528\u6237\u6837\u4f8b\uff09",
+    "c \u51fd\u6570\u540d\u5f53\u53d8\u91cf\u4f7f\u7528"
+  ]
+}

@@ -1,0 +1,1179 @@
+{
+  "passed": [
+    {
+      "mode": "all-on",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "all-on",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "all-on",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "all-on",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "all-on",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "all-on",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "all-on",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "all-on",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "all-on",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "all-on",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "all-on",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "all-on",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "all-on",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMem2Reg-off",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMem2Reg-off",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMem2Reg-off",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMem2Reg-off",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMem2Reg-off",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMem2Reg-off",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMem2Reg-off",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMem2Reg-off",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMem2Reg-off",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMem2Reg-off",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMem2Reg-off",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMem2Reg-off",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMem2Reg-off",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalScalarPromotion-off",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalScalarPromotion-off",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalScalarPromotion-off",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalScalarPromotion-off",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalScalarPromotion-off",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalScalarPromotion-off",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalScalarPromotion-off",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalScalarPromotion-off",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalScalarPromotion-off",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalScalarPromotion-off",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalScalarPromotion-off",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalScalarPromotion-off",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalScalarPromotion-off",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "enableIrCleanup-off",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "enableIrCleanup-off",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "enableIrCleanup-off",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableIrCleanup-off",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "enableIrCleanup-off",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "enableIrCleanup-off",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableIrCleanup-off",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "enableIrCleanup-off",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "enableIrCleanup-off",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "enableIrCleanup-off",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "enableIrCleanup-off",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "enableIrCleanup-off",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "enableIrCleanup-off",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "enableInlining-off",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "enableInlining-off",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "enableInlining-off",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableInlining-off",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "enableInlining-off",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "enableInlining-off",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableInlining-off",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "enableInlining-off",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "enableInlining-off",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "enableInlining-off",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "enableInlining-off",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "enableInlining-off",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "enableInlining-off",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "enableTailRecursion-off",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "enableTailRecursion-off",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "enableTailRecursion-off",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableTailRecursion-off",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "enableTailRecursion-off",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "enableTailRecursion-off",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableTailRecursion-off",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "enableTailRecursion-off",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "enableTailRecursion-off",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "enableTailRecursion-off",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "enableTailRecursion-off",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "enableTailRecursion-off",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "enableTailRecursion-off",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGvn-off",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGvn-off",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGvn-off",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGvn-off",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGvn-off",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGvn-off",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGvn-off",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGvn-off",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGvn-off",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGvn-off",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGvn-off",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGvn-off",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGvn-off",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGcm-off",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGcm-off",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGcm-off",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGcm-off",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGcm-off",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGcm-off",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGcm-off",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGcm-off",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGcm-off",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGcm-off",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGcm-off",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGcm-off",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGcm-off",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMemoryForwarding-off",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMemoryForwarding-off",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMemoryForwarding-off",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMemoryForwarding-off",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMemoryForwarding-off",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMemoryForwarding-off",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMemoryForwarding-off",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMemoryForwarding-off",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMemoryForwarding-off",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMemoryForwarding-off",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMemoryForwarding-off",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMemoryForwarding-off",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "enableMemoryForwarding-off",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalRegisters-off",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalRegisters-off",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalRegisters-off",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalRegisters-off",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalRegisters-off",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalRegisters-off",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalRegisters-off",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalRegisters-off",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalRegisters-off",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalRegisters-off",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalRegisters-off",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalRegisters-off",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "enableGlobalRegisters-off",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "enableConstantDivision-off",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "enableConstantDivision-off",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "enableConstantDivision-off",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableConstantDivision-off",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "enableConstantDivision-off",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "enableConstantDivision-off",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableConstantDivision-off",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "enableConstantDivision-off",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "enableConstantDivision-off",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "enableConstantDivision-off",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "enableConstantDivision-off",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "enableConstantDivision-off",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "enableConstantDivision-off",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "enableRangeAnalysis-off",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "enableRangeAnalysis-off",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "enableRangeAnalysis-off",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableRangeAnalysis-off",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "enableRangeAnalysis-off",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "enableRangeAnalysis-off",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableRangeAnalysis-off",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "enableRangeAnalysis-off",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "enableRangeAnalysis-off",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "enableRangeAnalysis-off",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "enableRangeAnalysis-off",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "enableRangeAnalysis-off",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "enableRangeAnalysis-off",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "enablePeephole-off",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "enablePeephole-off",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "enablePeephole-off",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enablePeephole-off",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "enablePeephole-off",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "enablePeephole-off",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enablePeephole-off",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "enablePeephole-off",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "enablePeephole-off",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "enablePeephole-off",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "enablePeephole-off",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "enablePeephole-off",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "enablePeephole-off",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "enableLoopLayout-off",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "enableLoopLayout-off",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "enableLoopLayout-off",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableLoopLayout-off",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "enableLoopLayout-off",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "enableLoopLayout-off",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableLoopLayout-off",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "enableLoopLayout-off",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "enableLoopLayout-off",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "enableLoopLayout-off",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "enableLoopLayout-off",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "enableLoopLayout-off",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "enableLoopLayout-off",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "enableDelaySlotRemoval-off",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "enableDelaySlotRemoval-off",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "enableDelaySlotRemoval-off",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableDelaySlotRemoval-off",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "enableDelaySlotRemoval-off",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "enableDelaySlotRemoval-off",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "enableDelaySlotRemoval-off",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "enableDelaySlotRemoval-off",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "enableDelaySlotRemoval-off",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "enableDelaySlotRemoval-off",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "enableDelaySlotRemoval-off",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "enableDelaySlotRemoval-off",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "enableDelaySlotRemoval-off",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "all-off",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "all-off",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "all-off",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "all-off",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "all-off",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "all-off",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "all-off",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "all-off",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "all-off",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "all-off",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "all-off",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "all-off",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "all-off",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "ssa-stack",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "ssa-stack",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "ssa-stack",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "ssa-stack",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "ssa-stack",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "ssa-stack",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "ssa-stack",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "ssa-stack",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "ssa-stack",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "ssa-stack",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "ssa-stack",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "ssa-stack",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "ssa-stack",
+      "case": "extreme-range-step",
+      "result": "passed"
+    },
+    {
+      "mode": "mem2reg-only",
+      "case": "extreme-phi-cycle",
+      "result": "passed"
+    },
+    {
+      "mode": "mem2reg-only",
+      "case": "extreme-loop-pressure",
+      "result": "passed"
+    },
+    {
+      "mode": "mem2reg-only",
+      "case": "extreme-inline-loop-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "mem2reg-only",
+      "case": "extreme-memory-alias",
+      "result": "passed"
+    },
+    {
+      "mode": "mem2reg-only",
+      "case": "extreme-gcm-zero-trip",
+      "result": "passed"
+    },
+    {
+      "mode": "mem2reg-only",
+      "case": "extreme-char-phi",
+      "result": "passed"
+    },
+    {
+      "mode": "mem2reg-only",
+      "case": "extreme-tail-recursion",
+      "result": "passed"
+    },
+    {
+      "mode": "mem2reg-only",
+      "case": "extreme-global-scalar",
+      "result": "passed"
+    },
+    {
+      "mode": "mem2reg-only",
+      "case": "extreme-array-parameter",
+      "result": "passed"
+    },
+    {
+      "mode": "mem2reg-only",
+      "case": "extreme-range-positive",
+      "result": "passed"
+    },
+    {
+      "mode": "mem2reg-only",
+      "case": "extreme-range-overflow",
+      "result": "passed"
+    },
+    {
+      "mode": "mem2reg-only",
+      "case": "extreme-range-negative",
+      "result": "passed"
+    },
+    {
+      "mode": "mem2reg-only",
+      "case": "extreme-range-step",
+      "result": "passed"
+    }
+  ],
+  "failures": [],
+  "configurations": 18,
+  "cases_per_configuration": 13,
+  "mars_modes": 2,
+  "retry_history": []
+}

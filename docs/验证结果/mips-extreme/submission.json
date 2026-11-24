@@ -1,0 +1,109 @@
+{
+  "java_release": 17,
+  "compiler_class_major": 61,
+  "source_matches_archive": true,
+  "source_files": 117,
+  "config": {
+    "programmingLanguage": "Java",
+    "objectCode": "MIPS"
+  },
+  "zip_sha256": "4203d9a5cc02eb28d80a2a0f181869326db760c548b44e1d41d588598d3611cb",
+  "results": [
+    {
+      "name": "extreme-phi-cycle",
+      "delayed": false,
+      "stdout": "2 3 1 8223",
+      "finalCycles": 843.5
+    },
+    {
+      "name": "extreme-phi-cycle",
+      "delayed": true,
+      "stdout": "2 3 1 8223",
+      "finalCycles": 884.5
+    },
+    {
+      "name": "extreme-loop-pressure",
+      "delayed": false,
+      "stdout": "781 822 863 904 945 986 1027 1068 1109 1150 1191 1232 1273 1314",
+      "finalCycles": 3489.0
+    },
+    {
+      "name": "extreme-loop-pressure",
+      "delayed": true,
+      "stdout": "781 822 863 904 945 986 1027 1068 1109 1150 1191 1232 1273 1314",
+      "finalCycles": 3533.0
+    },
+    {
+      "name": "extreme-tail-recursion",
+      "delayed": false,
+      "stdout": "14633",
+      "finalCycles": 133.0
+    },
+    {
+      "name": "extreme-tail-recursion",
+      "delayed": true,
+      "stdout": "14633",
+      "finalCycles": 163.0
+    },
+    {
+      "name": "extreme-global-scalar",
+      "delayed": false,
+      "stdout": "783 114",
+      "finalCycles": 298.0
+    },
+    {
+      "name": "extreme-global-scalar",
+      "delayed": true,
+      "stdout": "783 114",
+      "finalCycles": 342.0
+    },
+    {
+      "name": "extreme-range-overflow",
+      "delayed": false,
+      "stdout": "280114617",
+      "finalCycles": 1394.0
+    },
+    {
+      "name": "extreme-range-overflow",
+      "delayed": true,
+      "stdout": "280114617",
+      "finalCycles": 1448.0
+    },
+    {
+      "name": "recursive-stack-args",
+      "delayed": false,
+      "stdout": "105",
+      "finalCycles": 390.5
+    },
+    {
+      "name": "recursive-stack-args",
+      "delayed": true,
+      "stdout": "105",
+      "finalCycles": 411.5
+    },
+    {
+      "name": "array-sort",
+      "delayed": false,
+      "stdout": "-2 -2 0 1 3 4 8 9 ",
+      "finalCycles": 885.0
+    },
+    {
+      "name": "array-sort",
+      "delayed": true,
+      "stdout": "-2 -2 0 1 3 4 8 9 ",
+      "finalCycles": 1021.0
+    },
+    {
+      "name": "official-comprehensive",
+      "delayed": false,
+      "stdout": "raw=Az9!bB2?xy7#\nupper=AZ9!BB2?XY7#\nU=2 L=4 D=3 O=3\nscore=29\nreverse=#7YX?2BB!9ZA\n",
+      "finalCycles": 1094.0
+    },
+    {
+      "name": "official-comprehensive",
+      "delayed": true,
+      "stdout": "raw=Az9!bB2?xy7#\nupper=AZ9!BB2?XY7#\nU=2 L=4 D=3 O=3\nscore=29\nreverse=#7YX?2BB!9ZA\n",
+      "finalCycles": 1314.0
+    }
+  ]
+}

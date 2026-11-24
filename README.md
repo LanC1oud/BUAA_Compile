@@ -1,5 +1,7 @@
 # BUAA Compile — SysY 编译器
 
+本分支 **Optimize** 保存最终优化版本。历史阶段分支为 `Lexer`、`Parser`、`Semantic`、`LLVM-IR`、`MIPS`，各自仅保留 `src/`。完整项目文档与 UI 保留在本分支，来源与校验说明见 [六阶段分支说明](docs/阶段分支说明.md)。
+
 北京航空航天大学《编译原理》课程设计。用 Java 实现一个 SysY 语言编译器，
 目前阶段：
 - 词法分析 ✅

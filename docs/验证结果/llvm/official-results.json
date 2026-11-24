@@ -1,0 +1,1240 @@
+{
+  "date": "2026-11-02",
+  "archives": [
+    {
+      "path": "C:\\Users\\96330\\Downloads\\2026代码生成作业公共测试程序库-A.zip",
+      "sha256": "45b44627eaced28966b446a1ddfc88db8ffc8a77ab751f64957fe4899a075de8",
+      "cases": 20
+    },
+    {
+      "path": "C:\\Users\\96330\\Downloads\\2026代码生成作业公共测试程序库-B.zip",
+      "sha256": "613f52551dec3fbb137923e5c35c4988e3e2b2bd9ffd8931397bcb8732013787",
+      "cases": 20
+    },
+    {
+      "path": "C:\\Users\\96330\\Downloads\\2026代码生成作业公共测试程序库-C.zip",
+      "sha256": "f750574352e832e9fa1791405b5897782a9b82e254dedb966928861d0814f97d",
+      "cases": 20
+    }
+  ],
+  "versions": {
+    "llvm-as": "LLVM (http://llvm.org/):\n  LLVM version 12.0.0\n  Optimized build.\n  Default target: x86_64-pc-windows-msvc\n  Host CPU: goldmont",
+    "opt": "LLVM (http://llvm.org/):\n  LLVM version 12.0.0\n  Optimized build.\n  Default target: x86_64-pc-windows-msvc\n  Host CPU: goldmont",
+    "llvm-link": "LLVM (http://llvm.org/):\n  LLVM version 12.0.0\n  Optimized build.\n  Default target: x86_64-pc-windows-msvc\n  Host CPU: goldmont",
+    "lli": "LLVM (http://llvm.org/):\n  LLVM version 12.0.0\n  Optimized build.\n  Default target: x86_64-pc-windows-msvc\n  Host CPU: goldmont"
+  },
+  "runtime": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\runtime\\llvm12\\libsysy.ll",
+  "runtime_sha256": "3866b5849c34d432e4edf317adfc0360021dde54b5f7a4380ba2d4ae737f3781",
+  "timeout_seconds": 20,
+  "summary": {
+    "A": {
+      "total": 20,
+      "passed": 20,
+      "ir_verified": 20,
+      "runtime_output_match": 20,
+      "frontend": {
+        "lexer.txt": 20,
+        "parser.txt": 20,
+        "symbol.txt": 20
+      }
+    },
+    "B": {
+      "total": 20,
+      "passed": 20,
+      "ir_verified": 20,
+      "runtime_output_match": 20,
+      "frontend": {
+        "lexer.txt": 20,
+        "parser.txt": 20,
+        "symbol.txt": 20
+      }
+    },
+    "C": {
+      "total": 20,
+      "passed": 20,
+      "ir_verified": 20,
+      "runtime_output_match": 20,
+      "frontend": {
+        "lexer.txt": 20,
+        "parser.txt": 20,
+        "symbol.txt": 20
+      }
+    }
+  },
+  "compiler_source_sha256": {
+    "src\\Compiler.java": "bdb39d79a3e70d0e108ea08bdddf612db2104332d33407333f5adc78b5d8c784",
+    "src\\error\\ErrorEntry.java": "b7b5971c99becf8ff604a4aba779f856829d1dedca90bf3fd7f21aa7e0862a63",
+    "src\\error\\ErrorTable.java": "61d70e8b3280140914aacbb9c7d85126b2d6d219004f2b1333cf9363824d9f2d",
+    "src\\error\\ErrorType.java": "80e0be7adfc10bf15dc8f0731f951c67d27cc6212ce86cc5a8854b1e5584ddb6",
+    "src\\frontend\\ast\\ASTNode.java": "9e34f914e92351bda476797d7a41940623dd2bea6c6be6b0d2713a9aa3ff4ff3",
+    "src\\frontend\\ast\\block\\Block.java": "c074b21ba5f225333b2b4031fe11312dbefbe7e65984121d7c0b9937bd181b7a",
+    "src\\frontend\\ast\\block\\BlockItem.java": "a141df541873ff6c556da4b5f9eebed63ba46e5d048a88ab4e91915458c42ece",
+    "src\\frontend\\ast\\CompileUnit.java": "038189f97301e9045c800b7901a0b85b1a5366a22684801b4712374a1dcd64a6",
+    "src\\frontend\\ast\\declaration\\ConstDecl.java": "b4973d4ac97ce1f49e790c11857f0e6441bd7b61f9fc63c45309277e905589ee",
+    "src\\frontend\\ast\\declaration\\ConstDef.java": "9f64c21730e3dd6416f2aea2de4d2a1b9618385e8899c1a4dcbb12000aa2cc00",
+    "src\\frontend\\ast\\declaration\\ConstInitVal.java": "95a064e8adf208f22412ad4baec5de20bb5e0758f451c9ec259b03d0a87f9413",
+    "src\\frontend\\ast\\declaration\\Decl.java": "4ebbab16bdd0c683f2a10d0bcb50624bf07eb9692bf8673a08c124af6fa6abdf",
+    "src\\frontend\\ast\\declaration\\InitVal.java": "084e6b566e34c98e7cc9982b3006efaeb8b165ab557d46e7add2fbdc32953cee",
+    "src\\frontend\\ast\\declaration\\VarDecl.java": "b16781aec2d5544cf6be7e0a5162c6b9b73528877ba2337af803cc59157e25be",
+    "src\\frontend\\ast\\declaration\\VarDef.java": "632e7afa11b1acc8a868e0c0016481ab45c55ccd1c86c2fd340601e4a4138a9c",
+    "src\\frontend\\ast\\expression\\AddExp.java": "09b9b2d11723eb498f47ae83e488789a799f8e130f968bdb8ef5f2aeb1b335a2",
+    "src\\frontend\\ast\\expression\\BinaryExp.java": "7aba5221fc880a5718c0e55e2689b7a20e4673cdb00a1628818ecf5a2a701985",
+    "src\\frontend\\ast\\expression\\Cond.java": "37cd04a11a8e0c44505836046ca11e79957e78e8ec6eb4c59ecf04ab20b8a6b4",
+    "src\\frontend\\ast\\expression\\ConstExp.java": "855966c48bfcb43abf2dca8f8522c4c1c0f753007305ad5f6f234213ba523019",
+    "src\\frontend\\ast\\expression\\EqExp.java": "cf0d14a4b332c46d4d5c143480999697096e976457c3d6521a94ec766995a881",
+    "src\\frontend\\ast\\expression\\Exp.java": "5a9fb9b587a7e79bfec087c48115fd5e3830d5e3cec80950166b9d308a8f28f3",
+    "src\\frontend\\ast\\expression\\FuncRParams.java": "5eb25f58060b2c48ef3643bb649b18bc2525487b01dcdf0aa371c1f4fa0a04fb",
+    "src\\frontend\\ast\\expression\\LAndExp.java": "fb88461d8c8327e25a2f61eec58f630f89bca52439f0bddcb9e839347955e989",
+    "src\\frontend\\ast\\expression\\LOrExp.java": "4a36f61cea0ca0fc2b986e660addb148445e96610c86c3e338a12845b8548a8d",
+    "src\\frontend\\ast\\expression\\LVal.java": "8acf9b27d0eb9d16b224620b1ea7b5708b6f18fb23cb3384fb70f7d884a7796e",
+    "src\\frontend\\ast\\expression\\MulExp.java": "9cdacf97c71367a9dccc6042a9793590dd5151635e99975b053b22030664f6b8",
+    "src\\frontend\\ast\\expression\\Number.java": "729cb33f3174ba85af0304de2f2241551377398a4ef4f34a105a2c3c891cab15",
+    "src\\frontend\\ast\\expression\\PrimaryExp.java": "bf8d720dae48b967e279ca9d7ed85b88475d46d16f4828c4133b638c179e06fa",
+    "src\\frontend\\ast\\expression\\RelExp.java": "d1db531c6cf0ca3fd09f869fae5cf89f4f27d222ca52114fcd994e1fbfdd2067",
+    "src\\frontend\\ast\\expression\\UnaryExp.java": "81734b769aa233ee59340c468155aa3434a8825cc3d4926ed57d7d16cf99b111",
+    "src\\frontend\\ast\\expression\\UnaryOp.java": "f0e91adac2c895bc1db1552b515135fc94f8ee3983cc2508107bff33f0d5bd3f",
+    "src\\frontend\\ast\\function\\FuncDef.java": "e97a3aabe3f01307ef6083bdb83bf38e3213e887f66ac072ab284aac8bc51b6f",
+    "src\\frontend\\ast\\function\\FuncFormalParam.java": "c16107506de9e71f9ebbb2bd42fcbb4bf2dad3e8a8670837e97adfd9097c5ac5",
+    "src\\frontend\\ast\\function\\FuncFormalParams.java": "4f7dc044f5ded6ba76eb5ae9c7921e9168f12a610d8ce12bf920116045ca3173",
+    "src\\frontend\\ast\\function\\FuncType.java": "014f3adb2bd6b6d287057c95cec4d8b4a2fec7495d92a1df3302f2b3bfb141af",
+    "src\\frontend\\ast\\function\\MainFuncDef.java": "45b73ea185f3bb120c04c75378cfadf07664f5c8ff9800933cdde70cb5766d67",
+    "src\\frontend\\ast\\statement\\AssignStmt.java": "9f4e293d031a8a80b3ec0498d5b01226335d653789d6484bf175f8f06b86edff",
+    "src\\frontend\\ast\\statement\\BlockStmt.java": "aeaee6c73aa68e626862fae77e833bad4e20d5e9fb27a9ab86a3d6866711b250",
+    "src\\frontend\\ast\\statement\\BreakStmt.java": "b8c250d0e4c572d850a116ff63d816975849f3a01d59529d8a2b05bb08780c07",
+    "src\\frontend\\ast\\statement\\CaseStmt.java": "c7e6b1fd25a8b7af4f9007ab7aee3f10d0ec11fffbaafdbcffd8f2a1a3d9fe4e",
+    "src\\frontend\\ast\\statement\\ContinueStmt.java": "3d8f80b77e70c961481f57a916494a4e13a0a85ac5599e88fce3aa46d0927ea9",
+    "src\\frontend\\ast\\statement\\ExpStmt.java": "6bb19d44f60a1859eba85630a9ae97c320732ac750dc94540e0900bad104ce31",
+    "src\\frontend\\ast\\statement\\IfStmt.java": "b22079bce0bc6a1c664121a2768fd31d6a415e209685b593a09c1521c9eba544",
+    "src\\frontend\\ast\\statement\\PrintfStmt.java": "b892693332bf86c71c55d594397125c0167af4ecefbecb4274259a45a01e70ea",
+    "src\\frontend\\ast\\statement\\ReturnStmt.java": "f241cf35962b86f9191d2d890367efab1c27d775867d61166d5c257eb6841dd9",
+    "src\\frontend\\ast\\statement\\Stmt.java": "5fedd202dae0377b00227b22315d001c4b02189470c1d1234ebff1adabd34d5c",
+    "src\\frontend\\ast\\statement\\SwitchStmt.java": "0850c455379e2673aa17f4642b7602456599299ffb7c4c542744e92721c0487c",
+    "src\\frontend\\ast\\statement\\WhileStmt.java": "5ff186659608cf803302222c7363a3eae5ef8485e4a17f114a5765e150ca0325",
+    "src\\frontend\\Lexer.java": "368a6644fa0d70f5e30f4b1d28b262080951bb7ea8c4cba4ffbf04eb5ff595cb",
+    "src\\frontend\\Navigation.java": "6c15bfbb76cdd6a16d2c9d5eb56f875b9d33b0b46d37ad477d8c11279e03dfc7",
+    "src\\frontend\\Parser.java": "2ad3f818d591e29e610f2c7324c51c4803b743f73128e12c74fe71453e2815d4",
+    "src\\frontend\\ParserWatcher.java": "774f9de26cbfe8a3c68f3f7e8e6ebbf770c5bc7f840765f74dee4e42c783982c",
+    "src\\frontend\\SemanticInfo.java": "58d570a40aab9e702b8b735e9dbca7e75ff4fb0c12fcaabc39fbdda7fd0fe011",
+    "src\\frontend\\symbol\\FixedArray.java": "ec8027da4f61b15fcfbc4c7a67594b02921e7ec692cdbdcd093e31277d154f5c",
+    "src\\frontend\\symbol\\FixedValue.java": "ec3df97047a13bd3f2ef330350572ff5dca122d94681a5e42a59fc59004ac913",
+    "src\\frontend\\symbol\\Symbol.java": "747bf8f19ddfa6b7fcf8db3d89aceefc8ddbe6a6b0836e6edf33b7cd8dc186fa",
+    "src\\frontend\\symbol\\SymbolFunction.java": "e5acc179af9dc38311a3d51cc948ff2966721920e8753a579769101e0fbf442b",
+    "src\\frontend\\symbol\\SymbolTable.java": "05049089e895fc7612af3ee5cba96a75b6d44eabaab6b5282d57b97ffd6cc845",
+    "src\\frontend\\symbol\\SymbolVariable.java": "3299fa9fb459bd343cf0d219e294b83fc7fe1b02fb9d5e6993f6aa3f23d1ef4b",
+    "src\\frontend\\symbol\\type\\SymbolQualifier.java": "322f25cf4f6254395787b5b70f807b26486e330b0b4cd930f4d1cb23be579fd6",
+    "src\\frontend\\symbol\\type\\SymbolType.java": "3512c30b2c91427049cdedf4edcd8f4d3cddc70c8fa281839e699d058fec05f6",
+    "src\\frontend\\symbol\\type\\Type.java": "e07ce6920d2366085c3c28c8320537a6a760d8d24b167db4bbdf17b73604f39b",
+    "src\\frontend\\token\\Escapes.java": "9be06cb98438ab527d655671cc3b789525a6d0393dae0d8a1d03a0a00254cc11",
+    "src\\frontend\\token\\Keywords.java": "2079d17ef08b2f2d9817a33af6f9e303bb3e0e8542c90b9336648817685cd44f",
+    "src\\frontend\\token\\Symbols.java": "9e58fb379c561e920f981e60c9beeaff1d62a90fe525e3cf603bccb8728ed559",
+    "src\\frontend\\token\\Token.java": "fe46180b343087d3f4c99ad34243eaaf5117b1841302e44b0c83e4b8c3709909",
+    "src\\frontend\\token\\TokenStream.java": "c9194a6dbbd4ed2eb212f2e74322b9ba838c3743a5bf7033cd3f16a4a1db599b",
+    "src\\frontend\\token\\TokenType.java": "98b439502686504358cb21e4912a4c81e6b0a604a6c72263413d9f85a885c08c",
+    "src\\frontend\\Traverser.java": "cb7900ab20d7f3354975f31d36e01f0268ec069e0ea09e021d28e550990a9f90",
+    "src\\llvm\\instruction\\Instruction.java": "de85074b73e757b97b44cc2dfa2b0cf4c922249b8ddbdd6b0fdc24243aec14d6",
+    "src\\llvm\\IrBuilder.java": "3c8720fb750e8a16d791b7f08f5443ee65c4ffc598efb1eb02acb44451c492ca",
+    "src\\llvm\\IrGenerator.java": "bff37edfc27dddfe648594cc4d68f1e9d6acd9fab0b0ecd824d4169d435ab2c3",
+    "src\\llvm\\IrModule.java": "71732599c1ee80a959eec09a450c912b6ded81c56d741206090b0ea9514b53a3",
+    "src\\llvm\\IrPrinter.java": "32b09fe62f9a2a2e7fa40a8a5ff685a0e44252553a34aa7519462cb89fd85741",
+    "src\\llvm\\pass\\IrPass.java": "e0a6325955656efda572bd500f79c90a2cde5cd6ad8d100f4388cebd9c4e11f8",
+    "src\\llvm\\type\\IrType.java": "110f8fbb050129883c59fc394de4b0e2a8599b4960a8e339dfb269d4dbd4646b",
+    "src\\llvm\\value\\Argument.java": "954bdf86e6b39c512e0870ea063696a54d2d6b381989b535ea9043fedb28e4a5",
+    "src\\llvm\\value\\BasicBlock.java": "134b18045d9759d2f5295db32d72f5600971f1e26c5a0ac0b1e2bfb1068f4acb",
+    "src\\llvm\\value\\Constant.java": "e38051810e52e495a735a70aa4df54365777d70244cc21e502d63d8cd95a3f7c",
+    "src\\llvm\\value\\Function.java": "f50e634a7f9c1ae4039ae282c9cd13676ea019a88c4a09c2c67bd607b5d7ff62",
+    "src\\llvm\\value\\GlobalVariable.java": "0e1f0d9c4a4cbc3b99274eb2e60d353a8a2f3ab43d9486e81e9989b035fb023c",
+    "src\\llvm\\value\\Value.java": "2c425fb282954622564aeb2068cf0eef411029ce9d9dcd1e63ff1e972192940c",
+    "src\\llvm\\verify\\IrVerifier.java": "4baad234b9e9f3b64de33b3cd359ecb5942d5383f0948e739435d4fa111f14b1",
+    "src\\utils\\BackTrace.java": "363a2180a43e54b76c68d0452c10010fbb0d47ddae0a0f5c47e3ac066b630e32",
+    "src\\utils\\Configure.java": "17429b8be7215920507536c87214cde72d9c0a57b92491df4f13be262b62d463",
+    "src\\utils\\ConstFolder.java": "0eb21fa38c45b3f6d48b113636c879625af6b8e269e4d0409e5634c2f9c5ec95",
+    "src\\utils\\ConstValue.java": "3b3cad1fe1b3d77976c577903a7a8988a009f7854bb108239a9fcdec0a1a026d",
+    "src\\utils\\Controller.java": "40bcd33ce9f5f9d7bdada884a8efecd3ecdf3ab980b79a51d33c102e76fb030b",
+    "src\\utils\\HomeworkConfig.java": "4cc49aac1fb53633587061bd775b07ab0be58e098e86aa3eadf2fa9abd8d2d28",
+    "src\\utils\\Pair.java": "235afb54b253bc81c1bce2d979b0847652c74079b7eab442fbfd29c7a75674cb",
+    "src\\config.json": "3f3d5db3d38daee27f3fa3afab5cb2a0b6bcdb99d431a675424e564388797a80"
+  },
+  "original_root_files_unchanged": true,
+  "cases": [
+    {
+      "name": "A01",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase1/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A01",
+      "source_sha256": "4203452dfcd662bf32b34ea92d37642da17dc5c7a8d5e116d77c393cd5f2072c",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 677,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A02",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase2/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A02",
+      "source_sha256": "0a4aeb9b6746d2447812897f20b1dc4db0170127a0aa26490518b5b399c23d2b",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 93,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A03",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase3/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A03",
+      "source_sha256": "c1a9d96ac0e5e8010e3875887361284663ec417cc6d633516cb480a277a25e91",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 6,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A04",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase4/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A04",
+      "source_sha256": "e16a565fd7896fd32979eb777786d6e73f3a934f7fcf404ee1574839215c3048",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 37,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A05",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase5/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A05",
+      "source_sha256": "a05335ab0c2e4f72ae9e510f4be29192c5232f57913ec28a1344aca098957ccc",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 28,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A06",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase6/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A06",
+      "source_sha256": "731a1f70d8c015a09ac20bbd6a9546bbaa53e4b232cf19e2c87f2c1304e4dc3c",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 36,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A07",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase7/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A07",
+      "source_sha256": "de6aceef665269cc1052d162a07e32de03075cd62e364b1ee2bb854230a52d24",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 18,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A08",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase8/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A08",
+      "source_sha256": "70f1036c19e68f874aee1350f57e0bd1d9f28f456718714f18a6d05091de7ba1",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 972,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A09",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase9/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A09",
+      "source_sha256": "203e7f4a28a378a93dffce4929d35aff38b9b9e3377921c15df50307b5b678c2",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 23,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A10",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase10/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A10",
+      "source_sha256": "0aaae1e6c51e9c5f98249957f131ebb157f4bfafd6e53344deda45cf763ab7b6",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 70,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A11",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase11/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A11",
+      "source_sha256": "3b0bcdbac1d9a30accc8bdcedfe16fcc0755798ed1386e8c4fc35a2038e9d492",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 4,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A12",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase12/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A12",
+      "source_sha256": "ea986c8ad7037c3a3345753ff60565384923a3e0354998af806ec72b191ff1f6",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 6,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A13",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase13/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A13",
+      "source_sha256": "28dcbc25f8605d93535e615d96c4f60668c4aa8f5790fce9f2f71df9b2e0bc79",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 3,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A14",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase14/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A14",
+      "source_sha256": "2241ecf619ae0b84099542e3f36f43da64d2a24356c01feb7c5134b7c3ae1302",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 54,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A15",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase15/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A15",
+      "source_sha256": "cbc45dced0c8b193034b70bb71a23e7aa8d58fb5aeafc9367dc5cc4c31f7c669",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 16,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A16",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase16/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A16",
+      "source_sha256": "aed7299fde2e2d0a4e67a0ee955a0b780ccd3d0a0112937cbdfff2473a3ee601",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 9,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A17",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase17/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A17",
+      "source_sha256": "498650b85daf437f988b79aa806ced6e18600ab95017dc195e3efb984d0b7f4e",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 15,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A18",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase18/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A18",
+      "source_sha256": "73aa0c64fb9a451226be7cbbde3357b8bbcf3e611b6e2f78542b714cc864a0b1",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 12,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A19",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase19/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A19",
+      "source_sha256": "76f28aaf5c11510fbda99adf7084bb75489d97177fba0ee1d1a11e936badf8cc",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 197,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "A20",
+      "group": "A",
+      "member": "2026代码生成作业公共测试程序库-A/testcase20/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-A.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_A20",
+      "source_sha256": "f5adce9853046148cfbbbad5f14de866dc000911da928a0fe0561e308567a5b2",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 6,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B01",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase1/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B01",
+      "source_sha256": "ac0350ded87d8e3de7fa44fd064301345bbf88ff6ca97f7bfc63d239449d91a2",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 371,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B02",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase2/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B02",
+      "source_sha256": "51667fa1b7e6c2cb7cdff69ae2001d123c869f0c906d58fe7c5a0695a653e098",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 82,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B03",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase3/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B03",
+      "source_sha256": "02cbb457348af413f623f7ddc69f1e4d55975bf2487543ec1f9f0b74a81cd121",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 2,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B04",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase4/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B04",
+      "source_sha256": "752cf22051ce7c329e5df359f4f375dc65daa471f896875a7f9814c9f5e23e8f",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 27,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B05",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase5/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B05",
+      "source_sha256": "162bfc10b925c42fefb5ec840ab6eca3b941eb14b00c9835915a084f6de1bf0c",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 12,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B06",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase6/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B06",
+      "source_sha256": "055f4510ebd772b302bbb3db511ff5b7ee3f40e3b7340b82a97948c30cfe9dbb",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 16,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B07",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase7/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B07",
+      "source_sha256": "23ddba67aeeef4328423b6181b7cc9dc5ff8a4dbdf7e4cfab963b4bb72c5239f",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 16,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B08",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase8/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B08",
+      "source_sha256": "0727e601e1f3f146e2e1a094e24518a4f237c826e10331806212f684d3d2913a",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 16,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B09",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase9/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B09",
+      "source_sha256": "d52b305de0678f72893642543e6d92730413a8fc2a5ac3b296807acb1fc59a55",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 5,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B10",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase10/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B10",
+      "source_sha256": "cffe0ff9b9907fcd519c87ab15fc81d05228d9290e5fc0af49fad4b8a6415ebf",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 10,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B11",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase11/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B11",
+      "source_sha256": "0ad04ecedaeac358a57d415c1d83d8170108139e08e33fe9b351e5d57cb54092",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 14,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B12",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase12/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B12",
+      "source_sha256": "ba4bf8ee4ef8a5f9f0d27bdf10fa60d6f6d4b0940af961a300d310cb27645e90",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 15,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B13",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase13/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B13",
+      "source_sha256": "9e5fa057f4bd268db119ab3aa264480357246721c57ade7f1ce1d11bcf9f79ed",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 12,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B14",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase14/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B14",
+      "source_sha256": "49ec13106ff1eab08fad169ffc36c653a2e2e8c97cfcf34373205a90893b0290",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 13,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B15",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase15/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B15",
+      "source_sha256": "c217cc68eeaa44917f43f0d6037979eb9c5f707aa14c1b51fd1db6330bab760f",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 12,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B16",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase16/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B16",
+      "source_sha256": "6708acd9976307c2de76a52eca7a826303c11dfde0936c5c9147992fedeb6c7e",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 16,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B17",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase17/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B17",
+      "source_sha256": "06a90439f366b62a2cf9bf70507633d1cc8205523085cbe6f96abf3c5f9b87b1",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 70,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B18",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase18/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B18",
+      "source_sha256": "b80b743ac902ff23839fddd1a8fd189f608e71a0142695f45822665fa304488f",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 15,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B19",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase19/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B19",
+      "source_sha256": "0e1f81924bbb41ab1d8ccc426788c0787cafb0be391108ab7f1d38ac9cbe4912",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 15,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "B20",
+      "group": "B",
+      "member": "2026代码生成作业公共测试程序库-B/testcase20/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-B.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_B20",
+      "source_sha256": "9eda4de1f9ba99c72501ca62fc4c7019eca24ba344113a288357c8291925f59c",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 4,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C01",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase1/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C01",
+      "source_sha256": "b24500ab1996aabae6b571d2b9b7c13a6541820893a8e6c943eb306956bc5ca1",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 12,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C02",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase2/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C02",
+      "source_sha256": "26e86e6a9d60dc6fa5a81621fb999ac5a6e9a4d383f49fc0074c6ab90ab0e0c5",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 33,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C03",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase3/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C03",
+      "source_sha256": "9217fc3f2cf8f340431667a35908740d864767b41bb854c14788820fcf78d1b8",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 102,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C04",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase4/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C04",
+      "source_sha256": "8db4986b0ccbea9cce63de941c5aed0928d63d85960c4c2488923781748432bd",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 20,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C05",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase5/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C05",
+      "source_sha256": "d48e54fbc47b9ffe5faaca28f9b40c63ce800443ba4bb97aec5ef86dd4c12fa2",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 1,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C06",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase6/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C06",
+      "source_sha256": "ec0aa4a0ca58cb99e4c460aa0f34fbb508c9632bc100ecf913fe071b4c56313a",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 704,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C07",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase7/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C07",
+      "source_sha256": "86e15799bc815d73762df0a9837cc91fd37529c0f5527d959d54c6475e16ea01",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 11,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C08",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase8/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C08",
+      "source_sha256": "25170cd8071b707eeb310d276303ddd63a6c05c114252dbe266e55b34dc4fd00",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 4,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C09",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase9/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C09",
+      "source_sha256": "b7f4905c33733782ba667781503753bbae3372eb4ddf1513f4c2267e3257f868",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 296,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C10",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase10/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C10",
+      "source_sha256": "ac86945ab15c8918696f621f2ec4299974026ec191760e7cf6bcbb2c1b293eea",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 1,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C11",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase11/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C11",
+      "source_sha256": "046584b20a1c238168282848c00429650043a4b70f88088e3b93116b9085d260",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 24,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C12",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase12/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C12",
+      "source_sha256": "1f1d519eb41ac24f2ced99a9750818e0c07af00f3ad6a38531562b9ac4ff7b40",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 150,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C13",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase13/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C13",
+      "source_sha256": "90e13834c37849545c3e912c4e204fe7e15aa30da56922ced0bdb64546bc572e",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 21,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C14",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase14/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C14",
+      "source_sha256": "fd7eeae2bcdf827efbc58d08032bcd3b7c59098e19c60df016dcb9986cb03485",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 6,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C15",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase15/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C15",
+      "source_sha256": "2abaf27154776831f59ac9bb4914f223d15728fd02c9987ca4a9ca65bde1551b",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 4,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C16",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase16/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C16",
+      "source_sha256": "2eb0f957e9725c6e28db5d29b0d9409682b2c6b49cf1d76cffde88ede2ab1745",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 5,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C17",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase17/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C17",
+      "source_sha256": "fb08c58a62c84d4079ffb807f8e1e0b07addb8db731fd86c6f11982c0e1ccb4a",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 4,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C18",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase18/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C18",
+      "source_sha256": "9ae923e016a170c9ceae5f5afbd44025a340439a1c9cc0ba93a78647022d24df",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 59,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C19",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase19/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C19",
+      "source_sha256": "57b5602d5dc39fec33e8d7940469e8429da275bce35eadc70d9accaf81095d90",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 12,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    },
+    {
+      "name": "C20",
+      "group": "C",
+      "member": "2026代码生成作业公共测试程序库-C/testcase20/testfile.txt",
+      "archive": "2026代码生成作业公共测试程序库-C.zip",
+      "directory": "C:\\Users\\96330\\IdeaProjects\\BUAA_Compile1\\build\\official-llvm\\case_C20",
+      "source_sha256": "d6418d31e8ed459a8766cf4da23033b1a1745fdb386c438d9c5ed77ca3cac1db",
+      "exit_code": 0,
+      "runtime_output_match": true,
+      "runtime_output_bytes": 5,
+      "ir_verified": true,
+      "frontend": {
+        "lexer.txt": true,
+        "parser.txt": true,
+        "symbol.txt": true
+      },
+      "failures": []
+    }
+  ]
+}

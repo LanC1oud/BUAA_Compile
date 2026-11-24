@@ -1,0 +1,294 @@
+{
+  "root": {
+    "round1": {
+      "stdout": "-7 MOD 4 = -3\n-7 MOD -4 = -3\n7 MOD 4 = 3\n7 MOD -4 = 3\nThe ans should be -3, -3, 3, 3\n12 MOD 2 = 0\n12 MOD -2 = 0\n-12 MOD 2 = 0\n-12 MOD -2 = 0\nThe ans should be 0, 0, 0, 0\n12 MOD 8 = 4\n12 MOD -8 = 4\n-12 MOD 8 = -4\n-12 MOD -8 = -4\nThe ans should be 4, 4, -4, -4\n16 MOD 4 = 0\n16 MOD -4 = 0\n-16 MOD 4 = 0\n-16 MOD -4 = 0\nThe ans should be 0, 0, 0, 0\n-7 / 4 = -1\n-7 / -4 = 1\n7 / 4 = 1\n7 / -4 = -1\nThe ans should be -1, 1, 1, -1\n12 / 2 = 6\n12 / -2 = -6\n-12 / 2 = -6\n-12 / -2 = 6\nThe ans should be 6, -6, -6, 6\n12 / 8 = 1\n12 / -8 = -1\n-12 / 8 = -1\n-12 / -8 = 1\nThe ans should be 1, -1, -1, 1\n16 / 4 = 4\n16 / -4 = -4\n-16 / 4 = -4\n-16 / -4 = 4\nThe ans should be 4, -4, -4, 4\n",
+      "frames": [
+        [
+          "main",
+          "552"
+        ]
+      ],
+      "statistics": {
+        "finalCycles": 987.0,
+        "totalInstructionCount": 802,
+        "items": {
+          "Divide": {
+            "instructionCount": 0,
+            "weight": 18,
+            "weightedCycles": 0
+          },
+          "Branch": {
+            "instructionCount": 0,
+            "weight": 1.5,
+            "weightedCycles": 0.0
+          },
+          "Memory": {
+            "instructionCount": 184,
+            "weight": 2,
+            "weightedCycles": 368
+          },
+          "Multiply": {
+            "instructionCount": 0,
+            "weight": 3,
+            "weightedCycles": 0
+          },
+          "Jump": {
+            "instructionCount": 2,
+            "weight": 1.5,
+            "weightedCycles": 3.0
+          },
+          "Other": {
+            "instructionCount": 616,
+            "weight": 1,
+            "weightedCycles": 616
+          }
+        }
+      }
+    },
+    "round2": {
+      "stdout": "-7 MOD 4 = -3\n-7 MOD -4 = -3\n7 MOD 4 = 3\n7 MOD -4 = 3\nThe ans should be -3, -3, 3, 3\n12 MOD 2 = 0\n12 MOD -2 = 0\n-12 MOD 2 = 0\n-12 MOD -2 = 0\nThe ans should be 0, 0, 0, 0\n12 MOD 8 = 4\n12 MOD -8 = 4\n-12 MOD 8 = -4\n-12 MOD -8 = -4\nThe ans should be 4, 4, -4, -4\n16 MOD 4 = 0\n16 MOD -4 = 0\n-16 MOD 4 = 0\n-16 MOD -4 = 0\nThe ans should be 0, 0, 0, 0\n-7 / 4 = -1\n-7 / -4 = 1\n7 / 4 = 1\n7 / -4 = -1\nThe ans should be -1, 1, 1, -1\n12 / 2 = 6\n12 / -2 = -6\n-12 / 2 = -6\n-12 / -2 = 6\nThe ans should be 6, -6, -6, 6\n12 / 8 = 1\n12 / -8 = -1\n-12 / 8 = -1\n-12 / -8 = 1\nThe ans should be 1, -1, -1, 1\n16 / 4 = 4\n16 / -4 = -4\n-16 / 4 = -4\n-16 / -4 = 4\nThe ans should be 4, -4, -4, 4\n",
+      "frames": [
+        [
+          "main",
+          "16"
+        ]
+      ],
+      "statistics": {
+        "finalCycles": 931.0,
+        "totalInstructionCount": 834,
+        "items": {
+          "Divide": {
+            "instructionCount": 0,
+            "weight": 18,
+            "weightedCycles": 0
+          },
+          "Branch": {
+            "instructionCount": 0,
+            "weight": 1.5,
+            "weightedCycles": 0.0
+          },
+          "Memory": {
+            "instructionCount": 96,
+            "weight": 2,
+            "weightedCycles": 192
+          },
+          "Multiply": {
+            "instructionCount": 0,
+            "weight": 3,
+            "weightedCycles": 0
+          },
+          "Jump": {
+            "instructionCount": 2,
+            "weight": 1.5,
+            "weightedCycles": 3.0
+          },
+          "Other": {
+            "instructionCount": 736,
+            "weight": 1,
+            "weightedCycles": 736
+          }
+        }
+      }
+    }
+  },
+  "official": {
+    "round1": {
+      "stdout": "raw=Az9!bB2?xy7#\nupper=AZ9!BB2?XY7#\nU=2 L=4 D=3 O=3\nscore=29\nreverse=#7YX?2BB!9ZA\n",
+      "frames": [
+        [
+          "classify",
+          "112"
+        ],
+        [
+          "toUpper",
+          "88"
+        ],
+        [
+          "main",
+          "376"
+        ]
+      ],
+      "statistics": {
+        "finalCycles": 5067.5,
+        "totalInstructionCount": 3627,
+        "items": {
+          "Divide": {
+            "instructionCount": 0,
+            "weight": 18,
+            "weightedCycles": 0
+          },
+          "Branch": {
+            "instructionCount": 112,
+            "weight": 1.5,
+            "weightedCycles": 168.0
+          },
+          "Memory": {
+            "instructionCount": 1276,
+            "weight": 2,
+            "weightedCycles": 2552
+          },
+          "Multiply": {
+            "instructionCount": 0,
+            "weight": 3,
+            "weightedCycles": 0
+          },
+          "Jump": {
+            "instructionCount": 217,
+            "weight": 1.5,
+            "weightedCycles": 325.5
+          },
+          "Other": {
+            "instructionCount": 2022,
+            "weight": 1,
+            "weightedCycles": 2022
+          }
+        }
+      }
+    },
+    "round2": {
+      "stdout": "raw=Az9!bB2?xy7#\nupper=AZ9!BB2?XY7#\nU=2 L=4 D=3 O=3\nscore=29\nreverse=#7YX?2BB!9ZA\n",
+      "frames": [
+        [
+          "classify",
+          "16"
+        ],
+        [
+          "toUpper",
+          "16"
+        ],
+        [
+          "main",
+          "88"
+        ]
+      ],
+      "statistics": {
+        "finalCycles": 3279.5,
+        "totalInstructionCount": 2572,
+        "items": {
+          "Divide": {
+            "instructionCount": 0,
+            "weight": 18,
+            "weightedCycles": 0
+          },
+          "Branch": {
+            "instructionCount": 112,
+            "weight": 1.5,
+            "weightedCycles": 168.0
+          },
+          "Memory": {
+            "instructionCount": 543,
+            "weight": 2,
+            "weightedCycles": 1086
+          },
+          "Multiply": {
+            "instructionCount": 0,
+            "weight": 3,
+            "weightedCycles": 0
+          },
+          "Jump": {
+            "instructionCount": 217,
+            "weight": 1.5,
+            "weightedCycles": 325.5
+          },
+          "Other": {
+            "instructionCount": 1700,
+            "weight": 1,
+            "weightedCycles": 1700
+          }
+        }
+      }
+    }
+  },
+  "loop": {
+    "round1": {
+      "stdout": "999000",
+      "frames": [
+        [
+          "main",
+          "64"
+        ]
+      ],
+      "statistics": {
+        "finalCycles": 68546.0,
+        "totalInstructionCount": 48035,
+        "items": {
+          "Divide": {
+            "instructionCount": 0,
+            "weight": 18,
+            "weightedCycles": 0
+          },
+          "Branch": {
+            "instructionCount": 1001,
+            "weight": 1.5,
+            "weightedCycles": 1501.5
+          },
+          "Memory": {
+            "instructionCount": 19009,
+            "weight": 2,
+            "weightedCycles": 38018
+          },
+          "Multiply": {
+            "instructionCount": 0,
+            "weight": 3,
+            "weightedCycles": 0
+          },
+          "Jump": {
+            "instructionCount": 2003,
+            "weight": 1.5,
+            "weightedCycles": 3004.5
+          },
+          "Other": {
+            "instructionCount": 26022,
+            "weight": 1,
+            "weightedCycles": 26022
+          }
+        }
+      }
+    },
+    "round2": {
+      "stdout": "999000",
+      "frames": [
+        [
+          "main",
+          "16"
+        ]
+      ],
+      "statistics": {
+        "finalCycles": 45531.0,
+        "totalInstructionCount": 38025,
+        "items": {
+          "Divide": {
+            "instructionCount": 0,
+            "weight": 18,
+            "weightedCycles": 0
+          },
+          "Branch": {
+            "instructionCount": 1001,
+            "weight": 1.5,
+            "weightedCycles": 1501.5
+          },
+          "Memory": {
+            "instructionCount": 6004,
+            "weight": 2,
+            "weightedCycles": 12008
+          },
+          "Multiply": {
+            "instructionCount": 0,
+            "weight": 3,
+            "weightedCycles": 0
+          },
+          "Jump": {
+            "instructionCount": 2003,
+            "weight": 1.5,
+            "weightedCycles": 3004.5
+          },
+          "Other": {
+            "instructionCount": 29017,
+            "weight": 1,
+            "weightedCycles": 29017
+          }
+        }
+      }
+    }
+  }
+}
