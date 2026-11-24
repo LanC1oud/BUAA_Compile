@@ -2,6 +2,7 @@
 
 编译流程为 `源程序 → AST 与语义信息 → IrModule → MipsModule → mips.txt`。
 默认目标为 MIPS，`Compiler --stage llvm` 保留原 LLVM 输出能力。后端不修改 IR，生成 MIPS 时同时输出 `llvm_ir.txt`。
+开启优化时，`IrGenerator` 先执行 SSA、传播、内联和 GVN/GCM 等 IR Pass，再把校验后的 IR 交给后端；详细代码对应和逐轮结果见 [优化日志](优化日志.md)。
 
 逐指令学习示例见 [LLVM IR 到 MIPS 逐指令翻译详解](LLVM%20IR到MIPS逐指令翻译详解.md)，包含完整源码、真实栈布局与 62 条 IR 的汇编对照。
 
@@ -18,8 +19,12 @@
 | `MipsConstants` | 不修改 IR 的常量分析 |
 | `MipsFunctionPlan` | 块内末次使用、跨块结果、可重算地址和比较融合分析 |
 | `MipsLocalRegisters` | 块内 `$t3～$t8` 分配及按需写回 |
+| `MipsGlobalRegisters` | PHI 边感知的 CFG 活跃分析、干涉图、`$s0～$s7` 图着色 |
 | `MipsFrameOptimization` | 栈槽复用、无用槽剔除和叶子函数返回地址槽省略 |
 | `MipsPass` / `RemoveRedundantJumps` | 生成完成后的目标代码优化接口及冗余跳转删除 |
+| `DivisionMagic` | 有/无符号 32 位常数除法的精确逆元参数 |
+| `MipsRanges` | 无溢出的保守区间与受条件约束的归纳变量分析 |
+| `MipsPeephole` / `LoopBlockLayout` | 跳转穿透、汇编 CFG 清理、循环条件块布局 |
 
 `Controller` 和 UI 的 `Pipeline` 在入口选择生成器：关闭优化使用 `new MipsGenerator()`，开启优化使用 `new OptimizedMipsGenerator(Configure.mipsPasses)`。基础生成器的每个方法都实现基础行为；优化生成器通过方法覆盖接入优化，未接管的操作调用 `super` 复用基础实现，避免维护两份完整翻译代码。依赖方向是 `pass/ → mips/`。
 
@@ -70,7 +75,7 @@ CLI 编译前清理旧 MIPS、IR、错误文件和配置的优化前 IR，防止
 
 后端使用 `$t0～$t2` 计算，`$t3～$t8` 保存块内结果，`$t9` 处理超出 16 位范围的偏移。
 寄存器不足时按需写回；调用前只保存调用后仍使用或跨块使用的结果。调用方不依赖 `$t`、`$a`、HI/LO 在调用后保留。
-不分配 `$s` 寄存器，不修改 `$fp`，不占用 `$at`、`$k0`、`$k1`。
+优化路径为适合长期保留的值分配 `$s0～$s7`，按被调者保存约定保存和恢复实际使用的寄存器；没有 IR 调用者的 main 省略这部分保存。未着色值使用临时池和栈回退。基础路径仍只使用临时寄存器，不修改 `$fp`，不主动占用 `$at`、`$k0`、`$k1`。
 
 ## 指令选择
 
@@ -95,7 +100,7 @@ CLI 编译前清理旧 MIPS、IR、错误文件和配置的优化前 IR，防止
 大立即数通过 `li` 装入，大栈偏移通过 `$t9` 合成完整地址，避免依赖越界的 16 位立即数。
 条件分支只跨越一个绝对跳转，因此大函数也不会超出条件分支范围。
 
-每个跳转后放置 `nop`，能同时在延迟槽开、关两种设置下执行；课程提交按说明关闭延迟槽。
+基础路径和 `--optimize --delay-slots` 在每个跳转后放置 `nop`，能同时在延迟槽开、关两种设置下执行。课程明确要求关闭延迟槽，因此默认优化路径在内部 Pass 完成后移除 nop，以减少 FinalCycles；由 `Configure.enableDelaySlotRemoval` 控制。
 生成代码只使用基础指令、伪指令和数据伪操作，不定义宏。
 
 ## 输入输出
@@ -114,13 +119,13 @@ CLI 编译前清理旧 MIPS、IR、错误文件和配置的优化前 IR，防止
 
 ## 优化接口
 
-优化默认开启；`--optimize` 打开后端指令选择优化、已有 IR Pass 列表和 MIPS Pass 列表，`--no-optimize` 关闭。
-MIPS Pass 删除跳到下一标签的 `j/nop`，IR Pass 列表默认为空。
+保留 `Configure.optimize = false` 的现有默认值；`--optimize` 打开 IR 与 MIPS 优化路径，`--no-optimize` 关闭。界面仍由优化复选框选择。
+IR Pass 默认使用 `OptimizationPipeline`，各项功能由 Configure 独立布尔字段控制；目标代码优化包括寄存器分配、指令选择、跳转清理和循环布局。
 `--ir-before 路径` 输出优化前 IR，`llvm_ir.txt` 保存 IR Pass 执行并校验后的 IR。
 后续可增加跨块访存消除、活跃变量分析和全局寄存器分配。
-当前不生成 PHI；引入 mem2reg 前需要增加 PHI 表示、校验和消除。
+PHI 已有标准 LLVM 表示和支配/前驱校验；MIPS 在控制流边上执行并行复制。基础路径使用输入栈快照，优化路径省去同位置复制并用 `$t2` 解除复制环，不修改原 IR。
 
-## 初步后端优化
+## 初步后端优化（第一轮历史记录）
 
 本轮保留原始 IR 和调用约定，优化限定在后端，关闭优化时仍使用原生成路径。
 运行时临时值继续保留独立栈槽，避免依赖跨块寄存器分配。

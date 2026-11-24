@@ -13,6 +13,7 @@ public class MipsGenerator {
     private MipsModule output;
     private final Map<Value, String> labels = new IdentityHashMap<>();
     protected MipsFrame frame;
+    protected BasicBlock emittingBlock;
     private String epilogue;
     private int nextBranch;
 
@@ -95,11 +96,13 @@ public class MipsGenerator {
         addOffset("$sp", "$sp", -frame.size);
         if (frame.needsReturnAddress)
             memory("sw", "$ra", frame.returnAddress, "$sp");
+        saveCalleeRegisters();
         for (int i = 0; i < function.getArguments().size(); i++) {
             emitArgument(function.getArguments().get(i), i);
         }
         for (BasicBlock block : function.getBlocks()) emitBlock(block);
         text(epilogue + ":");
+        restoreCalleeRegisters();
         if (frame.needsReturnAddress)
             memory("lw", "$ra", frame.returnAddress, "$sp");
         addOffset("$sp", "$sp", frame.size);
@@ -108,6 +111,9 @@ public class MipsGenerator {
 
     // 为当前函数构建固定栈帧布局
     protected MipsFrame createFrame(Function function) { return new MipsFrame(function); }
+
+    protected void saveCalleeRegisters() { }
+    protected void restoreCalleeRegisters() { }
 
     // 取得寄存器或调用方栈中的形参，并保存到当前函数的值槽
     protected void emitArgument(Argument argument, int index) {
@@ -118,6 +124,7 @@ public class MipsGenerator {
 
     // 输出基本块标签，并依次生成块内指令
     protected void emitBlock(BasicBlock block) {
+        emittingBlock = block;
         text(label(block) + ":");
         List<Instruction> instructions = block.getInstructions();
         for (int position = 0; position < instructions.size(); position++)
@@ -127,7 +134,7 @@ public class MipsGenerator {
     // 根据分支操作数生成无条件或条件跳转
     protected void emitBranch(Instruction instruction) {
         List<Value> operands = instruction.getOperands();
-        if (operands.size() == 1) jump("j", label(operands.get(0)));
+        if (operands.size() == 1) jumpTo(operands.get(0));
         else {
             load(operands.get(0), "$t0");
             emitConditionalBranch(operands.get(1), operands.get(2));
@@ -138,16 +145,52 @@ public class MipsGenerator {
     protected void emitConditionalBranch(Value yes, Value no) {
         String nearby = nextBranchLabel();
         jump("beq", "$t0, $zero, " + nearby);
-        jump("j", label(yes));
+        if (((BasicBlock)yes).getInstructions().get(0).getOpcode() != Instruction.Opcode.PHI) {
+            jumpTo(yes);
+            text(nearby + ":");
+            jumpTo(no);
+            return;
+        }
+        // Dispatch before copies: every conditional branch remains near even with many PHIs.
+        String trueEdge = nextBranchLabel();
+        jump("j", trueEdge);
         text(nearby + ":");
-        jump("j", label(no));
+        jumpTo(no);
+        text(trueEdge + ":");
+        jumpTo(yes);
+    }
+
+    protected void jumpTo(Value target) {
+        emitEdgeCopies((BasicBlock) target);
+        jump("j", label(target));
+    }
+
+    protected Value incoming(Instruction phi) {
+        var operands = phi.getOperands();
+        for (int n = 0; n < operands.size(); n += 2)
+            if (operands.get(n + 1) == emittingBlock) return operands.get(n);
+        throw new IllegalStateException("Missing PHI edge");
+    }
+
+    // Snapshot all inputs before committing any output, including cyclic loop PHIs.
+    protected void emitEdgeCopies(BasicBlock target) {
+        List<Instruction> phis = target.getInstructions().stream()
+                .filter(i -> i.getOpcode() == Instruction.Opcode.PHI).toList();
+        for (int n = 0; n < phis.size(); n++) {
+            load(incoming(phis.get(n)), "$t0");
+            memory("sw", "$t0", frame.phiScratch + n * 4, "$sp");
+        }
+        for (int n = 0; n < phis.size(); n++) {
+            memory("lw", "$t0", frame.phiScratch + n * 4, "$sp");
+            memory("sw", "$t0", frame.slots.get(phis.get(n)), "$sp");
+        }
     }
 
     // 按 IR 操作码生成对应的 MIPS 指令
     protected void emitInstruction(Instruction instruction, int position) {
         List<Value> operands = instruction.getOperands();
         switch (instruction.getOpcode()) {
-            case ALLOCA -> { /* 地址可以从固定的 $sp 与偏移重新计算，无需额外槽位。 */ }
+            case ALLOCA, PHI -> { /* PHIs are simultaneous copies on incoming edges. */ }
             case LOAD -> {
                 String opcode = sizeOf(instruction.getType()) == 1 ? "lbu" : "lw";
                 load(operands.get(0), "$t0");
@@ -178,7 +221,7 @@ public class MipsGenerator {
     }
 
     // 生成整数算术指令并保存计算结果
-    private void arithmetic(Instruction instruction) {
+    protected void arithmetic(Instruction instruction) {
         load(instruction.getOperands().get(0), "$t0");
         load(instruction.getOperands().get(1), "$t1");
         if (instruction.getOpcode() == Instruction.Opcode.SDIV || instruction.getOpcode() == Instruction.Opcode.SREM) {
@@ -203,7 +246,7 @@ public class MipsGenerator {
     }
 
     // 按比较谓词生成值为零或一的结果
-    private void compare(Instruction instruction) {
+    protected void compare(Instruction instruction) {
         var operands = instruction.getOperands();
         load(operands.get(0), "$t0");
         load(operands.get(1), "$t1");

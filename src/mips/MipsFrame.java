@@ -13,15 +13,22 @@ public final class MipsFrame {
     public final int size;
     public final int returnAddress;
     public final boolean needsReturnAddress;
+    public final int phiScratch;
 
     // 接收已有的对象偏移、值槽和栈帧大小
     public MipsFrame(Map<Value, Integer> objects, Map<Value, Integer> slots,
                      int size, int returnAddress, boolean needsReturnAddress) {
+        this(objects, slots, size, returnAddress, needsReturnAddress, 0);
+    }
+
+    public MipsFrame(Map<Value, Integer> objects, Map<Value, Integer> slots,
+                     int size, int returnAddress, boolean needsReturnAddress, int phiScratch) {
         this.objects.putAll(objects);
         this.slots.putAll(slots);
         this.size = size;
         this.returnAddress = returnAddress;
         this.needsReturnAddress = needsReturnAddress;
+        this.phiScratch = phiScratch;
     }
 
     // 为形参、局部对象和指令结果分配独立栈空间
@@ -52,7 +59,10 @@ public final class MipsFrame {
                 }
             }
         }
-        returnAddress = align(cursor, 4);
+        phiScratch = align(cursor, 4);
+        int phis = function.getBlocks().stream().mapToInt(b -> (int)b.getInstructions().stream()
+                .filter(i -> i.getOpcode() == Instruction.Opcode.PHI).count()).max().orElse(0);
+        returnAddress = Math.addExact(phiScratch, Math.multiplyExact(phis, 4));
         size = align(Math.addExact(returnAddress, 4), 8);
     }
 }

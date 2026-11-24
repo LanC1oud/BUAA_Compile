@@ -19,6 +19,8 @@ public final class MipsPipelineRegression {
     }
 
     public static void main(String[] args) throws Exception {
+        try { utils.Configure.class.getField("enableDelaySlotRemoval").setBoolean(null, false); }
+        catch (NoSuchFieldException ignored) { /* Saved compiler predates this option. */ }
         Path out = Path.of(args[0]);
         Files.createDirectories(out);
         Pipeline pipeline = new Pipeline();

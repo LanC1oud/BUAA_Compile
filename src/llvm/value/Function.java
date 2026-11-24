@@ -54,4 +54,16 @@ public final class Function extends Value {
         blocks.add(block);
         return block;
     }
+
+    public BasicBlock newEntryBlock() {
+        BasicBlock block = new BasicBlock(this, "bb" + blockCounter++);
+        blocks.add(0, block);
+        return block;
+    }
+
+    public void removeBlocks(java.util.Set<BasicBlock> removed) {
+        for (BasicBlock block : removed)
+            for (var instruction : block.getInstructions()) instruction.detachOperands();
+        blocks.removeAll(removed);
+    }
 }

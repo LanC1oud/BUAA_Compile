@@ -51,7 +51,9 @@ final class MipsFunctionPlan {
                 }
             }
             for (Instruction instruction : instructions)
-                if (instruction.getUses().stream().anyMatch(use -> use.user().getParent() != block))
+                if (instruction.getOpcode() == Instruction.Opcode.PHI
+                        || instruction.getUses().stream().anyMatch(use -> use.user().getParent() != block
+                        || use.user().getOpcode() == Instruction.Opcode.PHI))
                     crossBlock.add(instruction);
         }
         for (BasicBlock block : function.getBlocks()) {
@@ -64,6 +66,15 @@ final class MipsFunctionPlan {
                 Comparison comparison = branches.get(instruction);
                 List<Value> operands = comparison == null ? instruction.getOperands() : comparison.instruction().getOperands();
                 for (Value operand : operands) uses.put(operand, n);
+            }
+        }
+        // PHI inputs are consumed at the predecessor terminator, even on self edges.
+        for (BasicBlock block : function.getBlocks()) for (Instruction i : block.getInstructions()) {
+            if (i.getOpcode() != Instruction.Opcode.PHI) break;
+            var a = i.getOperands();
+            for (int n = 0; n < a.size(); n += 2) {
+                BasicBlock predecessor = (BasicBlock)a.get(n + 1);
+                lastUses.get(predecessor).put(a.get(n), predecessor.getInstructions().size());
             }
         }
     }
@@ -95,7 +106,14 @@ final class MipsFunctionPlan {
     boolean needsSlot(Instruction instruction) {
         return !instruction.getType().equals(IrType.VOID) && instruction.getOpcode() != Instruction.Opcode.ALLOCA
                 && !instruction.getUses().isEmpty() && constants.get(instruction) == null
-                && !isFused(instruction) && !isStackAddress(instruction);
+                && !isFused(instruction) && !isStackAddress(instruction) && !singleGlobalAddress(instruction);
+    }
+
+    boolean singleGlobalAddress(Instruction i) {
+        return i.getOpcode() == Instruction.Opcode.GEP && i.getUses().size() == 1
+                && i.getUses().get(0).user().getParent() == i.getParent()
+                && i.getOperands().get(0) instanceof GlobalVariable
+                && i.getOperands().subList(1, i.getOperands().size()).stream().allMatch(v -> constants.get(v) != null);
     }
 
     // 判断值是否为可重算的局部对象地址或全常量下标地址

@@ -13,7 +13,7 @@ final class MipsFrameOptimization {
     private MipsFrameOptimization() { }
 
     // 根据使用分析分配对象和回退槽，并复用块内槽位
-    static MipsFrame allocate(Function function, MipsFunctionPlan plan) {
+    static MipsFrame allocate(Function function, MipsFunctionPlan plan, MipsGlobalRegisters globals) {
         Map<Value, Integer> objects = new IdentityHashMap<>();
         Map<Value, Integer> slots = new IdentityHashMap<>();
         int outgoing = 0;
@@ -26,7 +26,7 @@ final class MipsFrameOptimization {
                 }
         int cursor = outgoing;
         for (Argument argument : function.getArguments()) {
-            if (argument.getUses().isEmpty()) continue;
+            if (argument.getUses().isEmpty() || globals.homes.containsKey(argument)) continue;
             slots.put(argument, cursor);
             cursor = Math.addExact(cursor, 4);
         }
@@ -43,7 +43,7 @@ final class MipsFrameOptimization {
         cursor = align(cursor, 4);
         for (BasicBlock block : function.getBlocks()) {
             for (Instruction i : block.getInstructions()) {
-                if (plan.needsSlot(i) && plan.crossesBlock(i)) {
+                if (plan.needsSlot(i) && !globals.homes.containsKey(i) && plan.crossesBlock(i)) {
                     slots.put(i, cursor);
                     cursor = Math.addExact(cursor, 4);
                 }
@@ -57,7 +57,7 @@ final class MipsFrameOptimization {
             List<Instruction> instructions = block.getInstructions();
             for (int n = 0; n < instructions.size(); n++) {
                 Instruction i = instructions.get(n);
-                if (!plan.needsSlot(i) || plan.crossesBlock(i)) continue;
+                if (!plan.needsSlot(i) || globals.homes.containsKey(i) || plan.crossesBlock(i)) continue;
                 while (!active.isEmpty() && active.peek().end() <= n) free.add(active.remove().slot());
                 int slot = free.isEmpty() ? count++ : free.remove();
                 slots.put(i, Math.addExact(localBase, Math.multiplyExact(slot, 4)));
@@ -65,7 +65,13 @@ final class MipsFrameOptimization {
             }
             peak = Math.max(peak, count);
         }
-        int returnAddress = Math.addExact(localBase, Math.multiplyExact(peak, 4));
+        cursor = Math.addExact(localBase, Math.multiplyExact(peak, 4));
+        // main has no caller in the IR, so it need not preserve startup's saved registers.
+        if (!function.getName().equals("main") || !function.getUses().isEmpty())
+            for (String register : new TreeSet<>(globals.homes.values())) {
+                globals.savedOffsets.put(register, cursor); cursor = Math.addExact(cursor, 4);
+            }
+        int returnAddress = cursor;
         int size = align(Math.addExact(returnAddress, callsFunction ? 4 : 0), 8);
         return new MipsFrame(objects, slots, size, returnAddress, callsFunction);
     }
