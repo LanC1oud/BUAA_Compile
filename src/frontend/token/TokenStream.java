@@ -1,12 +1,10 @@
 package frontend.token;
 
-import utils.BackTrace;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TokenStream implements BackTrace.Traceable {
+public class TokenStream {
     private final List<Token> tokens = new LinkedList<>();
     private int index = 0;
     private boolean frozen = false;
@@ -59,8 +57,7 @@ public class TokenStream implements BackTrace.Traceable {
     
     public boolean among(TokenType... types) {
         assertFrozen();
-        Token token = peek();
-        return token != null && token.among(types);
+        return peek().among(types);
     }
     
     public Token peek(int next) {
@@ -75,11 +72,6 @@ public class TokenStream implements BackTrace.Traceable {
     public Token peek() { return peek(0);}
     
     public boolean eof() { return peek(0) == null;}
-
-    public int position() {
-        assertFrozen();
-        return index;
-    }
     
     public String toString() {
         return tokens.stream().map(Token::toString).collect(Collectors.joining("\n"));
@@ -87,15 +79,5 @@ public class TokenStream implements BackTrace.Traceable {
     
     public String toDebugString() {
         return tokens.stream().map(Token::toDebugString).collect(Collectors.joining("\n"));
-    }
-
-    @Override
-    public Object save() {
-        return index;
-    }
-
-    @Override
-    public void restore(Object state) {
-        index = (int) state;
     }
 }
