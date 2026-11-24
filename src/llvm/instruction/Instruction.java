@@ -24,7 +24,6 @@ public final class Instruction extends Value {
         ZEXT,
         TRUNC,
         GEP,
-        PHI,
         CALL,
         BR,
         RET,
@@ -32,7 +31,7 @@ public final class Instruction extends Value {
     }
 
     private final Opcode opcode;
-    private BasicBlock parent;
+    private final BasicBlock parent;
     private final List<Value> operands;
     private final String predicate;
 
@@ -66,25 +65,6 @@ public final class Instruction extends Value {
     // 取操作数列表的只读快照
     public List<Value> getOperands() {
         return List.copyOf(operands);
-    }
-
-    public void resetOperands(List<? extends Value> values) {
-        detachOperands();
-        operands.addAll(values);
-        for (int n = 0; n < operands.size(); n++) operands.get(n).addUse(this, n);
-    }
-
-    public void addIncoming(Value value, BasicBlock predecessor) {
-        if (opcode != Opcode.PHI || !getType().equals(value.getType()))
-            throw new IllegalArgumentException("Invalid phi incoming value");
-        int n = operands.size();
-        operands.add(value); value.addUse(this, n);
-        operands.add(predecessor); predecessor.addUse(this, n + 1);
-    }
-
-    public void relocate(BasicBlock target) {
-        if (target.getParent() != parent.getParent()) throw new IllegalArgumentException("Cross-function move");
-        parent = target;
     }
 
     // 替换指定位置的同类型操作数，并同步使用关系

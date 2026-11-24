@@ -4,23 +4,26 @@ import llvm.IrModule;
 import llvm.instruction.Instruction;
 import llvm.type.IrType;
 import llvm.value.*;
-import static mips.MipsLayout.*;
+import mips.pass.MipsPass;
 
 import java.util.*;
 
-// 将结构化 LLVM IR 按基础规则转换为 MIPS
-public class MipsGenerator {
+/**
+ * 将结构化 LLVM IR 降低为 MIPS32。临时值统一存入四字节栈槽；
+ * $t0-$t2 计算，$t9 处理大偏移，不占用 $at/$k0/$k1 或 $s 寄存器。
+ * 每个函数一次分配固定栈帧，包含调用传参区、局部对象、值槽和 $ra。
+ */
+public final class MipsGenerator {
+    private final List<MipsPass> passes;
     private MipsModule output;
     private final Map<Value, String> labels = new IdentityHashMap<>();
-    protected MipsFrame frame;
-    protected BasicBlock emittingBlock;
+    private Frame frame;
     private String epilogue;
     private int nextBranch;
 
-    // 创建基础 MIPS 生成器
-    public MipsGenerator() { }
+    public MipsGenerator() { this(List.of()); }
+    public MipsGenerator(List<MipsPass> passes) { this.passes = List.copyOf(passes); }
 
-    // 入口：分配标签，生成全局数据、启动入口与函数
     public MipsModule generate(IrModule module) {
         output = new MipsModule();
         labels.clear();
@@ -44,7 +47,8 @@ public class MipsGenerator {
             output.data(label(global) + ": # " + global.getName());
             emitConstant(global.getInitializer());
         }
-        text("main:");
+        output.text("main:");
+        // MARS 的初始 $sp 不保证八字节对齐；入口统一对齐后再调用用户 main。
         emit("li $t0, -8");
         emit("and $sp, $sp, $t0");
         jump("jal", label(main));
@@ -52,10 +56,10 @@ public class MipsGenerator {
         emit("syscall");
         for (Function function : module.getFunctions())
             if (!function.isExternal()) emitFunction(function);
+        for (MipsPass pass : passes) pass.run(output);
         return output;
     }
 
-    // 按类型将全局初始化常量输出到数据段
     private void emitConstant(Constant constant) {
         if (constant.getType().kind() != IrType.Kind.ARRAY) {
             boolean byteObject = sizeOf(constant.getType()) == 1;
@@ -73,6 +77,7 @@ public class MipsGenerator {
                 List<String> values = new ArrayList<>();
                 for (int j = i; j < Math.min(i + 16, elements.size()); j++) {
                     int number = elements.get(j).getNumber();
+                    // MARS 检查 .byte 的有符号范围；用相同位模式的负数字面值避免警告。
                     values.add(Integer.toString(sizeOf(constant.getType().element()) == 1 ? (byte) number : number));
                 }
                 output.data("    " + directive + String.join(", ", values));
@@ -82,126 +87,46 @@ public class MipsGenerator {
         }
     }
 
-    // 递归判断标量或数组常量是否全为零
     private boolean isZero(Constant c) {
         return c.getType().kind() == IrType.Kind.ARRAY
                 ? c.getElements().stream().allMatch(this::isZero) : c.getNumber() == 0;
     }
 
-    // 分配栈帧，保存形参并生成函数体与共同出口
-    protected void emitFunction(Function function) {
-        frame = createFrame(function);
+    private void emitFunction(Function function) {
+        frame = new Frame(function);
         epilogue = label(function) + "_return";
-        text(label(function) + ": # " + function.getName() + ", frame=" + frame.size);
+        output.text(label(function) + ": # " + function.getName() + ", frame=" + frame.size);
         addOffset("$sp", "$sp", -frame.size);
-        if (frame.needsReturnAddress)
-            memory("sw", "$ra", frame.returnAddress, "$sp");
-        saveCalleeRegisters();
+        memory("sw", "$ra", frame.returnAddress, "$sp");
         for (int i = 0; i < function.getArguments().size(); i++) {
-            emitArgument(function.getArguments().get(i), i);
+            Argument argument = function.getArguments().get(i);
+            if (i < 4) emit("move $t0, $a" + i);
+            else memory("lw", "$t0", Math.addExact(frame.size, Math.multiplyExact(i - 4, 4)), "$sp");
+            save(argument, "$t0");
         }
-        for (BasicBlock block : function.getBlocks()) emitBlock(block);
-        text(epilogue + ":");
-        restoreCalleeRegisters();
-        if (frame.needsReturnAddress)
-            memory("lw", "$ra", frame.returnAddress, "$sp");
+        for (BasicBlock block : function.getBlocks()) {
+            output.text(label(block) + ":");
+            for (Instruction instruction : block.getInstructions()) emitInstruction(instruction);
+        }
+        output.text(epilogue + ":");
+        memory("lw", "$ra", frame.returnAddress, "$sp");
         addOffset("$sp", "$sp", frame.size);
         jump("jr", "$ra");
     }
 
-    // 为当前函数构建固定栈帧布局
-    protected MipsFrame createFrame(Function function) { return new MipsFrame(function); }
-
-    protected void saveCalleeRegisters() { }
-    protected void restoreCalleeRegisters() { }
-
-    // 取得寄存器或调用方栈中的形参，并保存到当前函数的值槽
-    protected void emitArgument(Argument argument, int index) {
-        if (index < 4) emit("move $t0, $a" + index);
-        else memory("lw", "$t0", Math.addExact(frame.size, Math.multiplyExact(index - 4, 4)), "$sp");
-        save(argument, "$t0");
-    }
-
-    // 输出基本块标签，并依次生成块内指令
-    protected void emitBlock(BasicBlock block) {
-        emittingBlock = block;
-        text(label(block) + ":");
-        List<Instruction> instructions = block.getInstructions();
-        for (int position = 0; position < instructions.size(); position++)
-            emitInstruction(instructions.get(position), position);
-    }
-
-    // 根据分支操作数生成无条件或条件跳转
-    protected void emitBranch(Instruction instruction) {
-        List<Value> operands = instruction.getOperands();
-        if (operands.size() == 1) jumpTo(operands.get(0));
-        else {
-            load(operands.get(0), "$t0");
-            emitConditionalBranch(operands.get(1), operands.get(2));
-        }
-    }
-
-    // 根据 $t0 的真假选择出口，条件分支仅跨越一个绝对跳转
-    protected void emitConditionalBranch(Value yes, Value no) {
-        String nearby = nextBranchLabel();
-        jump("beq", "$t0, $zero, " + nearby);
-        if (((BasicBlock)yes).getInstructions().get(0).getOpcode() != Instruction.Opcode.PHI) {
-            jumpTo(yes);
-            text(nearby + ":");
-            jumpTo(no);
-            return;
-        }
-        // Dispatch before copies: every conditional branch remains near even with many PHIs.
-        String trueEdge = nextBranchLabel();
-        jump("j", trueEdge);
-        text(nearby + ":");
-        jumpTo(no);
-        text(trueEdge + ":");
-        jumpTo(yes);
-    }
-
-    protected void jumpTo(Value target) {
-        emitEdgeCopies((BasicBlock) target);
-        jump("j", label(target));
-    }
-
-    protected Value incoming(Instruction phi) {
-        var operands = phi.getOperands();
-        for (int n = 0; n < operands.size(); n += 2)
-            if (operands.get(n + 1) == emittingBlock) return operands.get(n);
-        throw new IllegalStateException("Missing PHI edge");
-    }
-
-    // Snapshot all inputs before committing any output, including cyclic loop PHIs.
-    protected void emitEdgeCopies(BasicBlock target) {
-        List<Instruction> phis = target.getInstructions().stream()
-                .filter(i -> i.getOpcode() == Instruction.Opcode.PHI).toList();
-        for (int n = 0; n < phis.size(); n++) {
-            load(incoming(phis.get(n)), "$t0");
-            memory("sw", "$t0", frame.phiScratch + n * 4, "$sp");
-        }
-        for (int n = 0; n < phis.size(); n++) {
-            memory("lw", "$t0", frame.phiScratch + n * 4, "$sp");
-            memory("sw", "$t0", frame.slots.get(phis.get(n)), "$sp");
-        }
-    }
-
-    // 按 IR 操作码生成对应的 MIPS 指令
-    protected void emitInstruction(Instruction instruction, int position) {
+    private void emitInstruction(Instruction instruction) {
         List<Value> operands = instruction.getOperands();
         switch (instruction.getOpcode()) {
-            case ALLOCA, PHI -> { /* PHIs are simultaneous copies on incoming edges. */ }
+            case ALLOCA -> { /* 地址可以从固定的 $sp 与偏移重新计算，无需额外槽位。 */ }
             case LOAD -> {
-                String opcode = sizeOf(instruction.getType()) == 1 ? "lbu" : "lw";
                 load(operands.get(0), "$t0");
-                emit(opcode + " $t1, 0($t0)");
+                emit((sizeOf(instruction.getType()) == 1 ? "lbu" : "lw") + " $t1, 0($t0)");
                 save(instruction, "$t1");
             }
             case STORE -> {
                 load(operands.get(0), "$t0");
-                String opcode = sizeOf(operands.get(0).getType()) == 1 ? "sb" : "sw";
                 load(operands.get(1), "$t1");
-                emit(opcode + " $t0, 0($t1)");
+                emit((sizeOf(operands.get(0).getType()) == 1 ? "sb" : "sw") + " $t0, 0($t1)");
             }
             case ADD, SUB, MUL, SDIV, SREM, UDIV, UREM -> arithmetic(instruction);
             case ICMP -> compare(instruction);
@@ -211,7 +136,18 @@ public class MipsGenerator {
             }
             case GEP -> gep(instruction);
             case CALL -> call(instruction);
-            case BR -> emitBranch(instruction);
+            case BR -> {
+                if (operands.size() == 1) jump("j", label(operands.get(0)));
+                else {
+                    load(operands.get(0), "$t0");
+                    String nearby = "__mips_branch" + nextBranch++;
+                    // 条件分支只跳过一个绝对跳转，避免大函数超出 16 位分支范围。
+                    jump("beq", "$t0, $zero, " + nearby);
+                    jump("j", label(operands.get(1)));
+                    output.text(nearby + ":");
+                    jump("j", label(operands.get(2)));
+                }
+            }
             case RET -> {
                 if (!operands.isEmpty()) load(operands.get(0), "$v0");
                 jump("j", epilogue);
@@ -220,8 +156,7 @@ public class MipsGenerator {
         }
     }
 
-    // 生成整数算术指令并保存计算结果
-    protected void arithmetic(Instruction instruction) {
+    private void arithmetic(Instruction instruction) {
         load(instruction.getOperands().get(0), "$t0");
         load(instruction.getOperands().get(1), "$t1");
         if (instruction.getOpcode() == Instruction.Opcode.SDIV || instruction.getOpcode() == Instruction.Opcode.SREM) {
@@ -245,8 +180,7 @@ public class MipsGenerator {
         save(instruction, "$t2");
     }
 
-    // 按比较谓词生成值为零或一的结果
-    protected void compare(Instruction instruction) {
+    private void compare(Instruction instruction) {
         var operands = instruction.getOperands();
         load(operands.get(0), "$t0");
         load(operands.get(1), "$t1");
@@ -270,7 +204,6 @@ public class MipsGenerator {
         save(instruction, "$t2");
     }
 
-    // 按各层元素大小计算下标对应的地址
     private void gep(Instruction instruction) {
         List<Value> operands = instruction.getOperands();
         load(operands.get(0), "$t0");
@@ -290,9 +223,9 @@ public class MipsGenerator {
         save(instruction, "$t0");
     }
 
-    // 按调用约定放置实参，调用函数或内建系统服务
     private void call(Instruction instruction) {
         List<Value> operands = instruction.getOperands();
+        Function callee = (Function) operands.get(0);
         for (int i = 1; i < operands.size(); i++) {
             if (i <= 4) load(operands.get(i), "$a" + (i - 1));
             else {
@@ -300,12 +233,6 @@ public class MipsGenerator {
                 memory("sw", "$t0", Math.multiplyExact(i - 5, 4), "$sp");
             }
         }
-        invokeCall(instruction);
-    }
-
-    // 执行函数或内建系统调用，并保存非 void 返回值
-    protected void invokeCall(Instruction instruction) {
-        Function callee = (Function) instruction.getOperands().get(0);
         if (callee.isExternal()) {
             int syscall = switch (callee.getName()) {
                 case "get_int" -> 5;
@@ -322,38 +249,24 @@ public class MipsGenerator {
         if (!instruction.getType().equals(IrType.VOID)) save(instruction, "$v0");
     }
 
-    // 将 IR 值或对象地址装入寄存器，必要时从值槽读取
-    protected void load(Value value, String register) {
-        if (value instanceof Constant c)
-            emit("li " + register + ", " + c.getNumber());
-        else if (value instanceof GlobalVariable)
-            emit("la " + register + ", " + label(value));
-        else if (frame.objects.containsKey(value))
-            addOffset(register, "$sp", frame.objects.get(value));
+    private void load(Value value, String register) {
+        if (value instanceof Constant c) emit("li " + register + ", " + c.getNumber());
+        else if (value instanceof GlobalVariable) emit("la " + register + ", " + label(value));
+        else if (frame.objects.containsKey(value)) addOffset(register, "$sp", frame.objects.get(value));
         else {
             Integer offset = frame.slots.get(value);
-            if (offset == null)
-                throw new IllegalArgumentException("No stack slot for " + value.getName());
+            if (offset == null) throw new IllegalArgumentException("No stack slot for " + value.getName());
             memory("lw", register, offset, "$sp");
         }
     }
 
-    // 按整数位宽截断结果，再保存到寄存器或栈槽
-    protected void save(Value value, String register) {
-        normalize(value, register);
+    private void save(Value value, String register) {
+        if (value.getType().bits() == 8) emit("andi " + register + ", " + register + ", 255");
+        else if (value.getType().bits() == 1) emit("andi " + register + ", " + register + ", 1");
         memory("sw", register, frame.slots.get(value), "$sp");
     }
 
-    // 按 IR 结果位宽规范化寄存器中的整数
-    protected void normalize(Value value, String register) {
-        if (value.getType().bits() == 8)
-            emit("andi " + register + ", " + register + ", 255");
-        else if (value.getType().bits() == 1)
-            emit("andi " + register + ", " + register + ", 1");
-    }
-
-    // 按 IR 位宽将窄整数符号扩展到三十二位
-    protected void signExtend(String register, IrType type) {
+    private void signExtend(String register, IrType type) {
         if (type.bits() > 0 && type.bits() < 32) {
             int shift = 32 - type.bits();
             emit("sll " + register + ", " + register + ", " + shift);
@@ -361,53 +274,79 @@ public class MipsGenerator {
         }
     }
 
-    // 生成访存指令，大偏移借助临时寄存器合成地址
-    protected void memory(String opcode, String register, int offset, String base) {
-        if (shortImmediate(offset))
-            emit(opcode + " " + register + ", " + offset + "(" + base + ")");
+    private void memory(String opcode, String register, int offset, String base) {
+        if (shortImmediate(offset)) emit(opcode + " " + register + ", " + offset + "(" + base + ")");
         else {
             addOffset("$t9", base, offset);
             emit(opcode + " " + register + ", 0($t9)");
         }
     }
 
-    // 计算基地址加偏移，处理超出十六位范围的立即数
-    protected void addOffset(String target, String base, int offset) {
-        if (shortImmediate(offset))
-            emit("addiu " + target + ", " + base + ", " + offset);
+    private void addOffset(String target, String base, int offset) {
+        if (shortImmediate(offset)) emit("addiu " + target + ", " + base + ", " + offset);
         else {
             emit("li $t9, " + offset);
             emit("addu " + target + ", " + base + ", $t9");
         }
     }
 
-    // 查询 IR 对象的汇编标签，缺失时报告错误
-    protected String label(Value value) {
+    private static boolean shortImmediate(int value) { return value >= -32768 && value <= 32767; }
+    private String label(Value value) {
         String label = labels.get(value);
-        if (label == null)
-            throw new IllegalArgumentException("Missing assembly label for " + value.getName());
+        if (label == null) throw new IllegalArgumentException("Missing assembly label for " + value.getName());
         return label;
     }
+    private void emit(String instruction) { output.text("    " + instruction); }
+    private void jump(String opcode, String target) { emit(opcode + " " + target); emit("nop"); }
 
-    // 向代码段输出一条缩进的汇编指令
-    protected void emit(String instruction) {
-        text("    " + instruction);
+    static int sizeOf(IrType type) {
+        return switch (type.kind()) {
+            case I1, I8 -> 1;
+            case I32, POINTER -> 4;
+            case ARRAY -> Math.multiplyExact(type.length(), sizeOf(type.element()));
+            default -> throw new IllegalArgumentException("No MIPS storage size for " + type);
+        };
+    }
+    private static int alignment(IrType type) {
+        return type.kind() == IrType.Kind.ARRAY ? alignment(type.element()) : Math.min(4, sizeOf(type));
+    }
+    private static int align(int value, int alignment) {
+        return Math.addExact(value, alignment - 1) / alignment * alignment;
     }
 
-    // 输出跳转指令并补充延迟槽空指令
-    protected void jump(String opcode, String target) {
-        emit(opcode + " " + target);
-        emit("nop");
-    }
+    private static final class Frame {
+        final Map<Value, Integer> objects = new IdentityHashMap<>();
+        final Map<Value, Integer> slots = new IdentityHashMap<>();
+        final int size;
+        final int returnAddress;
 
-    // 向当前模块追加标签等不缩进的代码段文本
-    protected void text(String line) {
-        output.text(line);
+        Frame(Function function) {
+            int outgoing = 0;
+            for (BasicBlock block : function.getBlocks())
+                for (Instruction i : block.getInstructions())
+                    if (i.getOpcode() == Instruction.Opcode.CALL)
+                        outgoing = Math.max(outgoing, Math.multiplyExact(Math.max(0, i.getOperands().size() - 5), 4));
+            int cursor = outgoing;
+            for (Argument argument : function.getArguments()) {
+                slots.put(argument, cursor);
+                cursor = Math.addExact(cursor, 4);
+            }
+            for (BasicBlock block : function.getBlocks()) {
+                for (Instruction i : block.getInstructions()) {
+                    if (i.getOpcode() == Instruction.Opcode.ALLOCA) {
+                        IrType object = i.getType().element();
+                        cursor = align(cursor, alignment(object));
+                        objects.put(i, cursor);
+                        cursor = Math.addExact(cursor, sizeOf(object));
+                    } else if (!i.getType().equals(IrType.VOID)) {
+                        cursor = align(cursor, 4);
+                        slots.put(i, cursor);
+                        cursor = Math.addExact(cursor, 4);
+                    }
+                }
+            }
+            returnAddress = align(cursor, 4);
+            size = align(Math.addExact(returnAddress, 4), 8);
+        }
     }
-
-    // 分配一个不重复的辅助分支标签
-    protected String nextBranchLabel() {
-        return "__mips_branch" + nextBranch++;
-    }
-
 }

@@ -59,8 +59,7 @@ public final class IrVerifier {
                         values.add(v);
                         require(v.getUses().contains(new Value.Use(i, k)), "missing use registration");
                         if (v instanceof BasicBlock target) {
-                            require(target.getParent() == f && f.getBlocks().contains(target)
-                                            && (i.getOpcode() != Instruction.Opcode.BR || target != entry),
+                            require(target.getParent() == f && f.getBlocks().contains(target) && target != entry,
                                     "invalid branch target/entry backedge");
                         } else if (v instanceof Argument arg)
                             require(arg.getParent() == f, "cross-function argument");
@@ -73,7 +72,6 @@ public final class IrVerifier {
                     }
                 }
             }
-            verifyDominance(f);
         }
         for (Value value : values)
             for (Value.Use use : value.getUses()) {
@@ -81,34 +79,6 @@ public final class IrVerifier {
                                 use.user().getOperands().get(use.index()) == value,
                         "dangling use");
             }
-    }
-
-    private void verifyDominance(Function function) {
-        llvm.analysis.ControlFlow cfg = new llvm.analysis.ControlFlow(function);
-        Map<Instruction, Integer> positions = new IdentityHashMap<>();
-        for (BasicBlock block : function.getBlocks()) {
-            boolean ordinary = false; List<Instruction> body = block.getInstructions();
-            for (int n = 0; n < body.size(); n++) {
-                Instruction i = body.get(n); positions.put(i, n);
-                if (i.getOpcode() == Instruction.Opcode.PHI) {
-                    require(!ordinary, "PHI after ordinary instruction");
-                    Set<BasicBlock> predecessors = new HashSet<>();
-                    for (int k = 1; k < i.getOperands().size(); k += 2) predecessors.add((BasicBlock)i.getOperands().get(k));
-                    require(predecessors.equals(new HashSet<>(cfg.predecessors.get(block))), "incomplete PHI predecessors");
-                } else ordinary = true;
-            }
-        }
-        for (BasicBlock block : function.getBlocks()) for (Instruction i : block.getInstructions()) {
-            var operands = i.getOperands();
-            for (int n = 0; n < operands.size(); n++) if (operands.get(n) instanceof Instruction def) {
-                BasicBlock use = i.getOpcode() == Instruction.Opcode.PHI ? (BasicBlock)operands.get(n + 1) : block;
-                require(positions.containsKey(def), "use of removed definition");
-                if (!cfg.reachable.contains(use)) continue;
-                require(cfg.dominates(def.getParent(), use), "definition does not dominate use: " + def.getName());
-                if (def.getParent() == use) require(positions.get(def) < (i.getOpcode() == Instruction.Opcode.PHI
-                        ? use.getInstructions().size() : positions.get(i)), "definition follows use");
-            }
-        }
     }
 
     // 按操作码检查指令的操作数数量、类型及相关约束
@@ -149,20 +119,6 @@ public final class IrVerifier {
                     require(index.getType().equals(IrType.I32), "GEP index type");
                 if (array)
                     require(a.get(1) instanceof Constant c && c.getNumber() == 0, "array GEP first index");
-            }
-            case PHI -> {
-                require(result.isInteger() || result.kind() == IrType.Kind.POINTER, "phi result type");
-                require(!a.isEmpty() && a.size() % 2 == 0, "phi incoming pairs");
-                Set<BasicBlock> incoming = Collections.newSetFromMap(new IdentityHashMap<>());
-                for (int n = 0; n < a.size(); n += 2) {
-                    require(a.get(n).getType().equals(result) && a.get(n + 1) instanceof BasicBlock, "phi pair type");
-                    require(incoming.add((BasicBlock) a.get(n + 1)), "duplicate phi predecessor");
-                    BasicBlock predecessor = (BasicBlock) a.get(n + 1);
-                    require(predecessor.isTerminated(), "phi predecessor terminator");
-                    Instruction terminator = predecessor.getInstructions().get(predecessor.getInstructions().size() - 1);
-                    require(terminator.getOpcode() == Instruction.Opcode.BR && terminator.getOperands().contains(i.getParent()),
-                            "phi incoming edge");
-                }
             }
             case CALL -> {
                 require(!a.isEmpty() && a.get(0) instanceof Function, "call target");

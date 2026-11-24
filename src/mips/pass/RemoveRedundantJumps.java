@@ -3,9 +3,8 @@ package mips.pass;
 import mips.MipsModule;
 import java.util.ArrayList;
 
-// 删除直接跳到下一标签的跳转及其延迟槽空指令
+/** 删除直接跳到下一标签的 j/nop，保持延迟槽开关下行为一致。 */
 public final class RemoveRedundantJumps implements MipsPass {
-    // 扫描代码段，删除跳到紧邻目标标签的 j/nop
     @Override
     public void run(MipsModule module) {
         var lines = module.getText();

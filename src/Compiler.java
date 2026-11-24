@@ -21,8 +21,6 @@ public class Compiler {
                 }
                 case "--optimize" -> Configure.optimize = true;
                 case "--no-optimize" -> Configure.optimize = false;
-                case "--delay-slots" -> Configure.enableDelaySlotRemoval = false;
-                case "--no-delay-slots" -> Configure.enableDelaySlotRemoval = true;
                 case "--ir-before" -> {
                     if (++i == args.length) throw new IllegalArgumentException("Missing --ir-before path");
                     Configure.irBeforeOptimization = args[i];

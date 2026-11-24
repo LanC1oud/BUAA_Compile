@@ -91,12 +91,6 @@ public final class IrPrinter {
                 String operandText = operands.stream().map(this::typed).collect(Collectors.joining(", "));
                 yield "getelementptr " + sourceType + ", " + operandText;
             }
-            case PHI -> {
-                java.util.ArrayList<String> incoming = new java.util.ArrayList<>();
-                for (int n = 0; n < operands.size(); n += 2)
-                    incoming.add("[ " + ref(operands.get(n)) + ", " + ref(operands.get(n + 1)) + " ]");
-                yield "phi " + resultType + " " + String.join(", ", incoming);
-            }
             case CALL -> {
                 Value callee = operands.get(0);
                 List<Value> arguments = operands.subList(1, operands.size());
