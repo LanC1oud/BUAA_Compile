@@ -4,7 +4,9 @@ import frontend.ast.ASTNode;
 import frontend.ast.block.Block;
 import frontend.token.Token;
 
-// FuncDef -> FuncType Ident '(' [FuncFParams] ')' Block
+/**
+ * FuncDef -> FuncType Ident '(' [FuncFParams] ')' Block
+ */
 public class FuncDef extends ASTNode {
     private final FuncType funcType;
     private final Token ident;
@@ -26,7 +28,7 @@ public class FuncDef extends ASTNode {
         return ident;
     }
 
-    // formal parameter list; null when the function takes none
+    /** @return the formal parameter list, or {@code null} when the function takes no parameters. */
     public FuncFormalParams getParams() {
         return params;
     }

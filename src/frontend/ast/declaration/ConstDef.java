@@ -4,7 +4,9 @@ import frontend.ast.ASTNode;
 import frontend.ast.expression.ConstExp;
 import frontend.token.Token;
 
-// ConstDef -> Ident [ '[' ConstExp ']' ] '=' ConstInitVal
+/**
+ * ConstDef -> Ident [ '[' ConstExp ']' ] '=' ConstInitVal
+ */
 public class ConstDef extends ASTNode {
     private final Token ident;
     private final ConstExp length;
@@ -20,7 +22,7 @@ public class ConstDef extends ASTNode {
         return ident;
     }
 
-    // array length expression; null for a scalar
+    /** @return the array-length expression, or {@code null} for a scalar. */
     public ConstExp getLength() {
         return length;
     }

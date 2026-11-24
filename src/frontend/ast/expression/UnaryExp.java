@@ -2,9 +2,13 @@ package frontend.ast.expression;
 
 import frontend.ast.ASTNode;
 import frontend.token.Token;
-import frontend.token.TokenType;
 
-// UnaryExp -> PrimaryExp | Ident '(' [FuncRParams] ')' | UnaryOp UnaryExp | '(' BType ')' UnaryExp
+/**
+ * UnaryExp -> PrimaryExp
+ * | Ident '(' [FuncRParams] ')'
+ * | UnaryOp UnaryExp
+ * | '(' BType ')' UnaryExp
+ */
 public class UnaryExp extends ASTNode {
     public enum Kind {
         Primary, Call, Unary, Cast
@@ -17,12 +21,6 @@ public class UnaryExp extends ASTNode {
     private final UnaryOp op;
     private final Token castType;
     private final UnaryExp operand;
-    private boolean charResult;
-
-    // 记录结果是否为 char，供求值时按 8 位回绕
-    public void setCharResult(boolean charResult) {
-        this.charResult = charResult;
-    }
 
     private UnaryExp(Kind kind, PrimaryExp primary, Token ident, FuncRParams params,
                      UnaryOp op, Token castType, UnaryExp operand) {
@@ -59,12 +57,12 @@ public class UnaryExp extends ASTNode {
         return primary;
     }
 
-    // callee name; null unless this is a call
+    /** @return the callee name token for a function call, otherwise {@code null}. */
     public Token getIdent() {
         return ident;
     }
 
-    // actual parameters; null when there are none
+    /** @return the actual parameters, or {@code null} when the call has none. */
     public FuncRParams getParams() {
         return params;
     }
@@ -73,50 +71,14 @@ public class UnaryExp extends ASTNode {
         return op;
     }
 
-    // int/char token of an explicit cast; null otherwise
+    /** @return the {@code int}/{@code char} token of an explicit cast, otherwise {@code null}. */
     public Token getCastType() {
         return castType;
     }
 
+    /** @return the operand of a unary operation or of an explicit cast. */
     public UnaryExp getOperand() {
         return operand;
-    }
-
-    // 按一元表达式类别求值；函数调用和逻辑非不可折叠
-    @Override
-    public int calculateConst() {
-        int value = switch (kind) {
-            case Primary -> primary.calculateConst();
-            case Call -> throw new UnsupportedOperationException(
-                    "函数调用 `" + ident.value() + "` 没有编译期值");
-            case Unary -> calculateUnary();
-            case Cast -> cast(operand.calculateConst(), castType);
-        };
-        return charResult ? value & 0xFF : value;
-    }
-
-    // 计算一元正号或负号的结果
-    private int calculateUnary() {
-        int value = operand.calculateConst();
-        return switch (op.getToken().getType()) {
-            case Plus -> value;
-            case Minus -> -value;
-            case Not -> throw new UnsupportedOperationException("常量表达式中不能出现逻辑非");
-            default -> throw new UnsupportedOperationException(
-                    "一元运算符 " + op.getToken() + " 没有编译期值");
-        };
-    }
-
-    // explicit cast. char is unsigned char (mod 256), so narrow with & 0xFF, not (byte):
-    // (char)255 must yield 255. throws IllegalArgumentException for other targets
-    public static int cast(int value, Token castType) {
-        if (castType.is(TokenType.Int)) {
-            return value;
-        }
-        if (castType.is(TokenType.Char)) {
-            return value & 0xFF;
-        }
-        throw new IllegalArgumentException("期望 int 或 char 转换，实际是 " + castType);
     }
 
     @Override

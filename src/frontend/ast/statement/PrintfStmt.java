@@ -4,7 +4,9 @@ import frontend.ast.expression.Exp;
 import frontend.token.Token;
 import java.util.List;
 
-// Stmt -> 'printf' '(' StringConst { ',' Exp } ')' ';'
+/**
+ * Stmt -> 'printf' '(' StringConst { ',' Exp } ')' ';'
+ */
 public class PrintfStmt extends Stmt {
     private final Token printfToken;
     private final Token format;
@@ -20,6 +22,7 @@ public class PrintfStmt extends Stmt {
         return printfToken;
     }
 
+    /** @return the format string token, whose value already had its escapes decoded. */
     public Token getFormat() {
         return format;
     }

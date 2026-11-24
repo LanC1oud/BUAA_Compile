@@ -2,7 +2,9 @@ package frontend.ast.statement;
 
 import frontend.ast.expression.Cond;
 
-// Stmt -> 'if' '(' Cond ')' Stmt [ 'else' Stmt ]
+/**
+ * Stmt -> 'if' '(' Cond ')' Stmt [ 'else' Stmt ]
+ */
 public class IfStmt extends Stmt {
     private final Cond cond;
     private final Stmt thenStmt;
@@ -22,7 +24,7 @@ public class IfStmt extends Stmt {
         return thenStmt;
     }
 
-    // else branch; null when there is no else
+    /** @return the else branch, or {@code null} when the statement has no {@code else}. */
     public Stmt getElseStmt() {
         return elseStmt;
     }

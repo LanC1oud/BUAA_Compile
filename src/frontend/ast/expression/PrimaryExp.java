@@ -2,7 +2,9 @@ package frontend.ast.expression;
 
 import frontend.ast.ASTNode;
 
-// PrimaryExp -> '(' Exp ')' | LVal | Number
+/**
+ * PrimaryExp -> '(' Exp ')' | LVal | Number
+ */
 public class PrimaryExp extends ASTNode {
     public enum Kind {
         Paren, LVal, Number
@@ -46,16 +48,6 @@ public class PrimaryExp extends ASTNode {
 
     public Number getNumber() {
         return number;
-    }
-
-    // 按括号表达式、左值或字面量分派常量求值
-    @Override
-    public int calculateConst() {
-        return switch (kind) {
-            case Paren -> exp.calculateConst();
-            case LVal -> lval.calculateConst();
-            case Number -> number.calculateConst();
-        };
     }
 
     @Override

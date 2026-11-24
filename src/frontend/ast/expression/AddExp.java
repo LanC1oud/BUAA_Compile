@@ -2,7 +2,9 @@ package frontend.ast.expression;
 
 import frontend.token.Token;
 
-// AddExp -> MulExp | AddExp ('+' | '-') MulExp
+/**
+ * AddExp -> MulExp | AddExp ('+' | '-') MulExp
+ */
 public class AddExp extends BinaryExp {
     public AddExp(MulExp operand) {
         super(operand);

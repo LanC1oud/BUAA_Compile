@@ -1,3 +1,0 @@
-// Use --replace: multiplication now consumes PowerExp operands.
-PowerExp -> UnaryExp | PowerExp '**' UnaryExp
-MulExp -> PowerExp | MulExp ('*' | '/' | '%') PowerExp

@@ -2,7 +2,9 @@ package frontend.ast.statement;
 
 import frontend.ast.block.Block;
 
-// Stmt -> Block
+/**
+ * Stmt -> Block
+ */
 public class BlockStmt extends Stmt {
     private final Block block;
 

@@ -2,7 +2,9 @@ package frontend.ast.statement;
 
 import frontend.ast.expression.Exp;
 
-// Stmt -> [Exp] ';'
+/**
+ * Stmt -> [Exp] ';'
+ */
 public class ExpStmt extends Stmt {
     private final Exp exp;
 
@@ -10,7 +12,7 @@ public class ExpStmt extends Stmt {
         this.exp = exp;
     }
 
-    // expression; null for an empty statement
+    /** @return the expression, or {@code null} for an empty statement ({@code ;}). */
     public Exp getExp() {
         return exp;
     }
