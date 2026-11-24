@@ -1,4 +1,4 @@
 {
   "programmingLanguage": "Java",
-  "objectCode": "MIPS"
+  "objectCode": "LLVM"
 }
