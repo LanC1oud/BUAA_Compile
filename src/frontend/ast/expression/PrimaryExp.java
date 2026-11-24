@@ -48,7 +48,7 @@ public class PrimaryExp extends ASTNode {
         return number;
     }
 
-    // 按括号表达式、左值或字面量分派常量求值
+    // throws UnsupportedOperationException if a referenced variable is not a constant
     @Override
     public int calculateConst() {
         return switch (kind) {

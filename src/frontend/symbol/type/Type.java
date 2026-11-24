@@ -50,7 +50,6 @@ final public class Type extends SymbolType {
     // 数组长度。0 既表示"长度为 0"，也表示"长度未知"，后者用于函数形参 int a[]。
     private final int length;
 
-    // 保存类型类别及数组的元素类型和长度
     private Type(Kind kind, Type elementType, int length) {
         this.kind = kind;
         this.elementType = elementType;
@@ -59,7 +58,6 @@ final public class Type extends SymbolType {
 
     // -------------------------------------------------------------- 构造入口
 
-    // 把函数返回类型节点转换为语义类型
     public static Type from(FuncType funcType) {
         if (funcType.isInt()) {
             return Int;
@@ -70,7 +68,6 @@ final public class Type extends SymbolType {
         return Void;
     }
 
-    // 按元素类型和长度构造数组类型
     public static Type ofArray(Type elementType, int length) {
         if (length < 0) {
             throw new IllegalArgumentException("数组长度不能为负：" + length);
@@ -84,7 +81,6 @@ final public class Type extends SymbolType {
         throw new IllegalArgumentException("数组元素类型只能是 int 或 char，实际是 " + elementType);
     }
 
-    // 由长度表达式构造数组类型
     public static Type ofArray(Type elementType, List<ConstExp> lengths) {
         if (lengths == null || lengths.isEmpty() || lengths.get(0) == null) {
             return ofArray(elementType, 0);
@@ -94,12 +90,10 @@ final public class Type extends SymbolType {
 
     // ------------------------------------------------------------------ 查询
 
-    // 取类型类别，供语义规则分支判断
     public Kind getKind() {
         return kind;
     }
 
-    // 取数组元素类型
     public Type getElementType() {
         if (elementType == null) {
             throw new UnsupportedOperationException(toString() + " 不是数组类型");
@@ -107,7 +101,6 @@ final public class Type extends SymbolType {
         return elementType;
     }
 
-    // 取数组长度，0 也用于表示未知长度
     public int getLength() {
         if (kind != Kind.IntArray && kind != Kind.CharArray) {
             throw new UnsupportedOperationException(toString() + " 不是数组类型");
@@ -115,42 +108,34 @@ final public class Type extends SymbolType {
         return length;
     }
 
-    // 判断是否为 int 标量
     public boolean isInt() {
         return kind == Kind.Int;
     }
 
-    // 判断是否为 char 标量
     public boolean isChar() {
         return kind == Kind.Char;
     }
 
-    // 判断是否为无返回值类型
     public boolean isVoid() {
         return kind == Kind.Void;
     }
 
-    // 区分数组与标量或 void
     public boolean isArray() {
         return kind == Kind.IntArray || kind == Kind.CharArray;
     }
 
-    // 判断是否为 int 或 char 标量
     public boolean isBasic() {
         return kind == Kind.Int || kind == Kind.Char;
     }
 
-    // 按文法类型名匹配，忽略大小写
     public boolean is(String type) {
         return kind.getLowerName().equalsIgnoreCase(type);
     }
 
-    // 取不含声明修饰的基础显示名
     public String getDisplayName() {
         return kind.getDisplayName();
     }
 
-    // 按 const、static 和数组属性生成符号表标签
     @Override
     public String displayName(boolean isConst, boolean isStatic) {
         return Kind.displayName(kind, isConst, isStatic, isArray());
@@ -172,7 +157,6 @@ final public class Type extends SymbolType {
     }
 
     // ------------------------------------------------------------------类型关系
-    // 严格比较类型，数组还比较长度
     @Override
     public boolean equals(Object other) {
         if (this == other) {
@@ -195,7 +179,6 @@ final public class Type extends SymbolType {
         return isArray() ? kind.hashCode() * 31 + length : kind.hashCode();
     }
 
-    // 判断传参兼容性：数组只比较元素类型
     public boolean isPassableTo(Type parameter) {
         if (this == parameter) {
             return true;

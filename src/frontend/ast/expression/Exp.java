@@ -14,7 +14,6 @@ public class Exp extends ASTNode {
         return addExp;
     }
 
-    // 将表达式的常量求值委托给内部加减表达式
     @Override
     public int calculateConst() {
         return addExp.calculateConst();

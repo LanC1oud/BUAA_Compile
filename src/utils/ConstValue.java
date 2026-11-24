@@ -7,7 +7,6 @@ public final class ConstValue {
     private ConstValue() {
     }
 
-    // 按运算符计算二元常量表达式
     public static int calculate(int left, int right, TokenType op) {
         return switch (op) {
             // AddExp

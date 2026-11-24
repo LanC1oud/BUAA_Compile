@@ -16,18 +16,15 @@ public class Number extends ASTNode {
         return token;
     }
 
-    // 读取整数字面量或字符字面量的值
     @Override
     public int calculateConst() {
         return valueOf(token);
     }
 
-    // 把整数字面量或字符记号转为编译期整数值
+    // throws IllegalArgumentException for any other token
     public static int valueOf(Token token) {
         if (token.is(TokenType.IntConst)) {
-            // The magnitude in -2147483648 is parsed before its unary minus.
-            // Retain its i32 bit pattern instead of overflowing Java's signed parser.
-            return Integer.parseUnsignedInt(token.value());
+            return Integer.parseInt(token.value());
         }
         if (token.is(TokenType.CharConst)) {
             return token.value().isEmpty() ? 0 : token.value().charAt(0);

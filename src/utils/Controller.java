@@ -11,30 +11,12 @@ import frontend.token.TokenStream;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import llvm.IrGenerator;
-import llvm.IrModule;
-import mips.MipsGenerator;
-import mips.MipsModule;
-import mips.pass.OptimizedMipsGenerator;
 
 public class Controller {
     public static final ErrorTable errors = new ErrorTable();
     public static final SymbolTable symbols = new SymbolTable();
     
     public static void run() throws IOException {
-        errors.clear();
-        symbols.clear();
-        Files.deleteIfExists(Path.of(Configure.target));
-        Files.deleteIfExists(Path.of(Configure.error));
-        if (HomeworkConfig.hw == HomeworkConfig.Hw.Llvm || HomeworkConfig.hw == HomeworkConfig.Hw.Mips) {
-            Files.deleteIfExists(Path.of("llvm_ir.txt"));
-            Files.deleteIfExists(Path.of("mips.txt"));
-        }
-        if (Configure.irBeforeOptimization != null)
-            Files.deleteIfExists(Path.of(Configure.irBeforeOptimization));
         
         // stage 1: Lexer
         String source = Configure.source;
@@ -43,13 +25,12 @@ public class Controller {
         if (Configure.debug.displayTokens) {
             System.err.println(tokens.toDebugString());
         }
-        if (HomeworkConfig.hw == HomeworkConfig.Hw.Lexer) {
+        if (HomeworkConfig.hw == HomeworkConfig.hw.Lexer) {
             try (FileWriter writer = new FileWriter(errors.noError() ?
-                    Configure.target : Configure.error, StandardCharsets.UTF_8)) {
+                    Configure.target : Configure.error)) {
                 writer.write((errors.noError() ? tokens : errors).toString());
             }
             Controller.exit();
-            return;
         }
 
         // stage 2: Parser
@@ -64,62 +45,32 @@ public class Controller {
             if (Configure.debug.displayErrors) {
                 System.err.println("==> Parsing aborted: " + e);
             }
-            try (FileWriter writer = new FileWriter(Configure.error, StandardCharsets.UTF_8)) {
+            try (FileWriter writer = new FileWriter(Configure.error)) {
                 writer.write("" + errors);
             }
             Controller.exit();
-            if (errors.noError()) throw e;
             return;
         }
         if (HomeworkConfig.hw == HomeworkConfig.Hw.Syntax) {
             try (FileWriter writer = new FileWriter(errors.noError() ?
-                    Configure.target : Configure.error, StandardCharsets.UTF_8)) {
+                    Configure.target : Configure.error)) {
                 writer.write((errors.noError() ? watcher : errors).toString());
             }
             Controller.exit();
-            return;
         }
 
         // stage 3: Semantic analysis
-        Traverser traverser = new Traverser(ast);
-        traverser.spawn();
+        new Traverser(ast).spawn();
         if (Configure.debug.displaySymbols) {
             System.err.println(symbols);
         }
         if (HomeworkConfig.hw == HomeworkConfig.Hw.Semantic) {
             try (FileWriter writer = new FileWriter(errors.noError() ?
-                    Configure.target : Configure.error, StandardCharsets.UTF_8)) {
+                    Configure.target : Configure.error)) {
                 writer.write((errors.noError() ? symbols.toString() : errors.toString()) + "\n");
             }
             Controller.exit();
-            return;
         }
-        if (!errors.noError()) {
-            Files.writeString(Path.of(Configure.error), errors.toString(), StandardCharsets.UTF_8);
-            return;
-        }
-        
-        // stage 4: LLVM IR
-        IrGenerator generator = new IrGenerator(traverser.getSemanticInfo(), Configure.optimize ?
-                Configure.irPasses : java.util.List.of());
-        IrModule module = generator.generate(ast);
-        String ir = module.toString();
-        if (Configure.irBeforeOptimization != null) {
-            Files.writeString(Path.of(Configure.irBeforeOptimization),
-                    generator.getUnoptimizedIr(), StandardCharsets.UTF_8);
-        }
-
-        // stage 5: MIPS
-        if (HomeworkConfig.hw == HomeworkConfig.Hw.Mips) {
-            MipsModule lowered;
-            if (Configure.optimize)
-                lowered = new OptimizedMipsGenerator(Configure.mipsPasses).generate(module);
-            else
-                lowered = new MipsGenerator().generate(module);
-            String assembly = lowered.toString();
-            Files.writeString(Path.of("llvm_ir.txt"), ir, StandardCharsets.UTF_8);
-            Files.writeString(Path.of(Configure.target), assembly, StandardCharsets.UTF_8);
-        } else Files.writeString(Path.of(Configure.target), ir, StandardCharsets.UTF_8);
     }
     
     private static void exit() {
@@ -128,5 +79,6 @@ public class Controller {
             System.err.println(errors.toDebugString());
         }
         
+        System.exit(0);
     }
 }

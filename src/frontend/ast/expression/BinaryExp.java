@@ -45,7 +45,6 @@ public abstract class BinaryExp extends ASTNode {
         return op == null;
     }
 
-    // 递归计算操作数，char 结果按 8 位回绕
     @Override
     public int calculateConst() {
         int value = left.calculateConst();

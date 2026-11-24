@@ -31,7 +31,9 @@ import frontend.ast.statement.ReturnStmt;
 import frontend.ast.statement.Stmt;
 import frontend.ast.statement.SwitchStmt;
 import frontend.ast.statement.WhileStmt;
-import frontend.symbol.*;
+import frontend.symbol.SymbolFunction;
+import frontend.symbol.SymbolTable;
+import frontend.symbol.SymbolVariable;
 import frontend.symbol.type.SymbolType;
 import frontend.symbol.type.Type;
 import frontend.token.Token;
@@ -59,19 +61,13 @@ final public class Traverser {
     private int breakDepth = 0;
 
     private final Map<ASTNode, Type> types = new IdentityHashMap<>();
-    private final SemanticInfo semanticInfo = new SemanticInfo();
-
-    // 返回本次分析的类型与符号绑定
-    public SemanticInfo getSemanticInfo() { return semanticInfo; }
 
     private boolean insideCondition = false;
 
-    // 接收待分析的编译单元
     public Traverser(CompileUnit ast) {
         this.ast = ast;
     }
 
-    // 入口：依次分析全局声明、普通函数和 main
     public void spawn() {
         for (Decl decl : ast.getDeclarations()) {
             analyzeDecl(decl);
@@ -82,7 +78,6 @@ final public class Traverser {
         analyzeMainFuncDef(ast.getMainFunc());
     }
 
-    // FuncDef：普通函数定义
     private void analyzeFuncDef(FuncDef func) {
         SymbolFunction symbol = symbols.addFunction(
                 func.getIdent().value(), func.getFuncType());
@@ -93,7 +88,6 @@ final public class Traverser {
                     func.getIdent().value(), Type.from(func.getFuncType()), symbols.currentScopeId());
         }
 
-        semanticInfo.bind(func, symbol);
         symbols.newScope();
         List<FuncFormalParam> params = func.getParams() == null
                 ? List.of() : func.getParams().getParams();
@@ -108,7 +102,6 @@ final public class Traverser {
                 duplicate.setFromParam();
                 symbol.addParameter(duplicate);
             }
-            semanticInfo.bind(param, symbol.getParameters().get(symbol.getParameters().size() - 1));
         }
 
         Type declaredReturn = Type.from(func.getFuncType());
@@ -119,7 +112,6 @@ final public class Traverser {
         symbols.exitScope();
     }
 
-    // MainFuncDef：主函数定义
     private void analyzeMainFuncDef(MainFuncDef main) {
         if (main == null) {
             return;
@@ -132,7 +124,6 @@ final public class Traverser {
         symbols.exitScope();
     }
 
-    // 检查有返回值的函数是否以直接 return 结尾
     private void checkMissingReturn(Block body, boolean isVoid) {
         if (isVoid || body == null) {
             return;
@@ -149,14 +140,12 @@ final public class Traverser {
         errors.add(ErrorType.MissingReturnStatement, end.location());
     }
 
-    // 构造形参类型：标量或长度未定的数组
     private Type paramTypeOf(FuncFormalParam param) {
         Type base = param.getBType().is(TokenType.Char) ? Type.Char : Type.Int;
         return param.isArray() ? Type.ofArray(base, 0) : base;
     }
 
 
-    // Decl：常量或变量声明
     private void analyzeDecl(Decl decl) {
         if (decl instanceof ConstDecl constDecl) {
             analyzeConstDecl(constDecl);
@@ -165,7 +154,6 @@ final public class Traverser {
         }
     }
 
-    // ConstDecl：常量声明
     private void analyzeConstDecl(ConstDecl decl) {
         Type base = decl.getBType().is(TokenType.Char) ? Type.Char : Type.Int;
         for (ConstDef def : decl.getDefs()) {
@@ -177,13 +165,11 @@ final public class Traverser {
                 continue;
             }
             symbol.setConst();
-            semanticInfo.bind(def, symbol);
             analyzeConstInitVal(def.getInitVal(), declared);
             recordConstantValue(symbol, declared, def.getInitVal());
         }
     }
 
-    // VarDecl：变量声明
     private void analyzeVarDecl(VarDecl decl) {
         Type base = decl.getBType().is(TokenType.Char) ? Type.Char : Type.Int;
         for (VarDef def : decl.getDefs()) {
@@ -197,7 +183,6 @@ final public class Traverser {
             if (decl.isStatic()) {
                 symbol.setStatic();
             }
-            semanticInfo.bind(def, symbol);
             analyzeInitVal(def.getInitVal(), declared, symbol.isGlobal());
             if (symbol.isGlobal() || symbol.isStatic()) {
                 recordVariableValue(symbol, declared, def.getInitVal());
@@ -205,7 +190,6 @@ final public class Traverser {
         }
     }
 
-    // 确定声明类型；数组长度须为 int 并尝试折叠
     private Type declaredType(ConstExp length, Type base, Token ident) {
         if (length == null) {
             return base;
@@ -221,7 +205,6 @@ final public class Traverser {
         return Type.ofArray(base, size);
     }
 
-    // 把常量初值存入符号
     private void recordConstantValue(SymbolVariable symbol, Type declared, ConstInitVal init) {
         if (init == null) {
             return;
@@ -229,26 +212,25 @@ final public class Traverser {
         if (!declared.isArray()) {
             Integer value = ConstFolder.fold(init.getExp());
             if (value != null) {
-                symbol.setConstantValue(new FixedValue(value));
+                symbol.setConstantValue(new frontend.symbol.FixedValue(value));
             }
             return;
         }
         if (declared.getLength() > 0) {
-            symbol.setConstantValue(FixedArray.from(
+            symbol.setConstantValue(frontend.symbol.FixedArray.from(
                     declared.getLength(), init));
         }
     }
 
-    // 记录全局或静态变量的初值，缺省补零
     private void recordVariableValue(SymbolVariable symbol, Type declared, InitVal init) {
         if (!declared.isArray()) {
             if (init == null) {
-                symbol.setConstantValue(new FixedValue(0));
+                symbol.setConstantValue(new frontend.symbol.FixedValue(0));
                 return;
             }
             Integer value = ConstFolder.fold(init.getExp());
             if (value != null) {
-                symbol.setConstantValue(new FixedValue(value));
+                symbol.setConstantValue(new frontend.symbol.FixedValue(value));
             }
             return;
         }
@@ -256,13 +238,12 @@ final public class Traverser {
             return;
         }
         if (init == null) {
-            symbol.setConstantValue(new FixedArray(declared.getLength()));
+            symbol.setConstantValue(new frontend.symbol.FixedArray(declared.getLength()));
             return;
         }
-        symbol.setConstantValue(FixedArray.from(declared.getLength(), init));
+        symbol.setConstantValue(frontend.symbol.FixedArray.from(declared.getLength(), init));
     }
 
-    // ConstInitVal：常量初值
     private void analyzeConstInitVal(ConstInitVal init, Type declared) {
         if (init == null) {
             return;
@@ -281,7 +262,6 @@ final public class Traverser {
         analyzeConstElements(init.getElements(), declared);
     }
 
-    // InitVal：变量初值
     private void analyzeInitVal(InitVal init, Type declared, boolean constContext) {
         if (init == null) {
             return;
@@ -311,7 +291,6 @@ final public class Traverser {
         }
     }
 
-    // ConstInitVal：常量数组初值列表
     private void analyzeConstElements(List<ConstExp> elements, Type declared) {
         if (elements == null) {
             return;
@@ -322,7 +301,6 @@ final public class Traverser {
         }
     }
 
-    // 检查字符串初值的目标是否为 char 数组
     private void checkStringInitializer(Token string, Type declared) {
         if (string == null) {
             return;
@@ -334,7 +312,6 @@ final public class Traverser {
         }
     }
 
-    // 取初值列表第一项的位置，用于报告项数超限
     private Navigation initTokenLine(InitVal init) {
         if (init.getElements() != null && !init.getElements().isEmpty()) {
             return lineOf(init.getElements().get(0));
@@ -342,7 +319,6 @@ final public class Traverser {
         return DeclarationFallback;
     }
 
-    // 核对初值类型；类型未知时跳过比较
     private void checkInitializerType(Type actual, Type declared, ASTNode node) {
         if (actual == null || declared == null) {
             return;
@@ -353,7 +329,6 @@ final public class Traverser {
         }
     }
 
-    // Block：按源码顺序访问块内各项
     private void visitBlock(Block block) {
         if (block == null) {
             return;
@@ -363,7 +338,6 @@ final public class Traverser {
         }
     }
 
-    // BlockItem：分派到声明或语句
     private void visitBlockItem(BlockItem item) {
         if (item.getType() == BlockItem.Type.Decl) {
             analyzeDecl((Decl) item.getItem());
@@ -372,7 +346,6 @@ final public class Traverser {
         }
     }
 
-    // Stmt：按语句种类分派，维护作用域与跳转计数
     private void visitStmt(Stmt stmt) {
         if (stmt == null) {
             return;
@@ -417,7 +390,7 @@ final public class Traverser {
         }
     }
 
-    // Stmt：switch 语句与分支标签
+    // Stmt -> 'switch' '(' Exp ')' '{' { CaseStmt } '}'
     private void analyzeSwitch(SwitchStmt stmt) {
         Type selector = analyzeExp(stmt.getExp());
         boolean selectorIsBasic = selector != null && selector.isBasic();
@@ -463,7 +436,7 @@ final public class Traverser {
         }
     }
 
-    // Stmt：赋值语句
+    // Stmt -> LVal '=' Exp ';'
     private void analyzeAssign(AssignStmt stmt) {
         LVal target = stmt.getLVal();
         Type left = analyzeLVal(target, false);
@@ -479,7 +452,7 @@ final public class Traverser {
         }
     }
 
-    // Stmt：return 语句
+    // Stmt -> 'return' [Exp] ';'
     private void analyzeReturn(ReturnStmt stmt) {
         if (!stmt.hasExp()) {
             return;
@@ -498,7 +471,7 @@ final public class Traverser {
         }
     }
 
-    // Stmt：printf 语句
+    // Stmt -> 'printf' '(' StringConst { ',' Exp } ')' ';'
     private void analyzePrintf(PrintfStmt stmt) {
         List<Character> specs = formatSpecifiers(stmt.getFormat());
         List<Exp> args = stmt.getArgs() == null ? List.of() : stmt.getArgs();
@@ -527,7 +500,6 @@ final public class Traverser {
         }
     }
 
-    // 提取格式占位符，跳过 %%
     private List<Character> formatSpecifiers(Token format) {
         List<Character> specs = new ArrayList<>();
         if (format == null) {
@@ -546,7 +518,6 @@ final public class Traverser {
         return specs;
     }
 
-    // 核对 %d、%c、%s 对应的实参类型
     private boolean matchesFormat(char spec, Type actual) {
         return switch (spec) {
             case 'd' -> actual.isInt();
@@ -556,7 +527,6 @@ final public class Traverser {
         };
     }
 
-    // Exp：普通表达式
     private Type analyzeExp(Exp exp) {
         if (exp == null) {
             return null;
@@ -570,7 +540,6 @@ final public class Traverser {
         return type;
     }
 
-    // ConstExp：常量表达式
     private Type analyzeConstExp(ConstExp exp) {
         if (exp == null) {
             return null;
@@ -584,7 +553,6 @@ final public class Traverser {
         return type;
     }
 
-    // 临时进入条件上下文，结束后恢复原状态
     private <T> T withConditionContext(java.util.function.Supplier<T> action) {
         boolean saved = insideCondition;
         insideCondition = true;
@@ -595,7 +563,6 @@ final public class Traverser {
         }
     }
 
-    // Cond：条件表达式
     private Type analyzeCond(Cond cond) {
         if (cond == null) {
             return null;
@@ -605,37 +572,30 @@ final public class Traverser {
         return type;
     }
 
-    // LOrExp：逻辑或
     private Type analyzeLOr(ASTNode node) {
         return analyzeBinary(node, true, false);
     }
 
-    // LAndExp：逻辑与
     private Type analyzeLAnd(ASTNode node) {
         return analyzeBinary(node, true, false);
     }
 
-    // EqExp：相等性比较
     private Type analyzeEq(ASTNode node) {
         return analyzeBinary(node, false, false);
     }
 
-    // RelExp：关系比较
     private Type analyzeRel(ASTNode node) {
         return analyzeBinary(node, false, false);
     }
 
-    // AddExp：加减表达式
     private Type analyzeAddExp(ASTNode node, boolean constContext) {
         return analyzeBinary(node, false, constContext);
     }
 
-    // MulExp：乘除模表达式
     private Type analyzeMulExp(ASTNode node, boolean constContext) {
         return analyzeBinary(node, false, constContext);
     }
 
-    // 二元表达式：算术、比较和逻辑运算
     private Type analyzeBinary(ASTNode node, boolean resultIsInt, boolean constContext) {
         if (node == null) {
             return null;
@@ -670,7 +630,6 @@ final public class Traverser {
         return result;
     }
 
-    // 检查逻辑操作数是否为 int 或 char
     private void checkLogicalOperand(Type operand, Token op) {
         if (operand == null || operand.isBasic()) {
             return;
@@ -680,7 +639,6 @@ final public class Traverser {
                 op == null ? DeclarationFallback : op.location());
     }
 
-    // 操作数：二元表达式子节点或 UnaryExp
     private Type analyzeOperand(ASTNode node, boolean constContext) {
         if (node == null) {
             return null;
@@ -716,7 +674,6 @@ final public class Traverser {
         return null;
     }
 
-    // 要求两侧为同一种基本类型
     private Type checkSameType(Type left, Type right, Token op) {
         if (left == null || right == null) {
             return null;
@@ -730,7 +687,6 @@ final public class Traverser {
         return null;
     }
 
-    // UnaryExp：一元表达式的各分支
     private Type analyzeUnaryExp(UnaryExp exp, boolean constContext) {
         if (exp == null) {
             return null;
@@ -749,7 +705,6 @@ final public class Traverser {
         return type;
     }
 
-    // UnaryExp：显式类型转换
     private Type analyzeCast(UnaryExp exp, boolean constContext) {
         Type operand = analyzeUnaryExp(exp.getOperand(), constContext);
         if (operand != null && !operand.isBasic()) {
@@ -760,7 +715,6 @@ final public class Traverser {
         return exp.getCastType().is(TokenType.Char) ? Type.Char : Type.Int;
     }
 
-    // UnaryExp：一元运算符 +、-、!
     private Type analyzeUnaryOp(UnaryExp exp, boolean constContext) {
         
         Type operand = analyzeUnaryExp(exp.getOperand(), constContext);
@@ -779,7 +733,6 @@ final public class Traverser {
         return exp.getOp().getToken().is(TokenType.Not) ? Type.Int : operand;
     }
 
-    // 检查直接相邻的一元运算符是否重复
     private void checkConsecutiveUnary(UnaryExp outer, Type operandType) {
         if (operandType == null || outer.getOp() == null) {
             return;
@@ -799,7 +752,7 @@ final public class Traverser {
         }
     }
 
-    // UnaryExp：函数调用
+    // UnaryExp -> Ident '(' [FuncRParams] ')'
     private Type analyzeCall(UnaryExp exp, boolean constContext) {
         Token ident = exp.getIdent();
         List<Exp> args = exp.getParams() == null
@@ -821,7 +774,6 @@ final public class Traverser {
             errors.add(ErrorType.UndefinedReference, ident.location());
             return null;
         }
-        semanticInfo.bind(exp, function);
         if (constContext) {
             //c:UndefinedReference
             errors.add(ErrorType.UndefinedReference, ident.location());
@@ -848,7 +800,6 @@ final public class Traverser {
         return (Type) function.getType();
     }
 
-    // PrimaryExp：括号表达式、左值或数值
     private Type analyzePrimaryExp(PrimaryExp exp, boolean constContext) {
         if (exp == null) {
             return null;
@@ -866,17 +817,13 @@ final public class Traverser {
         return type;
     }
 
-    // Number：整数或字符字面量
     private Type analyzeNumber(Number number) {
         if (number == null || number.getToken() == null) {
             return null;
         }
-        Type type = number.getToken().is(TokenType.CharConst) ? Type.Char : Type.Int;
-        put(number, type);
-        return type;
+        return number.getToken().is(TokenType.CharConst) ? Type.Char : Type.Int;
     }
 
-    // LVal：标识符及可选数组下标
     private Type analyzeLVal(LVal lval, boolean constContext) {
         if (lval == null) {
             return null;
@@ -920,11 +867,9 @@ final public class Traverser {
         return element;
     }
 
-    // 缓存节点类型，并标记 char 运算结果供常量求值使用
     private void put(ASTNode node, Type type) {
         if (node != null && type != null) {
             types.put(node, type);
-            semanticInfo.putType(node, type);
             if (node instanceof BinaryExp binary) {
                 binary.setCharResult(type.isChar());
             } else if (node instanceof UnaryExp unary) {
@@ -933,7 +878,6 @@ final public class Traverser {
         }
     }
 
-    // 判断初值或实参与目标类型是否兼容
     private boolean compatible(Type formal, Type actual) {
         if (formal == null || actual == null) {
             return true;
@@ -944,7 +888,6 @@ final public class Traverser {
         return formal.equals(actual);
     }
 
-    // 从表达式节点定位用于报错的记号
     private Navigation lineOf(ASTNode node) {
         if (node instanceof LVal lval && lval.getIdent() != null) {
             return lval.getIdent().location();
